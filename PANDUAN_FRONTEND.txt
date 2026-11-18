@@ -1,0 +1,48 @@
+ATLOF - Frontend XHTML 1.0 Strict (Revisi 3)
+==================================================
+Buka index.xhtml lewat browser, atau letakkan folder ini di xampp/htdocs.
+
+FONT
+- IBM Plex Sans (semua teks, judul, dan header) dan IBM Plex Mono
+  (label/ID) disimpan lokal di folder fonts/. Tidak perlu internet;
+  jangan hapus folder fonts/.
+
+AKUN PREVIEW ADMIN CS (hanya untuk menguji frontend lokal)
+- cs1@atlof.test  : Kampus 1 - Gedung Alfonsus Mrican
+- cs2@atlof.test  : Kampus 2 - Gedung Thomas Aquinas
+- cs3@atlof.test  : Kampus 3 - Gedung Bonaventura
+- cs4@atlof.test  : Kampus 4 - Gedung Theresa
+Password uji untuk keempat akun: ATLOFcs2026!
+Alamat .test adalah alamat contoh, BUKAN email resmi UAJY.
+
+Setelah login sebagai CS, buka Profil dan isi nomor WhatsApp layanan
+masing-masing kampus. Nomor tersimpan secara terpisah di sessionStorage.
+Nomor WhatsApp sebenarnya belum ditentukan: jangan memakai nomor palsu atau
+nomor pribadi tanpa izin pemilik. Bila kosong, kontak WA tidak muncul pada detail.
+
+PENGUJIAN STATUS
+- Pengguna biasa: buat laporan, buka Laporan Saya, ubah pilihan di dropdown
+  dan klik Simpan status. Status bisa diubah lagi (untuk barang yang tidak dititipkan ke CS).
+- Admin CS: buka Dasbor CS, pilih status 'Menunggu diterima', 'Diterima CS',
+  atau 'Sudah dikembalikan'. Barang harus diterima dahulu sebelum bisa dikembalikan.
+- Admin dapat membuat laporan lewat form yang sama dengan pengguna biasa.
+- Tiap dasbor CS hanya menampilkan barang yang dititipkan pada kampusnya.
+
+PENTING
+Semua login, peran, dan perubahan data ini masih berupa interaksi frontend.
+JavaScript dan sessionStorage TIDAK memberikan keamanan akun atau kontrol hak akses
+sebenarnya. Saat backend PHP + MySQL dibuat, autentikasi, pengecekan role, status,
+kepemilikan laporan, dan validasi harus diterapkan ulang di SERVER.
+Jangan menggunakan password uji di sistem sebenarnya.
+
+LUPA PASSWORD (SIMULASI FRONTEND)
+- Klik "Lupa password?" pada halaman masuk, lalu masukkan email akun.
+- Jika akun ditemukan, tautan "Ubah password" akan muncul.
+- Password baru disimpan di localStorage browser: kunci atlofAkunLokal untuk
+  pengguna dan atlofPasswordCS untuk penimpa password Admin CS.
+- Login sekarang memeriksa password yang tersimpan. Password uji bawaan Admin CS
+  tetap ATLOFcs2026! sampai diubah lewat alur lupa password.
+- PERINGATAN: password disimpan apa adanya (tanpa hash/enkripsi) dan hanya untuk
+  simulasi. localStorage dapat dibaca oleh siapa pun yang memakai browser ini.
+  Jangan memakai kata sandi sungguhan.
+

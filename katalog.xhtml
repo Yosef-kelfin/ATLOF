@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Katalog - ATLOF</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+
+<body>
+    <div class="header-utama">
+        <div class="container navbar">
+            <div class="logo">
+                <span>ATLOF<small>Atma Lost &amp; Found</small></span>
+            </div>
+            <div class="menu-links">
+                <a href="index.xhtml">Beranda</a>
+                <a href="katalog.xhtml" class="active">Katalog</a>
+                <a href="buat_laporan.xhtml">Buat Laporan</a>
+                <a href="laporan_saya.xhtml">Laporan Saya</a>
+            </div>
+            <div class="menu-akun" id="menu-akun">
+                <a href="login.xhtml" class="tombol tombol-outline tombol-kecil">Masuk</a>
+                <a href="pendaftaran.xhtml" class="tombol tombol-kuning tombol-kecil">Daftar</a>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="container bagian katalog-page">
+            <div class="page-intro">
+                <h1>Cari barang hilang dan ditemukan</h1>
+                <p class="subjudul">Telusuri laporan dari berbagai kampus UAJY dan gunakan filter untuk menemukan barang
+                    yang kamu cari.</p>
+            </div>
+            <form id="form-cari" class="cari" action="katalog.xhtml" method="get"><label for="cari">Cari nama atau ciri
+                    barang</label>
+                <div class="cari-baris"><input id="cari" type="text" name="cari" /><button class="tombol tombol-kuning"
+                        type="submit">Cari barang</button></div>
+            </form>
+            <div class="layout-katalog">
+                <div class="panel-filter">
+                    <h2>Saring laporan</h2>
+                    <p>Pilih beberapa filter agar pencarian lebih sesuai.</p>
+                    <div class="field"><label for="filter-jenis">Jenis laporan</label><select id="filter-jenis">
+                            <option value="">Semua jenis</option>
+                            <option value="hilang">Hilang</option>
+                            <option value="ditemukan">Ditemukan</option>
+                        </select></div>
+                    <div class="field"><label for="filter-kategori">Kategori</label><select id="filter-kategori">
+                            <option value="">Semua kategori</option>
+                            <option value="tumbler">Tumbler</option>
+                            <option value="pakaian_jaket">Pakaian / Jaket</option>
+                            <option value="elektronik">Elektronik</option>
+                            <option value="dompet_kartu">Dompet / Kartu</option>
+                            <option value="kunci">Kunci</option>
+                            <option value="lainnya">Lainnya</option>
+                        </select></div>
+                    <div class="field"><label for="filter-lokasi">Lokasi kampus</label><select id="filter-lokasi">
+                            <option value="">Semua lokasi</option>
+                            <option value="Kampus 1">Kampus 1 - Gedung Alfonsus Mrican</option>
+                            <option value="Kampus 2">Kampus 2 - Gedung Thomas Aquinas</option>
+                            <option value="Kampus 3">Kampus 3 - Gedung Bonaventura</option>
+                            <option value="Kampus 4">Kampus 4 - Gedung Theresa</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select></div>
+                    <div class="field"><label for="filter-status">Status barang</label><select id="filter-status">
+                            <option value="">Semua status</option>
+                            <option value="masih_dicari">Masih dicari</option>
+                            <option value="belum_dikembalikan">Belum dikembalikan</option>
+                            <option value="sudah_ditemukan">Sudah ditemukan</option>
+                            <option value="sudah_dikembalikan">Sudah dikembalikan</option>
+                        </select></div>
+                    <button id="tombol-filter" type="button" class="tombol tombol-kuning lebar-penuh">Terapkan
+                        filter</button>
+                    <button id="tombol-reset" type="button" class="tombol tombol-outline lebar-penuh">Bersihkan
+                        filter</button>
+                </div>
+                <div class="daftar-barang">
+                    <div class="judul-bagian">
+                        <div>
+                            <h2>Daftar laporan</h2>
+                            <p id="jumlah-barang" class="teks-abu">Memuat laporan...</p>
+                        </div>
+                    </div>
+                    <div id="semua-barang" class="grid-barang grid-katalog"></div>
+                    <p id="tidak-ada" class="kosong" style="display:none">Belum ada barang yang sesuai. Coba ubah kata
+                        kunci atau filter.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-utama">
+        <div class="container footer-isi">
+            <div class="footer-tentang">
+                <div class="footer-merk">
+                    <h3>ATLOF</h3>
+                </div>
+                <p>Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang barang hilang dan
+                    ditemukan.</p>
+                <span class="teks-emas">Temukan kembali, bantu kembali.</span>
+            </div>
+            <div class="footer-menu">
+                <h4>Jelajahi ATLOF</h4>
+                <a href="index.xhtml">Beranda</a>
+                <a href="katalog.xhtml">Cari barang</a>
+                <a href="buat_laporan.xhtml">Buat laporan</a>
+                <a href="laporan_saya.xhtml">Kelola laporan</a>
+            </div>
+            <div class="footer-kampus">
+                <div><strong>Untuk Lingkungan Kampus</strong>
+                    <p>Universitas Atma Jaya Yogyakarta</p><small>Kontak pelapor melalui Microsoft Teams. Pengembalian
+                        barang dilakukan dengan verifikasi kepemilikan.</small>
+                </div>
+            </div>
+        </div>
+        <div class="container footer-bawah"><span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span></div>
+    </div>
+    <script type="text/javascript" src="js/app.js"></script>
+</body>
+
+</html>
