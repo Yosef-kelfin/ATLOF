@@ -248,13 +248,14 @@ function keluar() {
 }
 
 // Cegah kunjungan langsung ke halaman khusus pengguna sebelum masuk.
-var halamanKhusus = ["katalog.xhtml", "detail.xhtml", "buat_laporan.xhtml", "edit_laporan.xhtml", "laporan_saya.xhtml", "profil.xhtml", "admin_cs.xhtml"];
+var halamanKhusus = ["katalog.xhtml", "detail.xhtml", "buat_laporan.xhtml", "edit_laporan.xhtml", "laporan_saya.xhtml", "profil.xhtml", "admin_cs.xhtml", "serah_terima.xhtml", "riwayat_serah_terima.xhtml"];
+var halamanAdminSaja = ["admin_cs.xhtml", "serah_terima.xhtml", "riwayat_serah_terima.xhtml"];
 var sekarang = halamanIni();
 if (!sudahMasuk() && halamanKhusus.indexOf(sekarang) != -1) {
     var tujuanHalaman = sekarang + window.location.search;
     pergiKeAkses(tujuanHalaman);
 }
-if (sudahMasuk() && sekarang == "admin_cs.xhtml" && !adalahAdmin()) {
+if (sudahMasuk() && !adalahAdmin() && halamanAdminSaja.indexOf(sekarang) != -1) {
     window.location.href = "index.xhtml";
 }
 
@@ -268,7 +269,7 @@ if (ambil("menu-akun") && sudahMasuk()) {
         var daftarMenu = document.querySelector(".menu-links");
         if (daftarMenu) {
             daftarMenu.innerHTML += '<a href="admin_cs.xhtml"' +
-                (sekarang == "admin_cs.xhtml" ? ' class="aktif"' : '') + '>Dasbor CS</a>';
+                (sekarang == "admin_cs.xhtml" ? ' class="aktif"' : '') + '>Dashboard CS</a>';
         }
     }
 }
@@ -569,11 +570,7 @@ function perbaruiLaporanSaya() {
         if (b.jenis == "hilang") hilang++;
         else ditemukan++;
         var dititipCS = b.jenis == "ditemukan" && b.penyimpanan.indexOf("CS Kampus ") == 0;
-        isi += '<div class="kartu-kelola" id="kelola-' + b.id + '">' + buatKartu(b) +
-            '<div class="aksi-kelola">' +
-            '<a href="edit_laporan.xhtml?id=' + b.id + '" class="tombol tombol-outline tombol-kecil">Edit</a>' +
-            '<button type="button" class="tombol tombol-bahaya tombol-kecil" onclick="hapusLaporan(' + b.id + ')">Hapus</button>' +
-            '</div>';
+        isi += '<div class="kartu-kelola" id="kelola-' + b.id + '">' + buatKartu(b);
         if (dititipCS) {
             isi += '<p class="catatan-status">Status pengembalian dikelola oleh CS tempat barang dititipkan.</p>';
         } else {
@@ -581,7 +578,10 @@ function perbaruiLaporanSaya() {
                 pilihanStatus(b, "status-") +
                 '<button type="button" class="tombol tombol-kuning tombol-kecil" onclick="simpanStatus(' + b.id + ')">Simpan status</button></div>';
         }
-        isi += '</div>';
+        isi += '<div class="aksi-kelola">' +
+            '<a href="edit_laporan.xhtml?id=' + b.id + '" class="tombol tombol-outline tombol-kecil">Edit</a>' +
+            '<button type="button" class="tombol tombol-bahaya tombol-kecil" onclick="hapusLaporan(' + b.id + ')">Hapus</button>' +
+            '</div></div>';
     }
     ambil("barang-saya").innerHTML = isi;
     teks("total-saya", daftar.length);
@@ -689,8 +689,13 @@ function pasangKalender() {
         kalender.style.display = "block";
     }
 
-    ambil("buka-kalender").onclick = bukaKalender;
     input.onclick = bukaKalender;
+    input.onkeydown = function (event) {
+        if (event.key == "Enter" || event.key == " ") {
+            event.preventDefault();
+            bukaKalender();
+        }
+    };
     ambil("bulan-sebelum").onclick = function () {
         bulanSaatIni--;
         if (bulanSaatIni < 0) {
@@ -953,74 +958,438 @@ function daftarBarangCS() {
     return hasil;
 }
 
+var halamanAdmin = 1;
+var jumlahPerHalamanAdmin = 5;
+
 function tampilkanDashboardCS() {
     if (!ambil("daftar-admin") || !adalahAdmin()) return;
     var daftar = daftarBarangCS();
-    var isi = "";
+    var cari = ambil("cari-admin").value.toLowerCase().trim();
+    var filter = ambil("filter-status-admin").value;
+    var hasil = [];
     var menunggu = 0;
     var diterima = 0;
     var selesai = 0;
+
     for (var i = 0; i < daftar.length; i++) {
         var b = daftar[i];
         var kondisi = statusCS(b);
         if (kondisi == "menunggu") menunggu++;
         if (kondisi == "diterima") diterima++;
         if (kondisi == "dikembalikan") selesai++;
-        isi += '<div class="baris-admin">' +
-            '<div class="info-admin"><img src="' + bersihkan(b.gambar) + '" alt="Foto kategori barang" />' +
-            '<div><h3><a href="detail.xhtml?id=' + b.id + '">' + bersihkan(b.nama) + '</a></h3>' +
-            '<p>' + bersihkan(b.pelapor) + ' · ' + bersihkan(namaKampus(b.lokasi)) + '</p>' +
-            '<span class="lencana">' + namaStatusCS(kondisi) + '</span></div></div>' +
-            '<div class="kontrol-admin"><label for="status-cs-' + b.id + '">Status penanganan</label>' +
-            '<select id="status-cs-' + b.id + '">' +
-            '<option value="menunggu"' + (kondisi == "menunggu" ? ' selected="selected"' : '') + '>Menunggu diterima</option>' +
-            '<option value="diterima"' + (kondisi == "diterima" ? ' selected="selected"' : '') + '>Diterima CS</option>' +
-            '<option value="dikembalikan"' + (kondisi == "dikembalikan" ? ' selected="selected"' : '') + '>Sudah dikembalikan</option>' +
-            '</select><button type="button" class="tombol tombol-kuning tombol-kecil" onclick="simpanStatusCS(' + b.id + ')">Simpan status</button></div></div>';
+        var cocokNama = b.nama.toLowerCase().indexOf(cari) != -1;
+        var cocokId = String(b.id).indexOf(cari) != -1;
+        var cocokStatus = filter == "semua" || kondisi == filter;
+        if ((cocokNama || cocokId) && cocokStatus) hasil.push(b);
     }
-    teks("subjudul-admin", "Kelola barang yang dititipkan di " + namaKampus(dataAkun().kampus_cs) + ".");
+
+    // Tampilkan laporan paling baru di atas.
+    hasil.sort(function (a, b) { return Number(b.id) - Number(a.id); });
+
+    teks("subjudul-admin", "Kelola barang titipan di " + namaKampus(dataAkun().kampus_cs) + ".");
     teks("admin-total", daftar.length);
     teks("admin-menunggu", menunggu);
     teks("admin-diterima", diterima);
     teks("admin-selesai", selesai);
     teks("nomor-wa-admin", dataAkun().telepon || "Belum diatur");
+    teks("jumlah-hasil-admin", hasil.length + " dari " + daftar.length + " barang");
+
+    var totalHalaman = Math.max(1, Math.ceil(hasil.length / jumlahPerHalamanAdmin));
+    if (halamanAdmin > totalHalaman) halamanAdmin = totalHalaman;
+    var awal = (halamanAdmin - 1) * jumlahPerHalamanAdmin;
+    var akhir = Math.min(awal + jumlahPerHalamanAdmin, hasil.length);
+    var isi = "";
+
+    for (var j = awal; j < akhir; j++) {
+        var barangCS = hasil[j];
+        var status = statusCS(barangCS);
+        var namaTombol = status == "dikembalikan" ? "Lihat serah terima" : "Kelola serah terima";
+        isi += '<div class="baris-admin">' +
+            '<div class="info-admin"><img src="' + bersihkan(barangCS.gambar) + '" alt="Foto kategori barang" />' +
+            '<div><h3><a href="detail.xhtml?id=' + Number(barangCS.id) + '">' + bersihkan(barangCS.nama) + '</a></h3>' +
+            '<p>ID #' + Number(barangCS.id) + ' · ' + bersihkan(namaKampus(barangCS.lokasi)) + '</p>' +
+            '<span class="lencana">' + namaStatusCS(status) + '</span></div></div>' +
+            '<div class="kontrol-admin"><a class="tombol tombol-outline tombol-kecil" href="serah_terima.xhtml?id=' +
+            Number(barangCS.id) + '">' + namaTombol + '</a></div></div>';
+    }
+
     ambil("daftar-admin").innerHTML = isi;
-    ambil("kosong-admin").style.display = daftar.length ? "none" : "block";
+    ambil("kosong-admin").style.display = hasil.length ? "none" : "block";
+    ambil("halaman-dashboard").style.display = hasil.length ? "flex" : "none";
+    teks("info-halaman-admin", "Halaman " + halamanAdmin + " dari " + totalHalaman);
+    ambil("admin-sebelumnya").disabled = halamanAdmin == 1;
+    ambil("admin-berikutnya").disabled = halamanAdmin == totalHalaman;
 }
 
-function simpanStatusCS(id) {
-    if (!adalahAdmin()) return;
-    var laporan = cariBarang(id);
-    if (!laporan || laporan.penyimpanan != "CS " + dataAkun().kampus_cs) return;
-    var statusBaru = ambil("status-cs-" + id).value;
-    if (statusCS(laporan) == statusBaru) {
-        pesan("Status penanganan belum berubah.");
-        return;
-    }
-    if (statusBaru == "dikembalikan" && statusCS(laporan) == "menunggu") {
-        pesan("Konfirmasi penerimaan barang terlebih dahulu sebelum mencatat pengembalian.");
-        return;
-    }
-    if (!confirm("Ubah penanganan barang menjadi '" + namaStatusCS(statusBaru) + "'?")) return;
-    laporan.status_cs = statusBaru;
-    laporan.status = statusBaru == "dikembalikan" ? "sudah_dikembalikan" : "belum_dikembalikan";
-    var daftar = laporanSaya();
-    var ditemukan = false;
+if (ambil("daftar-admin") && adalahAdmin()) {
+    ambil("cari-admin").oninput = function () {
+        halamanAdmin = 1;
+        tampilkanDashboardCS();
+    };
+    ambil("filter-status-admin").onchange = function () {
+        halamanAdmin = 1;
+        tampilkanDashboardCS();
+    };
+    ambil("admin-sebelumnya").onclick = function () {
+        if (halamanAdmin > 1) halamanAdmin--;
+        tampilkanDashboardCS();
+    };
+    ambil("admin-berikutnya").onclick = function () {
+        halamanAdmin++;
+        tampilkanDashboardCS();
+    };
+    tampilkanDashboardCS();
+}
+
+/* ========== SERAH TERIMA BARANG (ADMIN CS) ========== */
+
+// Catatan terpisah dari laporan barang, memakai id laporan sebagai penghubung.
+// Pada versi frontend, data disimpan di sessionStorage.
+function semuaCatatan() {
+    return bacaSesi("atlofSerahTerima", []);
+}
+
+function simpanCatatan(daftar) {
+    simpanSesi("atlofSerahTerima", daftar);
+}
+
+function catatanKampusSaya() {
+    var daftar = semuaCatatan();
+    var hasil = [];
+    var kampus = dataAkun().kampus_cs;
     for (var i = 0; i < daftar.length; i++) {
-        if (daftar[i].id == id) {
-            daftar[i].status_cs = laporan.status_cs;
-            daftar[i].status = laporan.status;
+        if (daftar[i].kampus_cs == kampus) hasil.push(daftar[i]);
+    }
+    return hasil;
+}
+
+function cariCatatan(id) {
+    var daftar = catatanKampusSaya();
+    for (var i = 0; i < daftar.length; i++) {
+        if (daftar[i].id == id) return daftar[i];
+    }
+    return null;
+}
+
+function adaCatatan(daftar, idLaporan, jenis, kecualiId) {
+    for (var i = 0; i < daftar.length; i++) {
+        if (daftar[i].id_laporan == idLaporan && daftar[i].jenis == jenis && daftar[i].id != kecualiId) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function namaJenisSerah(jenis) {
+    return jenis == "pengembalian" ? "Pengembalian barang" : "Penerimaan barang";
+}
+
+function waktuCatatan() {
+    var waktu = new Date();
+    function dua(angka) { return angka < 10 ? "0" + angka : String(angka); }
+    return dua(waktu.getDate()) + "-" + dua(waktu.getMonth() + 1) + "-" + waktu.getFullYear() +
+        " " + dua(waktu.getHours()) + ":" + dua(waktu.getMinutes());
+}
+
+// Setelah CRUD serah terima, samakan status laporan dan status CS.
+function sesuaikanStatusLaporan(idLaporan) {
+    var daftar = semuaCatatan();
+    var diterima = adaCatatan(daftar, idLaporan, "penerimaan", null);
+    var kembali = adaCatatan(daftar, idLaporan, "pengembalian", null);
+    var statusCSBaru = kembali ? "dikembalikan" : (diterima ? "diterima" : "menunggu");
+    var statusLaporan = kembali ? "sudah_dikembalikan" : "belum_dikembalikan";
+
+    var laporan = laporanSaya();
+    var ditemukan = false;
+    for (var i = 0; i < laporan.length; i++) {
+        if (laporan[i].id == idLaporan) {
+            laporan[i].status_cs = statusCSBaru;
+            laporan[i].status = statusLaporan;
             ditemukan = true;
         }
     }
     if (ditemukan) {
-        simpanSesi("atlofLaporan", daftar);
+        simpanSesi("atlofLaporan", laporan);
     } else {
-        var perubahan = bacaSesi("atlofPerubahanContoh", {});
-        perubahan[id] = { status_cs: laporan.status_cs, status: laporan.status };
-        simpanSesi("atlofPerubahanContoh", perubahan);
+        var contoh = bacaSesi("atlofPerubahanContoh", {});
+        contoh[idLaporan] = { status_cs: statusCSBaru, status: statusLaporan };
+        simpanSesi("atlofPerubahanContoh", contoh);
     }
-    tampilkanDashboardCS();
 }
 
-if (ambil("daftar-admin")) tampilkanDashboardCS();
+var idSerahSekarang = 0;
+var idCatatanEditSerah = 0;
+var halamanRiwayatCS = 1;
+var jumlahRiwayatPerHalaman = 8;
+
+// Ambil barang hanya dari daftar titipan kampus CS yang sedang login.
+function barangSerahSaya(idLaporan) {
+    var daftar = daftarBarangCS();
+    for (var i = 0; i < daftar.length; i++) {
+        if (Number(daftar[i].id) === Number(idLaporan)) return daftar[i];
+    }
+    return null;
+}
+
+function riwayatUntukBarang(idLaporan) {
+    var semua = catatanKampusSaya();
+    var hasil = [];
+    for (var i = 0; i < semua.length; i++) {
+        if (Number(semua[i].id_laporan) === Number(idLaporan)) hasil.push(semua[i]);
+    }
+    hasil.sort(function (a, b) { return Number(b.id) - Number(a.id); });
+    return hasil;
+}
+
+function jenisBerikutnyaSerah(daftar) {
+    var adaPenerimaan = false;
+    var adaPengembalian = false;
+    for (var i = 0; i < daftar.length; i++) {
+        if (daftar[i].jenis === "penerimaan") adaPenerimaan = true;
+        if (daftar[i].jenis === "pengembalian") adaPengembalian = true;
+    }
+    if (!adaPenerimaan) return "penerimaan";
+    if (!adaPengembalian) return "pengembalian";
+    return "selesai";
+}
+
+function tampilkanHalamanSerah() {
+    if (!ambil("serah-konten") || !adalahAdmin()) return;
+
+    var barangCS = barangSerahSaya(idSerahSekarang);
+    if (!barangCS) {
+        ambil("serah-konten").style.display = "none";
+        ambil("serah-tidak-ada").style.display = "block";
+        return;
+    }
+
+    ambil("serah-tidak-ada").style.display = "none";
+    ambil("serah-konten").style.display = "block";
+    teks("serah-nama-barang", barangCS.nama);
+    teks("serah-id-laporan", "#" + barangCS.id);
+    teks("serah-kampus", namaKampus(dataAkun().kampus_cs));
+    teks("serah-penyimpanan", namaKampus(barangCS.penyimpanan));
+
+    var daftar = riwayatUntukBarang(idSerahSekarang);
+    var berikutnya = jenisBerikutnyaSerah(daftar);
+    var statusTampil = berikutnya === "penerimaan" ? "Menunggu pencatatan penerimaan" :
+        berikutnya === "pengembalian" ? "Diterima CS" : "Sudah dikembalikan";
+    teks("serah-status", statusTampil);
+    ambil("kotak-form-serah").style.display = berikutnya === "selesai" ? "none" : "block";
+
+    if (berikutnya !== "selesai") {
+        ambil("form-serah-baru").reset();
+        ambil("id-catatan-edit-baru").value = "";
+        teks("judul-form-serah-baru", berikutnya === "penerimaan" ? "Catat penerimaan barang" : "Catat pengembalian barang");
+        teks("keterangan-form-serah", berikutnya === "penerimaan" ?
+            "Isi data setelah barang benar-benar diterima CS." :
+            "Catat setelah barang diserahkan kepada pemilik yang sudah diverifikasi.");
+        ambil("jenis-serah-tampil").value = namaJenisSerah(berikutnya);
+        teks("label-pihak-serah", berikutnya === "penerimaan" ? "Nama penyerah" : "Nama penerima");
+        teks("tombol-simpan-serah", "Simpan " + (berikutnya === "penerimaan" ? "penerimaan" : "pengembalian"));
+        ambil("konfirmasi-kembali").style.display = berikutnya === "pengembalian" ? "block" : "none";
+        ambil("batal-edit-serah").style.display = "none";
+        idCatatanEditSerah = 0;
+    }
+
+    var isi = "";
+    for (var i = 0; i < daftar.length; i++) {
+        var c = daftar[i];
+        isi += '<div class="serah-item">' +
+            '<h3>' + bersihkan(namaJenisSerah(c.jenis)) + '</h3>' +
+            '<p><strong>Waktu:</strong> ' + bersihkan(c.waktu) + '</p>' +
+            '<p><strong>' + (c.jenis === "penerimaan" ? "Penyerah" : "Penerima") +
+            ':</strong> ' + bersihkan(c.nama_pihak) + '</p>' +
+            '<p><strong>Petugas:</strong> ' + bersihkan(c.petugas) + '</p>' +
+            (c.catatan ? '<p><strong>Keterangan:</strong> ' + bersihkan(c.catatan) + '</p>' : '') +
+            '<div class="aksi">' +
+            '<button type="button" class="tombol tombol-outline tombol-kecil" onclick="mulaiEditSerah(' + Number(c.id) + ')">Edit</button>' +
+            '<button type="button" class="tombol tombol-bahaya tombol-kecil" onclick="hapusCatatanSerah(' + Number(c.id) + ')">Hapus</button>' +
+            '</div></div>';
+    }
+    ambil("riwayat-barang-serah").innerHTML = isi;
+    ambil("kosong-riwayat-barang").style.display = daftar.length ? "none" : "block";
+}
+
+function mulaiEditSerah(idCatatan) {
+    if (!adalahAdmin()) return;
+    var catatan = cariCatatan(Number(idCatatan));
+    if (!catatan || Number(catatan.id_laporan) !== idSerahSekarang) return;
+
+    idCatatanEditSerah = Number(catatan.id);
+    ambil("kotak-form-serah").style.display = "block";
+    ambil("id-catatan-edit-baru").value = String(catatan.id);
+    ambil("jenis-serah-tampil").value = namaJenisSerah(catatan.jenis);
+    ambil("nama-pihak-serah").value = catatan.nama_pihak;
+    ambil("keterangan-serah-baru").value = catatan.catatan || "";
+    teks("judul-form-serah-baru", "Edit catatan " + (catatan.jenis === "penerimaan" ? "penerimaan" : "pengembalian"));
+    teks("label-pihak-serah", catatan.jenis === "penerimaan" ? "Nama penyerah" : "Nama penerima");
+    teks("keterangan-form-serah", "Perbaiki nama pihak atau keterangan. Jenis transaksi dan barang tidak bisa diubah.");
+    teks("tombol-simpan-serah", "Simpan perubahan");
+    ambil("konfirmasi-kembali").style.display = "none";
+    ambil("batal-edit-serah").style.display = "inline-block";
+    ambil("kotak-form-serah").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function batalEditSerah() {
+    idCatatanEditSerah = 0;
+    tampilkanHalamanSerah();
+}
+
+function hapusCatatanSerah(idCatatan) {
+    if (!adalahAdmin()) return;
+    var c = cariCatatan(Number(idCatatan));
+    if (!c || Number(c.id_laporan) !== idSerahSekarang) return;
+    var daftar = semuaCatatan();
+    if (c.jenis === "penerimaan" && adaCatatan(daftar, idSerahSekarang, "pengembalian", null)) {
+        pesan("Hapus catatan pengembalian terlebih dahulu sebelum menghapus penerimaan.");
+        return;
+    }
+    if (!confirm("Hapus catatan " + namaJenisSerah(c.jenis).toLowerCase() + " ini?")) return;
+    var hasil = [];
+    for (var i = 0; i < daftar.length; i++) {
+        if (Number(daftar[i].id) !== Number(idCatatan)) hasil.push(daftar[i]);
+    }
+    simpanCatatan(hasil);
+    sesuaikanStatusLaporan(idSerahSekarang);
+    idCatatanEditSerah = 0;
+    tampilkanHalamanSerah();
+    pesan("Catatan berhasil dihapus.");
+}
+
+// Halaman Kelola Serah Terima dibuka dengan serah_terima.xhtml?id=ID_LAPORAN.
+if (ambil("serah-konten")) {
+    var parameterSerah = new URLSearchParams(window.location.search);
+    var idDariAlamat = parameterSerah.get("id");
+    idSerahSekarang = /^\d+$/.test(idDariAlamat || "") ? Number(idDariAlamat) : 0;
+
+    if (adalahAdmin()) {
+        tampilkanHalamanSerah();
+        ambil("batal-edit-serah").onclick = batalEditSerah;
+        ambil("form-serah-baru").onsubmit = function (event) {
+            event.preventDefault();
+            var barangCS = barangSerahSaya(idSerahSekarang);
+            if (!barangCS) return;
+
+            var nama = ambil("nama-pihak-serah").value.trim();
+            var keterangan = ambil("keterangan-serah-baru").value.trim();
+            if (!nama) {
+                pesan("Nama penyerah atau penerima harus diisi.");
+                return;
+            }
+            var daftar = semuaCatatan();
+            if (idCatatanEditSerah) {
+                var lama = cariCatatan(idCatatanEditSerah);
+                if (!lama || Number(lama.id_laporan) !== idSerahSekarang) return;
+                if (!confirm("Simpan perubahan catatan ini?")) return;
+                for (var i = 0; i < daftar.length; i++) {
+                    if (Number(daftar[i].id) === idCatatanEditSerah) {
+                        daftar[i].nama_pihak = nama;
+                        daftar[i].catatan = keterangan;
+                    }
+                }
+            } else {
+                var jenis = jenisBerikutnyaSerah(riwayatUntukBarang(idSerahSekarang));
+                if (jenis === "selesai") {
+                    pesan("Penerimaan dan pengembalian barang sudah dicatat.");
+                    return;
+                }
+                if (jenis === "pengembalian" && !ambil("cek-verifikasi-serah").checked) {
+                    pesan("Centang konfirmasi verifikasi kepemilikan sebelum mencatat pengembalian.");
+                    return;
+                }
+                if (!confirm("Simpan catatan " + namaJenisSerah(jenis).toLowerCase() + " ini?")) return;
+                var idBaru = Date.now();
+                for (var j = 0; j < daftar.length; j++) {
+                    if (Number(daftar[j].id) >= idBaru) idBaru = Number(daftar[j].id) + 1;
+                }
+                daftar.push({
+                    id: idBaru,
+                    id_laporan: idSerahSekarang,
+                    kampus_cs: dataAkun().kampus_cs,
+                    email_cs: dataAkun().email,
+                    jenis: jenis,
+                    nama_pihak: nama,
+                    catatan: keterangan,
+                    petugas: dataAkun().nama,
+                    waktu: waktuCatatan()
+                });
+            }
+            simpanCatatan(daftar);
+            sesuaikanStatusLaporan(idSerahSekarang);
+            idCatatanEditSerah = 0;
+            tampilkanHalamanSerah();
+            pesan("Catatan berhasil disimpan.");
+        };
+    }
+}
+
+// Halaman Riwayat Serah Terima: tampilkan semua transaksi kampus yang sedang login.
+function tampilkanRiwayatCS() {
+    if (!ambil("daftar-riwayat-cs") || !adalahAdmin()) return;
+    var seluruh = catatanKampusSaya();
+    var cari = ambil("cari-riwayat-cs").value.toLowerCase().trim();
+    var filter = ambil("jenis-riwayat-cs").value;
+    var hasil = [];
+
+    for (var i = 0; i < seluruh.length; i++) {
+        var c = seluruh[i];
+        var b = barangSerahSaya(c.id_laporan);
+        if (!b) continue;
+        var kata = (b.nama + " " + b.id + " " + c.nama_pihak).toLowerCase();
+        if ((filter === "semua" || filter === c.jenis) && kata.indexOf(cari) !== -1) {
+            hasil.push(c);
+        }
+    }
+
+    hasil.sort(function (a, b) { return Number(b.id) - Number(a.id); });
+    teks("jumlah-riwayat-cs", hasil.length + " dari " + seluruh.length + " catatan");
+    teks("keterangan-riwayat-cs", "Riwayat penerimaan dan pengembalian di " + namaKampus(dataAkun().kampus_cs) + ".");
+
+    var jumlahHalaman = Math.max(1, Math.ceil(hasil.length / jumlahRiwayatPerHalaman));
+    if (halamanRiwayatCS > jumlahHalaman) halamanRiwayatCS = jumlahHalaman;
+    var awal = (halamanRiwayatCS - 1) * jumlahRiwayatPerHalaman;
+    var akhir = Math.min(awal + jumlahRiwayatPerHalaman, hasil.length);
+    var html = "";
+
+    for (var j = awal; j < akhir; j++) {
+        var catatan = hasil[j];
+        var barangCS = barangSerahSaya(catatan.id_laporan);
+        html += '<div class="serah-item">' +
+            '<h3>' + bersihkan(barangCS.nama) + ' <span class="teks-abu">#' + Number(barangCS.id) + '</span></h3>' +
+            '<p><strong>Jenis:</strong> ' + bersihkan(namaJenisSerah(catatan.jenis)) + '</p>' +
+            '<p><strong>Waktu:</strong> ' + bersihkan(catatan.waktu) + '</p>' +
+            '<p><strong>' + (catatan.jenis === "penerimaan" ? "Penyerah" : "Penerima") +
+            ':</strong> ' + bersihkan(catatan.nama_pihak) + '</p>' +
+            '<p><strong>Petugas:</strong> ' + bersihkan(catatan.petugas) + '</p>' +
+            (catatan.catatan ? '<p><strong>Keterangan:</strong> ' + bersihkan(catatan.catatan) + '</p>' : '') +
+            '<div class="aksi"><a class="tombol tombol-outline tombol-kecil" href="serah_terima.xhtml?id=' +
+            Number(barangCS.id) + '">Lihat / kelola barang</a></div></div>';
+    }
+    ambil("daftar-riwayat-cs").innerHTML = html;
+    ambil("riwayat-cs-kosong").style.display = hasil.length ? "none" : "block";
+    ambil("halaman-riwayat-cs").style.display = hasil.length > jumlahRiwayatPerHalaman ? "flex" : "none";
+    teks("info-halaman-riwayat", "Halaman " + halamanRiwayatCS + " dari " + jumlahHalaman);
+    ambil("riwayat-sebelumnya").disabled = halamanRiwayatCS === 1;
+    ambil("riwayat-berikutnya").disabled = halamanRiwayatCS === jumlahHalaman;
+}
+
+if (ambil("daftar-riwayat-cs") && adalahAdmin()) {
+    ambil("cari-riwayat-cs").oninput = function () {
+        halamanRiwayatCS = 1;
+        tampilkanRiwayatCS();
+    };
+    ambil("jenis-riwayat-cs").onchange = function () {
+        halamanRiwayatCS = 1;
+        tampilkanRiwayatCS();
+    };
+    ambil("riwayat-sebelumnya").onclick = function () {
+        if (halamanRiwayatCS > 1) halamanRiwayatCS--;
+        tampilkanRiwayatCS();
+    };
+    ambil("riwayat-berikutnya").onclick = function () {
+        halamanRiwayatCS++;
+        tampilkanRiwayatCS();
+    };
+    tampilkanRiwayatCS();
+}

@@ -24,10 +24,23 @@ nomor pribadi tanpa izin pemilik. Bila kosong, kontak WA tidak muncul pada detai
 PENGUJIAN STATUS
 - Pengguna biasa: buat laporan, buka Laporan Saya, ubah pilihan di dropdown
   dan klik Simpan status. Status bisa diubah lagi (untuk barang yang tidak dititipkan ke CS).
-- Admin CS: buka Dasbor CS, pilih status 'Menunggu diterima', 'Diterima CS',
-  atau 'Sudah dikembalikan'. Barang harus diterima dahulu sebelum bisa dikembalikan.
+- Admin CS: buka Dashboard CS, cari/filter barang titipan, lalu klik
+  "Kelola serah terima". Catat penerimaan lebih dahulu, baru pengembalian.
+  Status laporan mengikuti catatan serah terima.
 - Admin dapat membuat laporan lewat form yang sama dengan pengguna biasa.
-- Tiap dasbor CS hanya menampilkan barang yang dititipkan pada kampusnya.
+- Tiap dashboard CS hanya menampilkan barang yang dititipkan pada kampusnya.
+
+SERAH TERIMA BARANG (ADMIN CS)
+- Dashboard CS punya pencarian nama/ID, filter status, dan navigasi halaman.
+- Tombol "Kelola serah terima" membuka serah_terima.xhtml?id=ID_LAPORAN.
+- Catat penerimaan (nama penyerah), lalu pengembalian (nama penerima dan centang
+  verifikasi kepemilikan). Pengembalian tidak bisa dicatat sebelum penerimaan.
+- Catatan bisa diedit atau dihapus. Penerimaan hanya bisa dihapus setelah
+  catatan pengembaliannya dihapus.
+- "Riwayat serah terima" (riwayat_serah_terima.xhtml) menampilkan semua catatan
+  kampus CS yang sedang login, lengkap dengan pencarian, filter jenis, dan
+  navigasi halaman.
+- Catatan disimpan di sessionStorage (atlofSerahTerima) untuk simulasi frontend.
 
 PENTING
 Semua login, peran, dan perubahan data ini masih berupa interaksi frontend.

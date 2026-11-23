@@ -54,8 +54,8 @@
                             </select></div>
                         <div class="field"><label for="tanggal">Tanggal kejadian <em>*</em></label>
                             <div class="tanggal-pilih">
-                                <input id="tanggal" name="tanggal" type="text" readonly="readonly" />
-                                <button type="button" id="buka-kalender" class="tombol-kalender">Pilih tanggal</button>
+                                <input id="tanggal" name="tanggal" type="text" readonly="readonly"
+                                    title="Pilih tanggal" />
                                 <div id="kotak-kalender" class="kalender" style="display:none;">
                                     <div class="kalender-atas">
                                         <button type="button" id="bulan-sebelum"
@@ -67,7 +67,7 @@
                                     <div id="hari-kalender" class="kalender-grid"></div>
                                 </div>
                             </div>
-                            <p class="bantuan">Klik untuk memilih tanggal kejadian melalui kalender.</p>
+                            <p class="bantuan">Klik kolom tanggal untuk membuka kalender.</p>
                         </div>
                     </div>
                     <div class="field"><label for="lokasi" id="label-lokasi">Lokasi hilang <em>*</em></label><select
@@ -98,13 +98,13 @@
                     </div>
                     <div class="field"><label for="deskripsi">Deskripsi barang <em>*</em></label><textarea
                             id="deskripsi" name="deskripsi" rows="4"></textarea>
-                        <p class="bantuan bantuan-penting">Tuliskan ciri umum secukupnya. Jangan ungkap seluruh ciri
+                        <p class="bantuan">Tuliskan ciri umum secukupnya. Jangan ungkap seluruh ciri
                             khusus atau informasi rahasia agar kepemilikan dapat diverifikasi saat ada yang mengklaim.
                         </p>
                     </div>
                     <div class="field"><label for="foto">Foto barang (opsional)</label><input type="file" id="foto"
                             name="foto" accept="image/png,image/jpeg,image/webp" />
-                        <p class="bantuan bantuan-penting">Jangan mengunggah foto KTP, KTM, SIM, atau dokumen identitas
+                        <p class="bantuan">Jangan mengunggah foto KTP, KTM, SIM, atau dokumen identitas
                             dengan data terbaca jelas. Blur atau tutupi nama, nomor identitas, alamat, dan informasi
                             sensitif sebelum mengunggah.</p>
                     </div>

@@ -4,7 +4,7 @@ Dokumentasi class CSS dan ID HTML untuk project **ATLOF (Atma Lost & Found)**.
 
 Dokumen ini memakai nama class dan ID yang **sudah ada**. Tidak ada rename pada project.
 
-Dokumen ini mencakup seluruh class dan ID yang ditemukan di 11 halaman `.xhtml`, `css/style.css`, dan string HTML di `js/app.js`, termasuk nama yang dibuat secara dinamis.
+Dokumen ini mencakup seluruh class dan ID yang ditemukan di 13 halaman `.xhtml`, `css/style.css`, dan string HTML di `js/app.js`, termasuk nama yang dibuat secara dinamis.
 
 ## Daftar isi
 
@@ -25,7 +25,8 @@ Dokumen ini mencakup seluruh class dan ID yang ditemukan di 11 halaman `.xhtml`,
 - Styling ada di `css/style.css`.
 - Logika halaman ada di `js/app.js`.
 - Data akun dan laporan disimpan di `localStorage` dan `sessionStorage` untuk simulasi.
-- Halaman terdiri dari 11 file `.xhtml`.
+- Admin CS mengelola barang titipan lewat alur **serah terima** (penerimaan lalu pengembalian) di `serah_terima.xhtml`; riwayatnya ada di `riwayat_serah_terima.xhtml`.
+- Halaman terdiri dari 13 file `.xhtml`.
 
 ## 2. Struktur file
 
@@ -41,6 +42,8 @@ ATLOF_Frontend_Revisi_5/
 ├── pendaftaran.xhtml
 ├── profil.xhtml
 ├── admin_cs.xhtml
+├── serah_terima.xhtml
+├── riwayat_serah_terima.xhtml
 ├── akses_akun.xhtml
 ├── css/
 │   └── style.css
@@ -79,7 +82,7 @@ Project juga bisa dibuka langsung lewat browser, tetapi beberapa browser membata
   - `baris-` untuk baris layout.
   - `panel-` untuk panel.
   - `footer-` untuk bagian footer.
-  - `admin-` dan `cs` untuk Dasbor Admin CS.
+  - `admin-` dan `cs` untuk Dashboard CS.
 - ID harus unik dalam satu halaman. ID yang sama boleh muncul di halaman berbeda.
 
 ## 5. Referensi class CSS
@@ -115,7 +118,7 @@ Project juga bisa dibuka langsung lewat browser, tetapi beberapa browser membata
 | `logo` | Blok merek ATLOF berisi ikon SVG dan teks | Semua halaman |
 | `menu-links` | Menu navigasi utama | Semua halaman |
 | `menu-akun` | Area tombol akun di kanan header | Semua halaman |
-| `aktif` | Menandai link navigasi yang sedang dibuka | `buat_laporan`, `detail`, `edit_laporan`, `index`, `katalog`, `laporan_saya`, dan link Dasbor CS yang dibuat JavaScript |
+| `aktif` | Menandai link navigasi yang sedang dibuka | `buat_laporan`, `detail`, `edit_laporan`, `index`, `katalog`, `laporan_saya`, dan link Dashboard CS yang dibuat JavaScript |
 | `tombol-keluar` | Varian tombol keluar di header | Dibuat JavaScript setelah login |
 
 ### 5.3 Tombol dan baris aksi
@@ -128,12 +131,11 @@ Project juga bisa dibuka langsung lewat browser, tetapi beberapa browser membata
 | `tombol-putih` | Tombol putih untuk latar gelap | `index` |
 | `tombol-kecil` | Tombol ukuran kecil | Semua halaman |
 | `tombol-bahaya` | Tombol untuk aksi berbahaya seperti hapus | `profil` dan tombol Hapus yang dibuat `app.js` |
-| `tombol-kalender` | Tombol pembuka kalender | `buat_laporan`, `edit_laporan` |
 | `lebar-penuh` | Membuat tombol atau tautan selebar container | `katalog`, `login`, `pendaftaran` |
 | `aksi` | Baris berisi beberapa tombol | `akses_akun`, `buat_laporan`, `edit_laporan`, `index`, `profil` |
 | `aksi-form` | Baris aksi di bagian bawah form | `buat_laporan`, `edit_laporan` |
 | `aksi-tengah` | Baris aksi rata tengah | `akses_akun` |
-| `aksi-kelola` | Baris tombol Edit dan Hapus pada kartu laporan | Dibuat `app.js` di `laporan_saya` |
+| `aksi-kelola` | Baris tombol Edit dan Hapus di bawah panel status, masih dalam satu kartu laporan | Dibuat `app.js` di `laporan_saya` |
 | `batal-profil` | Penanda tombol Batal pada form profil; belum punya aturan CSS | `profil` |
 | `lihat-password` | Hook checkbox untuk menampilkan password; belum punya aturan CSS | `login`, `pendaftaran` |
 
@@ -169,7 +171,7 @@ Project juga bisa dibuka langsung lewat browser, tetapi beberapa browser membata
 | `pilih-jenis` | Grup radio untuk jenis laporan | `buat_laporan`, `edit_laporan` |
 | `judul-form` | Judul di dalam kartu form | `buat_laporan`, `edit_laporan` |
 | `bantuan` | Teks bantuan kecil di bawah input | `buat_laporan`, `detail`, `edit_laporan`, `login`, `profil` |
-| `bantuan-penting` | Teks bantuan yang diberi garis peringatan | `buat_laporan`, `edit_laporan` |
+
 | `centang` | Label untuk checkbox | `login`, `pendaftaran` |
 | `panel-form` | Panel form yang bisa dibuka dan ditutup | `profil` |
 | `catatan` | Kotak catatan verifikasi barang | `detail` |
@@ -178,7 +180,7 @@ Project juga bisa dibuka langsung lewat browser, tetapi beberapa browser membata
 
 | Class | Fungsi | Dipakai di |
 | --- | --- | --- |
-| `tanggal-pilih` | Pembungkus input tanggal dan tombol kalender | `buat_laporan`, `edit_laporan` |
+| `tanggal-pilih` | Pembungkus input tanggal; klik input membuka kalender | `buat_laporan`, `edit_laporan` |
 | `kalender` | Panel kalender yang muncul di bawah input | `buat_laporan`, `edit_laporan` |
 | `kalender-atas` | Header kalender berisi tombol bulan dan nama bulan | `buat_laporan`, `edit_laporan` |
 | `kalender-grid` | Grid tujuh kolom untuk tanggal | `buat_laporan`, `edit_laporan` |
@@ -193,13 +195,13 @@ Project juga bisa dibuka langsung lewat browser, tetapi beberapa browser membata
 | `kartu-barang` | Kartu satu barang | Dibuat `app.js` untuk beranda, katalog, dan laporan saya |
 | `gambar-barang` | Tautan pembungkus gambar barang | Dibuat `app.js` |
 | `isi-kartu` | Bagian teks di dalam kartu barang | Dibuat `app.js` |
-| `lencana-baris` | Baris berisi lencana jenis dan status | `detail` dan dibuat `app.js` |
-| `lencana` | Lencana kecil untuk jenis atau status | `detail` dan dibuat `app.js` |
+| `lencana-baris` | Baris berisi lencana jenis barang | `detail` dan dibuat `app.js` |
+| `lencana` | Lencana kecil (IBM Plex Sans 11px) untuk jenis barang dan status | `detail` dan dibuat `app.js` |
 | `hilang` | Modifier lencana untuk laporan hilang | Dibuat `app.js` melalui `class="lencana ' + b.jenis + '"` |
 | `ditemukan` | Modifier lencana untuk laporan ditemukan | Dibuat `app.js` melalui `class="lencana ' + b.jenis + '"` |
-| `kartu-kelola` | Kartu laporan di halaman Laporan Saya | Dibuat `app.js` |
-| `pengaturan-status` | Panel dropdown dan tombol simpan status | Dibuat `app.js` |
-| `catatan-status` | Catatan bahwa status dikelola CS | Dibuat `app.js` |
+| `kartu-kelola` | Satu kartu laporan di Laporan Saya: info barang, panel status, dan tombol aksi | Dibuat `app.js` |
+| `pengaturan-status` | Panel "Ubah status laporan": label di atas, dropdown dan tombol "Simpan status" sejajar | Dibuat `app.js` |
+| `catatan-status` | Catatan bahwa status dikelola CS, menggantikan panel status | Dibuat `app.js` |
 
 ### 5.9 Detail barang
 
@@ -236,24 +238,33 @@ Project juga bisa dibuka langsung lewat browser, tetapi beberapa browser membata
 | --- | --- | --- |
 | `grid-akun` | Grid dua kolom: panel informasi dan kartu form | `login`, `pendaftaran` |
 | `panel-samping` | Panel informasi berwarna biru di kiri | `login`, `pendaftaran` |
+| `panel-tengah` | Modifier `panel-samping` di pendaftaran: lebar dan padding tetap sama seperti login, kotak dipusatkan (`align-self: center`) dengan tinggi minimal 440px, tidak mengikuti tinggi form | `pendaftaran` |
 | `kotak-form` | Kartu form autentikasi | `login`, `pendaftaran` |
 | `halaman-akses` | Scope halaman persyaratan akses | `akses_akun` |
 | `kotak-akses` | Kartu ajakan masuk atau daftar | `akses_akun` |
 | `aksi-tengah` | Baris tombol rata tengah | `akses_akun` |
 
-### 5.12 Dasbor Admin CS
+### 5.12 Dashboard CS
 
 | Class | Fungsi | Dipakai di |
 | --- | --- | --- |
-| `halaman-admin` | Scope halaman Dasbor Admin CS | `admin_cs` |
+| `halaman-admin` | Scope halaman Dashboard CS | `admin_cs` |
+| `dashboard-cs` | Penanda dan scope tambahan Dashboard CS | `admin_cs` |
+| `judul-dashboard` | Baris judul dan tombol aksi Dashboard CS | `admin_cs` |
+| `tombol-dashboard` | Grup tombol "+ Buat laporan" dan "Riwayat serah terima" | `admin_cs` |
 | `ringkasan-admin` | Grid empat kartu ringkasan | `admin_cs` |
 | `angka-admin` | Satu kartu angka ringkasan | `admin_cs` |
 | `panel-admin` | Panel judul dan kontak CS | `admin_cs` |
 | `baris-kontak-cs` | Baris nomor WhatsApp layanan CS | `admin_cs` |
+| `filter-dashboard` | Baris pencarian dan filter status barang titipan | `admin_cs` |
+| `cari-dashboard` | Kolom pencarian nama atau ID barang | `admin_cs` |
+| `status-dashboard` | Kolom filter status penanganan | `admin_cs` |
+| `jumlah-hasil-admin` | Teks jumlah barang yang cocok dengan filter | `admin_cs` |
 | `daftar-admin` | Wadah daftar barang titipan | `admin_cs` |
 | `baris-admin` | Satu baris barang titipan | Dibuat `app.js` |
 | `info-admin` | Bagian foto dan info barang | Dibuat `app.js` |
-| `kontrol-admin` | Dropdown dan tombol status penanganan | Dibuat `app.js` |
+| `kontrol-admin` | Tombol "Kelola serah terima" per barang | Dibuat `app.js` |
+| `halaman-dashboard` | Baris navigasi halaman daftar barang | `admin_cs` |
 
 ### 5.13 Footer
 
@@ -285,7 +296,7 @@ Tabel ini merangkum class yang tidak selalu terlihat di file `.xhtml`.
 | `gambar-barang` | `buatKartu()` | Tautan gambar barang |
 | `isi-kartu` | `buatKartu()` | Isi teks kartu |
 | `lencana-baris` | `buatKartu()` | Baris lencana |
-| `lencana` | `buatKartu()`, `tampilkanDashboardCS()` | Lencana status |
+| `lencana` | `buatKartu()`, `tampilkanDashboardCS()` | Lencana jenis barang atau status |
 | `hilang` | `buatKartu()` | Modifier lencana jenis hilang |
 | `ditemukan` | `buatKartu()` | Modifier lencana jenis ditemukan |
 | `kartu-kelola` | `perbaruiLaporanSaya()` | Kartu laporan di Laporan Saya |
@@ -294,14 +305,30 @@ Tabel ini merangkum class yang tidak selalu terlihat di file `.xhtml`.
 | `catatan-status` | `perbaruiLaporanSaya()` | Catatan status CS |
 | `baris-admin` | `tampilkanDashboardCS()` | Baris barang titipan |
 | `info-admin` | `tampilkanDashboardCS()` | Info barang titipan |
-| `kontrol-admin` | `tampilkanDashboardCS()` | Kontrol status barang |
+| `kontrol-admin` | `tampilkanDashboardCS()` | Tombol kelola serah terima barang |
 | `nama-hari` | `pasangKalender()` | Label hari kalender |
 | `pilih-hari` | `pasangKalender()` | Tombol tanggal kalender |
 | `tanggal-kosong` | `pasangKalender()` | Sel kosong kalender |
 | `pesan-form` | `pesan()` | Notifikasi global |
 | `gagal` | `pesan()` | Modifier notifikasi gagal |
 | `tombol-keluar` | Header setelah login | Tombol keluar |
-| `aktif` | Header admin | Menandai link Dasbor CS |
+| `aktif` | Header admin | Menandai link Dashboard CS |
+
+### 5.16 Serah terima barang
+
+| Class | Fungsi | Dipakai di |
+| --- | --- | --- |
+| `halaman-serah` | Scope halaman Kelola dan Riwayat Serah Terima | `serah_terima`, `riwayat_serah_terima` |
+| `serah-info-barang` | Kartu ringkasan barang yang dipilih | `serah_terima` |
+| `serah-info-grid` | Grid dua kolom info barang | `serah_terima` |
+| `layout-serah-baru` | Grid form catatan dan riwayat barang | `serah_terima` |
+| `kotak-daftar-serah` | Kartu riwayat barang | `serah_terima` |
+| `serah-list` | Wadah daftar catatan serah terima | `serah_terima`, `riwayat_serah_terima` |
+| `serah-item` | Satu catatan serah terima | Dibuat `app.js` |
+| `serah-kosong` | Keadaan kosong daftar catatan | `serah_terima`, `riwayat_serah_terima` |
+| `filter-riwayat-cs` | Baris pencarian dan filter riwayat | `riwayat_serah_terima` |
+| `serah-jumlah` | Teks jumlah catatan riwayat | `riwayat_serah_terima` |
+| `serah-pagination` | Navigasi halaman riwayat | `riwayat_serah_terima` |
 
 ## 6. Referensi ID per halaman
 
@@ -354,7 +381,6 @@ Semua halaman memiliki `#menu-akun` di header. ID tersebut dipakai `app.js` untu
 | `foto` | Input file foto barang |
 | `telepon` | Input nomor WhatsApp alternatif |
 | `bantuan-telepon` | Teks bantuan nomor WhatsApp |
-| `buka-kalender` | Tombol membuka kalender |
 | `kotak-kalender` | Panel kalender |
 | `bulan-sebelum` | Tombol bulan sebelumnya |
 | `bulan-berikut` | Tombol bulan berikutnya |
@@ -382,7 +408,6 @@ ID di halaman ini sama dengan `buat_laporan.xhtml`, kecuali form utama memakai `
 | `foto` | Input file foto barang |
 | `telepon` | Input nomor WhatsApp alternatif |
 | `bantuan-telepon` | Teks bantuan nomor WhatsApp |
-| `buka-kalender` | Tombol membuka kalender |
 | `kotak-kalender` | Panel kalender |
 | `bulan-sebelum` | Tombol bulan sebelumnya |
 | `bulan-berikut` | Tombol bulan berikutnya |
@@ -489,9 +514,15 @@ ID di halaman ini sama dengan `buat_laporan.xhtml`, kecuali form utama memakai `
 | `admin-diterima` | Jumlah barang diterima CS |
 | `admin-selesai` | Jumlah barang sudah dikembalikan |
 | `nomor-wa-admin` | Nomor WhatsApp layanan CS |
+| `cari-admin` | Input pencarian nama atau ID barang |
+| `filter-status-admin` | Dropdown filter status penanganan |
+| `jumlah-hasil-admin` | Teks jumlah barang yang cocok dengan filter |
 | `daftar-admin` | Wadah daftar barang titipan |
-| `kosong-admin` | Keadaan kosong saat belum ada titipan |
-| `status-cs-<id>` | Dropdown status penanganan per barang, dibuat `app.js` |
+| `kosong-admin` | Keadaan kosong saat tidak ada barang yang cocok |
+| `halaman-dashboard` | Baris navigasi halaman daftar barang |
+| `admin-sebelumnya` | Tombol halaman sebelumnya |
+| `info-halaman-admin` | Teks posisi halaman daftar barang |
+| `admin-berikutnya` | Tombol halaman berikutnya |
 
 ### 6.11 `akses_akun.xhtml`
 
@@ -501,12 +532,55 @@ ID di halaman ini sama dengan `buat_laporan.xhtml`, kecuali form utama memakai `
 | `akses-masuk` | Tombol menuju halaman masuk |
 | `akses-daftar` | Tombol menuju halaman pendaftaran |
 
+### 6.12 `serah_terima.xhtml`
+
+| ID | Fungsi |
+| --- | --- |
+| `menu-akun` | Wadah tombol akun di header |
+| `serah-tidak-ada` | Pesan saat barang tidak tersedia untuk CS ini |
+| `serah-konten` | Wadah seluruh konten serah terima |
+| `serah-nama-barang` | Nama barang yang dipilih |
+| `serah-id-laporan` | ID laporan barang |
+| `serah-kampus` | Nama kampus CS |
+| `serah-penyimpanan` | Lokasi penyimpanan barang |
+| `serah-status` | Status serah terima barang |
+| `kotak-form-serah` | Kartu form catatan serah terima |
+| `judul-form-serah-baru` | Judul form penerimaan/pengembalian |
+| `keterangan-form-serah` | Keterangan pengantar form |
+| `form-serah-baru` | Form catatan serah terima |
+| `id-catatan-edit-baru` | ID catatan yang sedang diedit |
+| `jenis-serah-tampil` | Jenis transaksi yang ditampilkan |
+| `label-pihak-serah` | Label nama penyerah atau penerima |
+| `nama-pihak-serah` | Input nama penyerah atau penerima |
+| `keterangan-serah-baru` | Input keterangan tambahan |
+| `konfirmasi-kembali` | Blok konfirmasi pengembalian |
+| `cek-verifikasi-serah` | Checkbox verifikasi kepemilikan |
+| `tombol-simpan-serah` | Tombol simpan catatan |
+| `batal-edit-serah` | Tombol batal edit |
+| `riwayat-barang-serah` | Daftar riwayat barang ini |
+| `kosong-riwayat-barang` | Keadaan kosong riwayat barang |
+
+### 6.13 `riwayat_serah_terima.xhtml`
+
+| ID | Fungsi |
+| --- | --- |
+| `menu-akun` | Wadah tombol akun di header |
+| `keterangan-riwayat-cs` | Keterangan riwayat sesuai kampus CS |
+| `cari-riwayat-cs` | Input pencarian riwayat |
+| `jenis-riwayat-cs` | Dropdown filter jenis transaksi |
+| `jumlah-riwayat-cs` | Teks jumlah catatan yang cocok |
+| `daftar-riwayat-cs` | Wadah daftar catatan riwayat |
+| `riwayat-cs-kosong` | Keadaan kosong daftar riwayat |
+| `halaman-riwayat-cs` | Baris navigasi halaman riwayat |
+| `riwayat-sebelumnya` | Tombol halaman sebelumnya |
+| `info-halaman-riwayat` | Teks posisi halaman riwayat |
+| `riwayat-berikutnya` | Tombol halaman berikutnya |
+
 ## 7. ID yang dibuat JavaScript
 
 | ID | Dibuat oleh | Fungsi |
 | --- | --- | --- |
 | `status-<id>` | `pilihanStatus()` dipanggil `perbaruiLaporanSaya()` | Dropdown status laporan pengguna |
-| `status-cs-<id>` | `tampilkanDashboardCS()` | Dropdown status penanganan barang CS |
 | `kelola-<id>` | `perbaruiLaporanSaya()` | Pembungkus kartu laporan di Laporan Saya |
 | `pesan-global` | `pesan()` | Kotak notifikasi global |
 | `keluar-header` | Header setelah login | Tombol keluar di header |
@@ -548,7 +622,24 @@ Kartu barang yang dibuat `app.js`:
 </div>
 ```
 
-Lencana jenis dan status:
+Kartu Laporan Saya juga menampilkan lencana jenis dan status, lalu panel status dan tombol aksi dalam satu kartu:
+
+```html
+<div class="kartu-kelola">
+  <div class="kartu-barang">...</div>
+  <div class="pengaturan-status">
+    <label for="status-1">Ubah status laporan</label>
+    <select id="status-1">...</select>
+    <button type="button" class="tombol tombol-kuning tombol-kecil">Simpan status</button>
+  </div>
+  <div class="aksi-kelola">
+    <a class="tombol tombol-outline tombol-kecil" href="edit_laporan.xhtml?id=1">Edit</a>
+    <button type="button" class="tombol tombol-bahaya tombol-kecil">Hapus</button>
+  </div>
+</div>
+```
+
+Lencana jenis barang:
 
 ```html
 <!-- Pilih salah satu sesuai jenis laporan. -->
@@ -580,7 +671,7 @@ Notifikasi gagal yang dibuat `app.js`:
   - `profil-tombol`
   - `tanggal-kosong`
 - `teks-emas` dan `footer-pesan` sama-sama memberi warna aksen pada slogan footer, tetapi warnanya berbeda. Saat ini `pendaftaran` dan `profil` memakai `footer-pesan`, halaman lain memakai `teks-emas`.
-- ID `status-<id>`, `status-cs-<id>`, dan `kelola-<id>` harus unik dalam satu halaman. Jangan memakai ID laporan yang sama dua kali.
+- ID `status-<id>` dan `kelola-<id>` harus unik dalam satu halaman. Jangan memakai ID laporan yang sama dua kali.
 - Jika nanti ada rename class atau ID, file yang perlu diperbarui adalah semua `.xhtml`, `css/style.css`, dan string HTML di `js/app.js`.
 
 ## 10. Perawatan CSS
@@ -604,14 +695,14 @@ Notifikasi gagal yang dibuat `app.js`:
 - `.logo` memakai `align-items: center` dan `gap: 10px` karena memiliki dua anak: ikon SVG dan teks.
 - Logo SVG memakai `alt=""` karena teks “ATLOF” di sebelahnya sudah memberi nama yang dapat dibaca pembaca layar.
 - `.detail-identitas` tetap dua kolom (label 170px dan nilai fleksibel) di semua lebar layar.
-- `input[type="text"]`, `input[type="password"]`, `select`, dan `textarea` tetap dipakai.
+- `input[type="text"]`, `input[type="password"]`, `input[type="file"]`, `select`, dan `textarea` tetap dipakai dan berbagi gaya kotak input yang sama.
 - `overflow: hidden` pada `.kartu-barang` tetap dipakai untuk memotong gambar dan sudut kartu.
 
 ### 10.3 Font
 
 - IBM Plex Sans tetap dipakai untuk seluruh teks sans melalui `--font-display` dan `--font-body`.
 - Poppins weight 400, 500, 600, dan 700 (`Poppins-<weight>-latin.woff2`) hanya dipakai di navbar melalui `--font-navbar`: logo, menu navigasi, dan tombol Masuk/Daftar/Keluar di header.
-- IBM Plex Mono dipakai untuk label kecil, lencana, kalender, dan ID melalui `--font-mono`. Label pada daftar identitas profil tidak memakai mono; keduanya memakai IBM Plex Sans seperti dijelaskan di 10.4.
+- IBM Plex Mono dipakai untuk label kecil, kalender, dan ID melalui `--font-mono`. Lencana jenis barang dan label pada daftar identitas profil memakai IBM Plex Sans, seperti dijelaskan di 10.4.
 
 ### 10.4 Tipografi daftar identitas profil
 

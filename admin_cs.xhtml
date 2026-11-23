@@ -4,7 +4,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Dasbor Admin CS - ATLOF</title>
+    <title>Dashboard CS - ATLOF</title>
     <link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
 
@@ -27,13 +27,16 @@
             </div>
         </div>
     </div>
-    <div class="container bagian halaman-admin">
-        <div class="judul-bagian">
+    <div class="container bagian halaman-admin dashboard-cs">
+        <div class="judul-bagian judul-dashboard">
             <div>
-                <h1>Dasbor Admin CS</h1>
-                <p class="subjudul" id="subjudul-admin">Kelola penitipan dan pengembalian barang di kampusmu.</p>
+                <h1>Dashboard CS</h1>
+                <p class="subjudul" id="subjudul-admin">Kelola barang titipan di kampusmu.</p>
             </div>
-            <a href="buat_laporan.xhtml" class="tombol tombol-kuning">+ Buat laporan</a>
+            <div class="tombol-dashboard">
+                <a href="buat_laporan.xhtml" class="tombol tombol-kuning">+ Buat laporan</a>
+                <a href="riwayat_serah_terima.xhtml" class="tombol tombol-outline">Riwayat serah terima</a>
+            </div>
         </div>
         <div class="ringkasan-admin">
             <div class="angka-admin"><strong id="admin-total">0</strong><span>Total barang titipan</span></div>
@@ -44,17 +47,38 @@
         <div class="panel-admin">
             <div>
                 <h2>Barang yang ditangani CS</h2>
-                <p class="teks-abu">Pilih status dan simpan setelah barang diterima atau dikembalikan secara fisik.</p>
+                <p class="teks-abu">Cari dan kelola barang titipan pada kampusmu.</p>
             </div>
             <div class="baris-kontak-cs">
                 <span>WhatsApp layanan: <strong id="nomor-wa-admin">Belum diatur</strong></span>
                 <a href="profil.xhtml" class="tombol tombol-outline tombol-kecil">Atur di profil</a>
             </div>
         </div>
+        <div class="filter-dashboard">
+            <div class="cari-dashboard">
+                <label for="cari-admin">Cari nama atau ID barang</label>
+                <input type="text" id="cari-admin" name="cari_admin" />
+            </div>
+            <div class="status-dashboard">
+                <label for="filter-status-admin">Filter status</label>
+                <select id="filter-status-admin" name="filter_status_admin">
+                    <option value="semua">Semua status</option>
+                    <option value="menunggu">Menunggu diterima</option>
+                    <option value="diterima">Diterima CS</option>
+                    <option value="dikembalikan">Sudah dikembalikan</option>
+                </select>
+            </div>
+        </div>
+        <p class="jumlah-hasil-admin" id="jumlah-hasil-admin">0 barang ditemukan</p>
         <div id="daftar-admin" class="daftar-admin"></div>
         <div id="kosong-admin" class="kosong" style="display:none;">
-            <h2>Belum ada barang titipan</h2>
-            <p>Laporan barang ditemukan dengan lokasi penyimpanan di CS kampusmu akan muncul di sini.</p>
+            <h2>Tidak ada barang yang sesuai</h2>
+            <p>Coba ubah kata kunci atau filter status.</p>
+        </div>
+        <div class="halaman-dashboard" id="halaman-dashboard" style="display:none;">
+            <button type="button" id="admin-sebelumnya" class="tombol tombol-outline tombol-kecil">Sebelumnya</button>
+            <span id="info-halaman-admin">Halaman 1 dari 1</span>
+            <button type="button" id="admin-berikutnya" class="tombol tombol-outline tombol-kecil">Berikutnya</button>
         </div>
     </div>
     <div class="footer-utama">
