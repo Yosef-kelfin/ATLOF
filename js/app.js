@@ -836,6 +836,7 @@ function perbaruiProfil() {
     teks("info-nama", akun.nama);
     teks("info-email", akun.email);
     teks("info-teams", akun.teams || "-");
+    ambil("info-teams").className = akun.teams ? "" : "nilai-kosong";
     teks("avatar-profil", akun.nama.charAt(0).toUpperCase());
     if (adalahAdmin()) {
         ambil("label-peran-profil").style.display = "inline-block";
@@ -844,6 +845,7 @@ function perbaruiProfil() {
         ambil("form-nomor-cs").style.display = "block";
         teks("info-kampus-cs", namaKampus(akun.kampus_cs));
         teks("info-telepon", akun.telepon || "Belum diisi");
+        ambil("info-telepon").className = akun.telepon ? "" : "nilai-kosong";
     }
 }
 

@@ -15,6 +15,38 @@
 }
 
 @font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../fonts/Poppins-400-latin.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("../fonts/Poppins-500-latin.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("../fonts/Poppins-600-latin.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("../fonts/Poppins-700-latin.woff2") format("woff2");
+}
+
+@font-face {
     font-family: "IBM Plex Mono";
     font-style: normal;
     font-weight: 400;
@@ -34,6 +66,7 @@
     --font-display: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
     --font-body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
     --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+    --font-navbar: "Poppins", system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -127,6 +160,7 @@ img {
     justify-content: space-between;
     gap: 22px;
     min-height: 68px;
+    font-family: var(--font-navbar);
 }
 
 .logo {
@@ -134,7 +168,7 @@ img {
     align-items: center;
     gap: 10px;
     color: #f3ad1b;
-    font-family: var(--font-display);
+    font-family: var(--font-navbar);
     font-size: 23px;
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -149,7 +183,7 @@ img {
 
 .logo small {
     display: block;
-    font-family: var(--font-body);
+    font-family: var(--font-navbar);
     font-size: 10px;
     color: #e3ecf7;
     font-weight: 500;
@@ -172,7 +206,7 @@ img {
 
 .menu-links a {
     color: #e3ecf7;
-    font-family: var(--font-display);
+    font-family: var(--font-navbar);
     font-size: 14px;
     font-weight: 600;
     letter-spacing: 0.01em;
@@ -188,7 +222,7 @@ img {
 }
 
 .menu-akun .tombol {
-    font-family: var(--font-display);
+    font-family: var(--font-navbar);
     font-weight: 600;
 }
 
@@ -656,8 +690,15 @@ label.centang {
     margin-bottom: 18px;
 }
 
-.profil-atas h2, .profil-atas p {
+.profil-atas h2 {
+    margin: 0 0 2px;
+    font-size: 23px;
+}
+
+.profil-atas p {
     margin: 0;
+    color: #657282;
+    font-size: 14px;
 }
 
 .avatar {
@@ -698,72 +739,11 @@ label.centang {
     font-size: 13px;
 }
 
-/* ========== 10. TAMPILAN LAYAR KECIL ========== */
-
-@media (max-width: 1000px) {
-    .navbar {
-        flex-wrap: wrap;
-        padding: 12px 0;
-    }
-
-    .menu-links {
-        order: 3;
-        width: 100%;
-        gap: 15px;
-    }
-
-    .grid-barang {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 700px) {
-    h1 {
-        font-size: 27px;
-    }
-
-    .hero-isi {
-        padding: 62px 0;
-    }
-
-    .layout-katalog, .grid-akun, .detail-grid, .dua-kolom {
-        grid-template-columns: 1fr;
-    }
-
-    .grid-barang {
-        grid-template-columns: 1fr;
-    }
-
-    .baris-pencarian {
-        flex-direction: column;
-    }
-
-    .grid-akun {
-        padding: 28px 0;
-    }
-
-    .panel-samping {
-        padding: 27px;
-    }
-
-    .panel-filter, .kotak-form, .form-besar {
-        padding: 19px;
-    }
-}
-
-
-/* ========== 11. IDENTITAS ATLOF DAN HALAMAN BERANDA ========== */
+/* ========== 10. IDENTITAS ATLOF DAN HALAMAN BERANDA ========== */
 
 .teks-emas {
     color: #f3ad1b;
     font-weight: bold
-}
-
-@media (max-width: 900px) {
-    .hero h1,
-    .hero p {
-        max-width: 100%;
-    }
 }
 
 .judul-terpusat {
@@ -813,7 +793,7 @@ label.centang {
     padding-top: 46px;
 }
 
-/* ========== 12. KATALOG: SEARCH DAN FILTER STICKY ========== */
+/* ========== 11. KATALOG: SEARCH DAN FILTER STICKY ========== */
 
 .grid-katalog .gambar-barang {
     height: 146px;
@@ -838,7 +818,7 @@ label.centang {
     font-size: 10px;
 }
 
-/* ========== 13. FORM LAPORAN DAN PROFIL ========== */
+/* ========== 12. FORM LAPORAN DAN PROFIL ========== */
 
 .halaman-form .pengantar {
     max-width: 920px;
@@ -910,20 +890,38 @@ label.centang {
 .detail-identitas {
     display: grid;
     grid-template-columns: 170px minmax(0, 1fr);
-    padding: 16px 0;
+    align-items: baseline;
+    padding: 14px 0;
     border-bottom: 1px solid #e5eaf0;
     gap: 12px;
 }
 
 .detail-identitas span {
-    color: #657282;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.02em;
+    color: #1f2937;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.6;
 }
 
 .detail-identitas strong {
+    color: #1f2937;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.6;
     overflow-wrap: anywhere;
+}
+
+.detail-identitas:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.nilai-kosong {
+    color: #6b7888;
+    font-style: italic;
+    font-weight: 400;
 }
 
 .tombol-bahaya {
@@ -936,7 +934,7 @@ label.centang {
     margin-top: 16px;
 }
 
-/* ========== 14. HALAMAN AKSES AKUN ========== */
+/* ========== 13. HALAMAN AKSES AKUN ========== */
 
 .halaman-akses {
     min-height: 65vh;
@@ -967,7 +965,7 @@ label.centang {
     margin-bottom: 23px;
 }
 
-/* ========== 15. FOOTER ATLOF ========== */
+/* ========== 14. FOOTER ATLOF ========== */
 
 .footer-utama {
     background: #083f71;
@@ -1036,17 +1034,7 @@ label.centang {
     color: #c6d8e8;
 }
 
-@media (max-width: 1170px) {
-    .grid-katalog {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .footer-isi {
-        gap: 24px;
-    }
-}
-
-/* ========== 16. NOTIFIKASI FORM ========== */
+/* ========== 15. NOTIFIKASI FORM ========== */
 
 .pesan-form {
     position: fixed;
@@ -1070,14 +1058,14 @@ label.centang {
     border-color: #edc7c7;
 }
 
-/* ========== 17. BERANDA SESUAI STATUS AKUN ========== */
+/* ========== 16. BERANDA SESUAI STATUS AKUN ========== */
 
 .bagian-cara {
     padding-top: 52px;
     padding-bottom: 66px;
 }
 
-/* ========== 18. KALENDER UNTUK XHTML STRICT ========== */
+/* ========== 17. KALENDER UNTUK XHTML STRICT ========== */
 
 .tanggal-pilih {
     position: relative;
@@ -1172,7 +1160,7 @@ label.centang {
     background: #0a5896;
 }
 
-/* ========== 19. KONTAK DETAIL BARANG ========== */
+/* ========== 18. KONTAK DETAIL BARANG ========== */
 
 .kontak-detail {
     display: flex;
@@ -1193,52 +1181,7 @@ label.centang {
     width: 100%;
 }
 
-@media (max-width: 480px) {
-    .grid-katalog {
-        grid-template-columns: 1fr;
-    }
-
-    .kotak-akses {
-        padding: 25px 17px;
-    }
-
-    .profil-kartu {
-        padding: 20px;
-    }
-
-    .menu-links {
-        gap: 12px;
-    }
-
-    .menu-links a {
-        font-size: 12px;
-    }
-
-    .logo {
-        font-size: 20px;
-    }
-
-    .logo img {
-        width: 28px;
-        height: 28px;
-    }
-
-    .tanggal-pilih {
-        flex-wrap: wrap;
-    }
-
-    .tombol-kalender {
-        width: 100%;
-    }
-
-    .kalender {
-        left: 0;
-        right: auto;
-        width: 100%;
-    }
-}
-
-/* ========== 20. PENGELOLAAN STATUS LAPORAN ========== */
+/* ========== 19. PENGELOLAAN STATUS LAPORAN ========== */
 
 .pengaturan-status {
     padding: 13px;
@@ -1282,7 +1225,7 @@ label.centang {
     letter-spacing: 0.04em;
 }
 
-/* ========== 21. DASHBOARD ADMIN CS ========== */
+/* ========== 20. DASHBOARD ADMIN CS ========== */
 
 .halaman-admin .judul-bagian {
     margin-bottom: 24px;
@@ -1392,30 +1335,4 @@ label.centang {
     gap: 7px;
 }
 
-@media (max-width: 760px) {
-    .tiga-langkah, .footer-isi {
-        grid-template-columns: 1fr;
-    }
 
-    .panel-filter {
-        position: static;
-        max-height: none;
-    }
-
-    .detail-identitas {
-        grid-template-columns: 1fr;
-        gap: 3px;
-    }
-
-    .hero h1 {
-        font-size: 35px;
-    }
-
-    .ringkasan-admin {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .kontrol-admin {
-        width: 100%;
-    }
-}

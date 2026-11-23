@@ -4,7 +4,7 @@ Dokumentasi class CSS dan ID HTML untuk project **ATLOF (Atma Lost & Found)**.
 
 Dokumen ini memakai nama class dan ID yang **sudah ada**. Tidak ada rename pada project.
 
-Dokumen ini mencakup seluruh class dan ID yang ditemukan di 13 halaman `.xhtml`, `css/style.css`, dan string HTML di `js/app.js`, termasuk nama yang dibuat secara dinamis.
+Dokumen ini mencakup seluruh class dan ID yang ditemukan di 11 halaman `.xhtml`, `css/style.css`, dan string HTML di `js/app.js`, termasuk nama yang dibuat secara dinamis.
 
 ## Daftar isi
 
@@ -47,6 +47,10 @@ ATLOF_Frontend_Revisi_5/
 ├── js/
 │   └── app.js
 ├── fonts/
+│   ├── Poppins-400-latin.woff2
+│   ├── Poppins-500-latin.woff2
+│   ├── Poppins-600-latin.woff2
+│   ├── Poppins-700-latin.woff2
 │   ├── IBMPlexSans-latin.woff2
 │   ├── IBMPlexMono-400-latin.woff2
 │   └── IBMPlexMono-600-latin.woff2
@@ -220,7 +224,8 @@ Project juga bisa dibuka langsung lewat browser, tetapi beberapa browser membata
 | `profil-atas` | Header kartu berisi avatar dan nama | `profil` |
 | `avatar` | Lingkaran inisial pengguna | `profil` |
 | `profil-identitas` | Grid data identitas | `profil` |
-| `detail-identitas` | Satu baris data identitas | `profil` |
+| `detail-identitas` | Satu baris data identitas: label di kiri, nilai di kanan | `profil` |
+| `nilai-kosong` | Penanda nilai belum terisi; miring dan abu-abu | `profil`, class diatur `app.js` |
 | `label-peran` | Lencana peran Admin CS | `profil` |
 | `profil-tombol` | Pembungkus tombol profil; belum punya aturan CSS | `profil` |
 | `tombol-bahaya` | Tombol Keluar berwarna merah | `profil` |
@@ -584,36 +589,36 @@ Notifikasi gagal yang dibuat `app.js`:
 
 ### 10.1 Yang sudah dihapus
 
-- `.footer-kampus img` dan `@media 480px .footer-kampus img`: tidak ada gambar di dalam footer kampus.
+- Seluruh aturan responsif `@media` (480px, 700px, 760px, 900px, 1000px, 1170px) dan tag `meta viewport` di semua halaman. Layout desktop dipakai di semua lebar layar.
+- `.footer-kampus img`: tidak ada gambar di dalam footer kampus.
 - `.footer-isi h3`: semua `h3` footer ada di dalam `.footer-merk`, dan warnanya ditentukan `.footer-merk h3`.
 - `input[type="email"]`, `input[type="search"]`, `input[type="date"]`, `input[type="tel"]`: tidak ada input dengan tipe tersebut.
 - `position: relative` dan `overflow: hidden` pada `.hero`.
 - `position: relative` dan `z-index: 1` pada `.hero-isi`.
 - `overflow: hidden` pada `.gambar-barang`; parent `.kartu-barang` sudah memotong gambar.
 - Properti flex pada elemen yang hanya punya satu anak: `.footer-merk`, `.footer-bawah`, dan `.footer-kampus`.
-- `.hero h1 { font-size: 34px; }` di `@media 700px`; ditimpa `.hero h1 { font-size: 35px; }` di `@media 760px`.
-- `.footer-isi` di dalam `@media 700px`; sudah diatur `@media 760px`.
-- `.grid-katalog` di dalam `@media 1000px` dan `@media 700px`; aturan dua kolom sudah diatur `@media 1170px`.
 
 ### 10.2 Yang sengaja dipertahankan
 
 - `display: flex` pada `.footer-kampus` tetap ada karena memengaruhi lebar konten; yang dihapus hanya `gap` dan `align-items`.
-- `.logo` kembali memakai `align-items: center` dan `gap: 10px` karena sekarang memiliki dua anak: ikon SVG dan teks.
+- `.logo` memakai `align-items: center` dan `gap: 10px` karena memiliki dua anak: ikon SVG dan teks.
 - Logo SVG memakai `alt=""` karena teks “ATLOF” di sebelahnya sudah memberi nama yang dapat dibaca pembaca layar.
-- `@media 480px .grid-katalog { grid-template-columns: 1fr; }` tetap ada karena mengembalikan katalog ke satu kolom di layar kecil setelah aturan dua kolom yang lebih lebar.
+- `.detail-identitas` tetap dua kolom (label 170px dan nilai fleksibel) di semua lebar layar.
 - `input[type="text"]`, `input[type="password"]`, `select`, dan `textarea` tetap dipakai.
 - `overflow: hidden` pada `.kartu-barang` tetap dipakai untuk memotong gambar dan sudut kartu.
 
-### 10.3 Breakpoint aktual
+### 10.3 Font
 
-| Selector | Perilaku |
-|---|---|
-| `.grid-barang` | 3 kolom di atas 1000px, 2 kolom 701-1000px, 1 kolom 700px ke bawah |
-| `.grid-katalog` | 3 kolom di atas 1170px, 2 kolom 481-1170px, 1 kolom 480px ke bawah |
-| `.footer-isi` | 3 kolom di atas 760px, 1 kolom 760px ke bawah |
-| `.hero h1` | 48px di atas 760px, 35px 760px ke bawah |
-| `.hero-isi` | padding 76px 0 74px di atas 700px, 62px 0 700px ke bawah |
+- IBM Plex Sans tetap dipakai untuk seluruh teks sans melalui `--font-display` dan `--font-body`.
+- Poppins weight 400, 500, 600, dan 700 (`Poppins-<weight>-latin.woff2`) hanya dipakai di navbar melalui `--font-navbar`: logo, menu navigasi, dan tombol Masuk/Daftar/Keluar di header.
+- IBM Plex Mono dipakai untuk label kecil, lencana, kalender, dan ID melalui `--font-mono`. Label pada daftar identitas profil tidak memakai mono; keduanya memakai IBM Plex Sans seperti dijelaskan di 10.4.
 
-Ukuran ikon logo di header adalah 32px, lalu 28px pada layar 480px ke bawah.
+### 10.4 Tipografi daftar identitas profil
 
-Catatan: aturan satu kolom `.grid-katalog` di `@media 700px` dihapus karena sudah ditimpa oleh aturan dua kolom `@media 1170px`. Jangan menambahkannya kembali sebelum urutan media query diperbaiki. Perbaikan urutan media query sengaja tidak dilakukan sekarang agar tampilan dan perilaku responsif tetap sama.
+| Elemen | Font | Ukuran | Berat |
+| --- | --- | --- | --- |
+| Label kiri (`Nama lengkap`, `Email akun`, `Microsoft Teams`, `Lokasi pelayanan`, `WhatsApp layanan`) | IBM Plex Sans (`--font-body`) | 15px | 600 |
+| Nilai kanan (`Admin CS Kampus 3`, `cs3@atlof.test`, `Kampus 3 - Gedung Bonaventura`, dll.) | IBM Plex Sans (`--font-body`) | 15px | 400 |
+| Nilai kosong (`-`, `Belum diisi`) | IBM Plex Sans (`--font-body`) | 15px | 400, miring, abu-abu |
+
+Kedua kolom memakai font yang sama. Label dibedakan hanya dari berat hurufnya, bukan dari jenis font atau huruf kapital. Class `.nilai-kosong` dipasang di markup sebagai kondisi awal, lalu dihapus oleh `perbaruiProfil()` di `app.js` saat nilainya terisi.

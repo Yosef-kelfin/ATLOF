@@ -3,9 +3,10 @@ ATLOF - Frontend XHTML 1.0 Strict (Revisi 3)
 Buka index.xhtml lewat browser, atau letakkan folder ini di xampp/htdocs.
 
 FONT
-- IBM Plex Sans (semua teks, judul, dan header) dan IBM Plex Mono
-  (label/ID) disimpan lokal di folder fonts/. Tidak perlu internet;
-  jangan hapus folder fonts/.
+- IBM Plex Sans (semua teks sans), IBM Plex Mono (label/ID), dan Poppins
+  (khusus navbar: logo, menu, dan tombol akun) disimpan lokal di folder
+  fonts/. Tidak perlu internet; jangan hapus folder fonts/.
+- Tidak ada aturan @media: layout desktop dipakai di semua lebar layar.
 
 AKUN PREVIEW ADMIN CS (hanya untuk menguji frontend lokal)
 - cs1@atlof.test  : Kampus 1 - Gedung Alfonsus Mrican
