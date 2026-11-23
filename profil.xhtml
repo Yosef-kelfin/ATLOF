@@ -12,6 +12,7 @@
 <div class="header-utama">
     <div class="container navbar">
         <div class="logo">
+            <img src="images/logo-atlof-ikon.svg" alt="" />
             <span>ATLOF<small>Atma Lost &amp; Found</small></span>
         </div>
         <div class="menu-links">
@@ -33,9 +34,9 @@
             <div class="profil-atas"><div id="avatar-profil" class="avatar">A</div><div>
                 <h2 id="nama-profil">Pengguna ATLOF</h2>
                 <p id="email-profil">Email akun</p>
-                <span id="label-peran" class="label-peran" style="display:none;">Admin CS</span>
+                <span id="label-peran-profil" class="label-peran" style="display:none;">Admin CS</span>
             </div></div>
-            <div id="profil-identitas" class="profil-identitas"><div class="detail-identitas"><span>Nama lengkap</span><strong id="info-nama">-</strong></div><div class="detail-identitas"><span>Email akun</span><strong id="info-email">-</strong></div><div class="detail-identitas"><span>Microsoft Teams</span><strong id="info-teams">-</strong></div>
+            <div id="data-profil" class="profil-identitas"><div class="detail-identitas"><span>Nama lengkap</span><strong id="info-nama">-</strong></div><div class="detail-identitas"><span>Email akun</span><strong id="info-email">-</strong></div><div class="detail-identitas"><span>Microsoft Teams</span><strong id="info-teams">-</strong></div>
                 <div id="identitas-admin" class="detail-identitas" style="display:none;">
                     <span>Lokasi pelayanan</span><strong id="info-kampus-cs">-</strong>
                 </div>
@@ -44,14 +45,14 @@
                 </div>
             </div>
             <div class="aksi profil-tombol" id="profil-tombol"><button type="button" id="tombol-edit-profil" class="tombol tombol-kuning">Ubah profil</button><button type="button" id="tombol-ganti-password" class="tombol tombol-outline">Ubah password</button><button type="button" id="tombol-logout" class="tombol tombol-bahaya">Keluar</button></div>
-            <form id="form-profil" class="form-tersembunyi" action="#" method="post" style="display:none"><h3>Edit informasi profil</h3><div class="field"><label for="nama">Nama lengkap</label><input type="text" id="nama" /></div><div class="field"><label for="email">Email akun</label><input type="text" id="email" readonly="readonly" /></div><div class="field"><label for="teams">Kontak Microsoft Teams</label><input type="text" id="teams" /></div>
+            <form id="form-profil" class="panel-form" action="#" method="post" style="display:none"><h3>Edit informasi profil</h3><div class="field"><label for="nama">Nama lengkap</label><input type="text" id="nama" /></div><div class="field"><label for="email">Email akun</label><input type="text" id="email" readonly="readonly" /></div><div class="field"><label for="teams">Kontak Microsoft Teams</label><input type="text" id="teams" /></div>
                 <div class="field" id="form-nomor-cs" style="display:none;">
                     <label for="nomor-cs">WhatsApp layanan CS</label>
                     <input type="text" id="nomor-cs" name="nomor-cs" />
                     <p class="bantuan">Nomor ini ditampilkan sebagai kontak CS untuk barang yang dititipkan pada kampusmu. Gunakan nomor layanan yang diizinkan.</p>
                 </div>
                 <div class="aksi"><button class="tombol tombol-kuning" type="submit">Simpan profil</button><button class="tombol tombol-outline batal-profil" type="button">Batal</button></div></form>
-            <form id="form-password" class="form-tersembunyi" action="#" method="post" style="display:none"><h3>Ubah password</h3><div class="field"><label for="password-lama">Password sekarang</label><input id="password-lama" type="password" /></div><div class="field"><label for="password-baru">Password baru</label><input id="password-baru" type="password" /></div><div class="field"><label for="konfirmasi-password">Konfirmasi password baru</label><input id="konfirmasi-password" type="password" /></div><div class="aksi"><button class="tombol tombol-kuning" type="submit">Perbarui password</button><button class="tombol tombol-outline batal-profil" type="button">Batal</button></div></form>
+            <form id="form-password" class="panel-form" action="#" method="post" style="display:none"><h3>Ubah password</h3><div class="field"><label for="password-lama">Password sekarang</label><input id="password-lama" type="password" /></div><div class="field"><label for="password-baru">Password baru</label><input id="password-baru" type="password" /></div><div class="field"><label for="konfirmasi-password">Konfirmasi password baru</label><input id="konfirmasi-password" type="password" /></div><div class="aksi"><button class="tombol tombol-kuning" type="submit">Perbarui password</button><button class="tombol tombol-outline batal-profil" type="button">Batal</button></div></form>
         </div>
     </div>
 </div>

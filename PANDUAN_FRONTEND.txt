@@ -35,14 +35,3 @@ sebenarnya. Saat backend PHP + MySQL dibuat, autentikasi, pengecekan role, statu
 kepemilikan laporan, dan validasi harus diterapkan ulang di SERVER.
 Jangan menggunakan password uji di sistem sebenarnya.
 
-LUPA PASSWORD (SIMULASI FRONTEND)
-- Klik "Lupa password?" pada halaman masuk, lalu masukkan email akun.
-- Jika akun ditemukan, tautan "Ubah password" akan muncul.
-- Password baru disimpan di localStorage browser: kunci atlofAkunLokal untuk
-  pengguna dan atlofPasswordCS untuk penimpa password Admin CS.
-- Login sekarang memeriksa password yang tersimpan. Password uji bawaan Admin CS
-  tetap ATLOFcs2026! sampai diubah lewat alur lupa password.
-- PERINGATAN: password disimpan apa adanya (tanpa hash/enkripsi) dan hanya untuk
-  simulasi. localStorage dapat dibaca oleh siapa pun yang memakai browser ini.
-  Jangan memakai kata sandi sungguhan.
-

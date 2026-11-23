@@ -141,6 +141,11 @@ img {
     white-space: nowrap;
 }
 
+.logo img {
+    width: 32px;
+    height: 32px;
+    flex: none;
+}
 
 .logo small {
     display: block;
@@ -156,6 +161,41 @@ img {
     display: flex;
     align-items: center;
     gap: 7px;
+}
+
+.menu-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 22px;
+}
+
+.menu-links a {
+    color: #e3ecf7;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    border-bottom: 2px solid transparent;
+    padding: 6px 0;
+}
+
+.menu-links a:hover,
+.menu-links a.aktif {
+    text-decoration: none;
+    color: white;
+    border-bottom-color: #f3ad1b;
+}
+
+.menu-akun .tombol {
+    font-family: var(--font-display);
+    font-weight: 600;
+}
+
+.menu-akun .tombol-keluar {
+    background: transparent;
+    color: white;
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* ========== 2. TOMBOL ========== */
@@ -217,14 +257,10 @@ img {
 .hero {
     background-color: #0a5896;
     color: white;
-    position: relative;
-    overflow: hidden;
 }
 
 .hero-isi {
     padding: 76px 0 74px;
-    position: relative;
-    z-index: 1;
 }
 
 .hero h1 {
@@ -239,15 +275,6 @@ img {
     font-size: 17px;
     color: #e3ecf7;
 }
-
-.hero .label-kecil {
-    background: transparent;
-    color: #ffe0a3;
-    padding: 0 0 0 10px;
-    border-radius: 0;
-    letter-spacing: 0.08em;
-}
-
 
 .judul-bagian {
     display: flex;
@@ -288,7 +315,6 @@ img {
     display: block;
     height: 220px;
     background: #eef3f9;
-    overflow: hidden;
 }
 
 .gambar-barang img {
@@ -350,9 +376,8 @@ img {
 
 /* ========== 5. HALAMAN KATALOG ========== */
 
-.cari {
+.pencarian {
     width: 100%;
-    max-width: none;
     padding: 20px;
     background: white;
     border: 1px solid #e2e8f0;
@@ -361,19 +386,20 @@ img {
     box-shadow: 0 4px 16px rgba(10, 88, 150, 0.05);
 }
 
-.cari label {
+.pencarian label {
     display: block;
     margin-bottom: 6px;
     font-weight: bold;
 }
 
-.cari-baris {
+.baris-pencarian {
     display: flex;
     gap: 8px;
 }
 
-.cari-baris input {
+.baris-pencarian input {
     flex: 1;
+    min-width: 0;
 }
 
 .layout-katalog {
@@ -389,6 +415,13 @@ img {
     border-radius: 13px;
     padding: 26px;
     box-shadow: 0 4px 18px rgba(10, 88, 150, 0.06);
+}
+
+.panel-filter {
+    position: sticky;
+    top: 90px;
+    max-height: calc(100vh - 105px);
+    overflow-y: auto;
 }
 
 .panel-filter h2 {
@@ -445,7 +478,7 @@ img {
     margin-bottom: 5px;
 }
 
-input[type="text"], input[type="email"], input[type="password"], input[type="search"], input[type="date"], select, textarea {
+input[type="text"], input[type="password"], select, textarea {
     width: 100%;
     padding: 11px 12px;
     border-radius: 8px;
@@ -479,9 +512,9 @@ textarea {
     resize: vertical;
 }
 
-.centang {
-    font-size: 12px !important;
-    font-weight: normal !important;
+label.centang {
+    font-size: 12px;
+    font-weight: normal;
     margin-top: 7px;
 }
 
@@ -509,7 +542,7 @@ textarea {
     cursor: pointer;
 }
 
-.page-intro {
+.pengantar {
     margin-bottom: 22px;
 }
 
@@ -529,38 +562,38 @@ textarea {
 
 /* ========== 7. LOGIN DAN PENDAFTARAN ========== */
 
-.auth-grid {
+.grid-akun {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     padding: 52px 0 60px;
 }
 
-.auth-samping {
+.panel-samping {
     background: linear-gradient(145deg, #0a5896, #135d99);
     border-radius: 13px;
     color: white;
     padding: 48px 36px;
 }
 
-.auth-samping h1 {
+.panel-samping h1 {
     font-size: 32px;
     line-height: 1.12;
 }
 
-.auth-samping .label-kecil {
+.panel-samping .label-kecil {
     color: #f3ad1b;
 }
 
-.auth-samping p {
+.panel-samping p {
     color: #e3ecf7;
 }
 
-.auth-samping ul {
+.panel-samping ul {
     padding-left: 20px;
 }
 
-.auth-samping li {
+.panel-samping li {
     margin-bottom: 10px;
 }
 
@@ -665,24 +698,21 @@ textarea {
     font-size: 13px;
 }
 
-.footer-isi h3 {
-    color: #fff;
-}
-
 /* ========== 10. TAMPILAN LAYAR KECIL ========== */
 
 @media (max-width: 1000px) {
     .navbar {
         flex-wrap: wrap;
-        padding: 14px 0;
+        padding: 12px 0;
     }
 
-    .navbar .menu-links {
+    .menu-links {
         order: 3;
         width: 100%;
+        gap: 15px;
     }
 
-    .grid-barang, .grid-katalog {
+    .grid-barang {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -692,31 +722,27 @@ textarea {
         font-size: 27px;
     }
 
-    .hero h1 {
-        font-size: 34px;
-    }
-
     .hero-isi {
         padding: 62px 0;
     }
 
-    .layout-katalog, .auth-grid, .detail-grid, .footer-isi, .dua-kolom {
+    .layout-katalog, .grid-akun, .detail-grid, .dua-kolom {
         grid-template-columns: 1fr;
     }
 
-    .grid-barang, .grid-katalog {
+    .grid-barang {
         grid-template-columns: 1fr;
     }
 
-    .cari-baris {
+    .baris-pencarian {
         flex-direction: column;
     }
 
-    .auth-grid {
+    .grid-akun {
         padding: 28px 0;
     }
 
-    .auth-samping {
+    .panel-samping {
         padding: 27px;
     }
 
@@ -789,17 +815,6 @@ textarea {
 
 /* ========== 12. KATALOG: SEARCH DAN FILTER STICKY ========== */
 
-.cari-baris input {
-    min-width: 0;
-}
-
-.panel-filter {
-    position: sticky;
-    top: 90px;
-    max-height: calc(100vh - 105px);
-    overflow-y: auto;
-}
-
 .grid-katalog .gambar-barang {
     height: 146px;
 }
@@ -825,7 +840,7 @@ textarea {
 
 /* ========== 13. FORM LAPORAN DAN PROFIL ========== */
 
-.halaman-form .page-intro {
+.halaman-form .pengantar {
     max-width: 920px;
     margin: 0 auto 20px;
 }
@@ -834,7 +849,7 @@ textarea {
     max-width: 920px;
 }
 
-.halaman-form .page-intro h1 {
+.halaman-form .pengantar h1 {
     margin-bottom: 10px;
 }
 
@@ -873,15 +888,6 @@ textarea {
     border-top: 1px solid #e7edf4;
 }
 
-input[type="tel"] {
-    width: 100%;
-    padding: 11px 12px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    font-family: inherit;
-    font-size: 14px;
-}
-
 .halaman-profil .profil-container {
     max-width: 820px;
     margin: auto;
@@ -898,7 +904,6 @@ input[type="tel"] {
 
 .profil-identitas {
     display: grid;
-    gap: 0;
     margin: 10px 0 24px;
 }
 
@@ -927,7 +932,7 @@ input[type="tel"] {
     background: #fff7f7;
 }
 
-.form-tersembunyi {
+.panel-form {
     margin-top: 16px;
 }
 
@@ -972,9 +977,6 @@ input[type="tel"] {
 }
 
 .footer-merk {
-    display: flex;
-    align-items: center;
-    gap: 0;
     margin-bottom: 14px;
 }
 
@@ -1010,15 +1012,6 @@ input[type="tel"] {
 
 .footer-kampus {
     display: flex;
-    gap: 14px;
-    align-items: flex-start;
-}
-
-.footer-kampus img {
-    width: 52px;
-    height: 61px;
-    object-fit: contain;
-    flex: none;
 }
 
 .footer-kampus strong {
@@ -1036,9 +1029,6 @@ input[type="tel"] {
 }
 
 .footer-bawah {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
     padding-top: 20px;
     margin-top: 30px;
     border-top: 1px solid rgba(255, 255, 255, 0.18);
@@ -1056,84 +1046,7 @@ input[type="tel"] {
     }
 }
 
-@media (max-width: 760px) {
-    .tiga-langkah, .footer-isi {
-        grid-template-columns: 1fr;
-    }
-
-    .panel-filter {
-        position: static;
-        max-height: none;
-    }
-
-    .detail-identitas {
-        grid-template-columns: 1fr;
-        gap: 3px;
-    }
-
-    .footer-bawah {
-        flex-direction: column;
-    }
-
-    .hero h1 {
-        font-size: 35px;
-    }
-}
-
-@media (max-width: 480px) {
-    .grid-katalog {
-        grid-template-columns: 1fr;
-    }
-
-    .kotak-akses {
-        padding: 25px 17px;
-    }
-
-    .profil-kartu {
-        padding: 20px;
-    }
-
-    .footer-kampus img {
-        width: 42px;
-    }
-}
-
-/* ========== 16. XHTML STRICT: NAVIGASI DAN PENYEMPURNAAN ========== */
-
-.menu-links {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 22px;
-}
-
-.menu-links a {
-    color: #e3ecf7;
-    font-family: var(--font-display);
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    border-bottom: 2px solid transparent;
-    padding: 6px 0;
-}
-
-.menu-links a:hover,
-.menu-links a.active {
-    text-decoration: none;
-    color: white;
-    border-bottom-color: #f3ad1b;
-}
-
-.menu-akun .tombol {
-    font-family: var(--font-display);
-    font-weight: 600;
-}
-
-.menu-akun .tombol-logout-header {
-    background: transparent;
-    color: white;
-    border-color: rgba(255, 255, 255, 0.5);
-}
+/* ========== 16. NOTIFIKASI FORM ========== */
 
 .pesan-form {
     position: fixed;
@@ -1156,34 +1069,6 @@ input[type="tel"] {
     color: #8b2525;
     border-color: #edc7c7;
 }
-
-@media (max-width: 1000px) {
-    .navbar {
-        flex-wrap: wrap;
-        padding: 12px 0;
-    }
-
-    .menu-links {
-        order: 3;
-        width: 100%;
-        gap: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .menu-links {
-        gap: 12px;
-    }
-
-    .menu-links a {
-        font-size: 12px;
-    }
-
-    .logo {
-        font-size: 20px;
-    }
-}
-
 
 /* ========== 17. BERANDA SESUAI STATUS AKUN ========== */
 
@@ -1309,6 +1194,35 @@ input[type="tel"] {
 }
 
 @media (max-width: 480px) {
+    .grid-katalog {
+        grid-template-columns: 1fr;
+    }
+
+    .kotak-akses {
+        padding: 25px 17px;
+    }
+
+    .profil-kartu {
+        padding: 20px;
+    }
+
+    .menu-links {
+        gap: 12px;
+    }
+
+    .menu-links a {
+        font-size: 12px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+
+    .logo img {
+        width: 28px;
+        height: 28px;
+    }
+
     .tanggal-pilih {
         flex-wrap: wrap;
     }
@@ -1324,7 +1238,7 @@ input[type="tel"] {
     }
 }
 
-/* ========== 17. PENGELOLAAN STATUS LAPORAN ========== */
+/* ========== 20. PENGELOLAAN STATUS LAPORAN ========== */
 
 .pengaturan-status {
     padding: 13px;
@@ -1368,7 +1282,7 @@ input[type="tel"] {
     letter-spacing: 0.04em;
 }
 
-/* ========== 18. DASHBOARD ADMIN CS ========== */
+/* ========== 21. DASHBOARD ADMIN CS ========== */
 
 .halaman-admin .judul-bagian {
     margin-bottom: 24px;
@@ -1479,6 +1393,24 @@ input[type="tel"] {
 }
 
 @media (max-width: 760px) {
+    .tiga-langkah, .footer-isi {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-filter {
+        position: static;
+        max-height: none;
+    }
+
+    .detail-identitas {
+        grid-template-columns: 1fr;
+        gap: 3px;
+    }
+
+    .hero h1 {
+        font-size: 35px;
+    }
+
     .ringkasan-admin {
         grid-template-columns: repeat(2, 1fr);
     }

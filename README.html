@@ -1,0 +1,3087 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>README</title>
+<style>
+  /* White paper (#332 follow-up): the warm off-white page, beige code blocks
+     and orange table headers read as "yellow" on screen and looked
+     unprofessional in a file people hand to others. Backgrounds are neutral,
+     and so are the accents: the orange h1 rule and quote bar still read as
+     unserious on paper (second #332 follow-up), so rules and bars are dark
+     gray and links a sober blue. Deliberately no dark-mode variant: the file
+     is a document, and mermaid diagrams are rendered for a light page. */
+  :root {
+    --solomd-content-max-width: 960px;
+    --accent-rule: var(--md-h1, var(--accent, #3d444d));
+    --link: var(--accent-text, var(--md-link, #0b5cad));
+    --link-soft: #c9dcf0;
+    --ink: var(--text, #1f2328);
+    --ink-muted: var(--text-muted, #59636e);
+    --rule: var(--border, #e4e6e9);
+    --paper: var(--bg, #ffffff);
+    --code-bg: var(--fill-1, var(--md-code-bg, #f6f8fa));
+    --code-key: var(--syn-keyword, #cf222e);
+    --row-alt: #f9fafb;
+    --thead-bg: #f3f4f6;
+    --quote-bg: #f9fafb;
+  }
+  html, body { background: var(--paper); }
+  body {
+    max-width: var(--solomd-content-max-width, 960px);
+    margin: 56px auto;
+    padding: 0 56px 96px;
+    font: 16px/1.75 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+      "Helvetica Neue", Arial,
+      "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+      "Noto Sans CJK SC", "WenQuanYi Micro Hei",
+      system-ui, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* #293 — words joined by NO-BREAK SPACE (Word / web / chat pastes) form a
+       single unbreakable run; without this the exported page overflows its
+       760px column exactly the way the preview used to. */
+    overflow-wrap: break-word;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.25;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 2em 0 0.6em;
+  }
+  h1:first-child, h2:first-child, h3:first-child { margin-top: 0; }
+  h1 {
+    font-size: 2.15em;
+    color: var(--md-h1, var(--ink));
+    border-bottom: 2px solid var(--accent-rule);
+    padding-bottom: .35em;
+    letter-spacing: -0.01em;
+  }
+  h2 {
+    font-size: 1.55em;
+    color: var(--md-h2, var(--ink));
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: .25em;
+  }
+  h3 { font-size: 1.25em; color: var(--md-h3, var(--ink)); }
+  h4 { font-size: 1.05em; color: var(--md-h4, var(--ink)); }
+  h5, h6 { font-size: 1em; color: var(--md-h5, var(--ink-muted)); }
+  p { margin: .9em 0; }
+  a {
+    color: var(--link);
+    text-decoration: none;
+    border-bottom: 1px solid var(--link-soft);
+  }
+  a:hover { border-bottom-color: var(--link); }
+  strong { color: var(--md-strong, var(--ink)); }
+  em { color: var(--md-em, var(--ink)); }
+  code {
+    font-family: "JetBrains Mono", "SF Mono", "Menlo", "Consolas",
+      "Liberation Mono", monospace;
+    font-size: .9em;
+    background: var(--code-bg);
+    padding: .15em .45em;
+    border-radius: 4px;
+    color: var(--md-code, var(--ink));
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 16px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1.2em 0;
+    line-height: 1.55;
+    border: 1px solid var(--rule);
+  }
+  pre code {
+    background: transparent;
+    padding: 0;
+    color: var(--md-code, var(--ink));
+    font-size: .88em;
+  }
+  pre code .hljs-keyword,
+  pre code .hljs-selector-tag,
+  pre code .hljs-doctag,
+  pre code .hljs-literal { color: var(--syn-keyword, #a626a4); }
+  pre code .hljs-string,
+  pre code .hljs-regexp,
+  pre code .hljs-template-tag,
+  pre code .hljs-template-variable,
+  pre code .hljs-addition { color: var(--syn-string, #50a14f); }
+  pre code .hljs-number,
+  pre code .hljs-symbol,
+  pre code .hljs-bullet { color: var(--syn-number, #986801); }
+  pre code .hljs-comment,
+  pre code .hljs-quote,
+  pre code .hljs-meta { color: var(--syn-comment, #6a737d); font-style: italic; }
+  pre code .hljs-function,
+  pre code .hljs-title,
+  pre code .hljs-built_in { color: var(--syn-function, #4078f2); }
+  pre code .hljs-type,
+  pre code .hljs-class,
+  pre code .hljs-params { color: var(--syn-type, #c18401); }
+  pre code .hljs-property,
+  pre code .hljs-attr,
+  pre code .hljs-attribute,
+  pre code .hljs-selector-class,
+  pre code .hljs-selector-id { color: var(--syn-property, #e45649); }
+  pre code .hljs-operator,
+  pre code .hljs-punctuation { color: var(--syn-operator, #0184bc); }
+  pre code .hljs-variable,
+  pre code .hljs-name,
+  pre code .hljs-tag { color: var(--syn-variable, var(--code-key, #383a42)); }
+  pre code .hljs-deletion { color: #d64545; }
+  blockquote {
+    border-left: 4px solid var(--accent-rule);
+    background: var(--quote-bg);
+    margin: 1.4em 0;
+    padding: .5em 1.2em;
+    color: var(--md-quote, var(--ink-muted));
+    font-style: italic;
+    border-radius: 0 4px 4px 0;
+  }
+  blockquote p { margin: .4em 0; }
+  ul, ol { padding-left: 1.8em; margin: .9em 0; }
+  li { margin: .3em 0; }
+  li > p { margin: .3em 0; }
+  table {
+    border-collapse: collapse;
+    margin: 1.4em 0;
+    width: 100%;
+    font-size: .95em;
+  }
+  th, td {
+    border: 1px solid var(--rule);
+    padding: 8px 14px;
+    text-align: left;
+    /* #370 — a long unbreakable run breaks inside its cell instead of pushing
+       the table past the page (and off the paper when printed). */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  th::after, td::after {
+    content: '\00a0';
+    display: inline-block;
+    width: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+  /* #271 — short cells stay on one line (see markdown.ts table_short_cells). */
+  .cell-nowrap { white-space: nowrap; }
+  thead th {
+    background: var(--thead-bg);
+    color: var(--ink);
+    font-weight: 700;
+    border-bottom: 2px solid var(--rule);
+  }
+  tbody tr:nth-child(even) { background: var(--row-alt); }
+  hr {
+    border: none;
+    border-top: 1px solid var(--md-hr, var(--rule));
+    margin: 2.4em 0;
+  }
+  img {
+    max-width: 100%;
+    border-radius: 6px;
+    margin: 1.2em 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+  }
+  .katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.5em 0; margin: 0.7em 0; }
+  .katex:not(.katex-display .katex):has(.mfrac) { display: inline-block; margin: 0.2em 0; }
+  .mermaid-block, .plantuml-block { display: flex; justify-content: center; margin: 1.5em 0; }
+  .mermaid-block svg, .plantuml-block svg { max-width: 100%; height: auto; }
+  .plantuml-block img { box-shadow: none; border-radius: 0; margin: 0; }
+  pre.mermaid-error { color: #b42318; white-space: pre-wrap; }
+  /* #454 — code block soft-wrap & line numbers in standalone HTML export */
+  .preview-content.cb-wrap-on pre {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    overflow-x: visible;
+  }
+  .preview-content.cb-numbered-on pre.cb-numbered {
+    counter-reset: cb-line;
+    padding-left: 0;
+  }
+  .preview-content.cb-numbered-on pre.cb-numbered code {
+    display: block;
+    white-space: normal;
+  }
+  .preview-content.cb-numbered-on pre.cb-numbered code .cb-line {
+    counter-increment: cb-line;
+    display: block;
+    padding-left: 3.4em;
+    position: relative;
+    white-space: pre;
+  }
+  .preview-content.cb-wrap-on.cb-numbered-on pre.cb-numbered code .cb-line {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  .preview-content.cb-numbered-on pre.cb-numbered code .cb-line::before {
+    content: counter(cb-line);
+    position: absolute;
+    left: 0;
+    width: 2.6em;
+    padding-right: 0.6em;
+    text-align: right;
+    color: var(--ink-muted, #59636e);
+    border-right: 1px solid var(--rule, #e4e6e9);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  body.has-solomd-nav {
+    max-width: none !important;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    background: #f3f4f6;
+  }
+  .solomd-export-sidebar {
+    width: 320px;
+    min-width: 180px;
+    max-width: 72vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 6px 12px 12px;
+    background: #f3f4f6;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    user-select: none;
+  }
+  .solomd-sidebar-resizer {
+    width: 6px;
+    height: 100vh;
+    cursor: col-resize;
+    flex-shrink: 0;
+    background: transparent;
+    border-right: 1px solid var(--rule, #d0d7de);
+    transition: background-color 0.15s, border-color 0.15s;
+    z-index: 5;
+  }
+  .solomd-sidebar-resizer:hover,
+  .solomd-sidebar-resizer.is-dragging {
+    background: rgba(37, 99, 235, 0.16);
+    border-right-color: #2563eb;
+  }
+  .solomd-export-tabs {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    padding-left: 2px;
+    margin-bottom: -1px;
+    z-index: 2;
+  }
+  .solomd-export-tab {
+    appearance: none;
+    border: 1px solid #b8c0c8;
+    border-bottom: 1px solid #b8c0c8;
+    background: #e5e7eb;
+    color: var(--ink, #1f2328);
+    font: 500 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    padding: 6px 14px;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+  .solomd-export-tab:hover {
+    background: #eef0f3;
+  }
+  .solomd-export-tab.is-active {
+    background: #ffffff;
+    border-bottom-color: #ffffff;
+    font-weight: 600;
+  }
+  .solomd-search-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .solomd-search-badge[hidden] {
+    display: none !important;
+  }
+  .solomd-export-panel {
+    flex: 1;
+    min-height: 0;
+    background: #ffffff;
+    border: 1px solid #b8c0c8;
+    border-radius: 0 4px 4px 4px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .solomd-nav-wrap {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .solomd-nav-wrap[hidden],
+  .solomd-nav-pane[hidden],
+  .solomd-search-pane[hidden] {
+    display: none !important;
+  }
+  .solomd-nav-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+  }
+  .solomd-nav-tool-btn {
+    appearance: none;
+    padding: 3px 10px;
+    font: 500 12px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #334155;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+  }
+  .solomd-nav-tool-btn:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+  }
+  .solomd-nav-pane {
+    flex: 1;
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 10px 12px;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .solomd-nav-pane > ul.md-toc__list {
+    padding-left: 0;
+    width: max-content;
+    min-width: 100%;
+    box-sizing: border-box;
+  }
+  .solomd-nav-pane ul.md-toc__list {
+    margin: 0;
+    padding-left: 18px;
+    list-style: none;
+  }
+  .solomd-nav-pane li.md-toc__item {
+    margin: 2px 0;
+    white-space: nowrap;
+  }
+  .solomd-nav-pane li.md-toc__item.is-collapsed > ul.md-toc__list {
+    display: none;
+  }
+  .solomd-toc-toggle {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    padding: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 3px;
+    background: #f8fafc;
+    color: #475569;
+    font: 700 12px/1 monospace;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+  .solomd-toc-toggle:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #eff6ff;
+  }
+  .solomd-toc-spacer {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .solomd-nav-pane a.md-toc__link {
+    display: inline-block;
+    white-space: nowrap;
+    color: var(--ink, #1f2328);
+    text-decoration: none;
+    border-bottom: none;
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: background 0.12s, color 0.12s;
+  }
+  .solomd-nav-pane a.md-toc__link:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+  .solomd-nav-pane a.md-toc__link.is-active {
+    background: #2563EB !important;
+    color: #FFFFFF !important;
+    font-weight: 600;
+  }
+  .solomd-search-pane {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 8px;
+  }
+  .solomd-search-bar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .solomd-search-input {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 10px;
+    font-size: 13px;
+    border: 1px solid #b8c0c8;
+    border-radius: 3px;
+    outline: none;
+    color: var(--ink, #1f2328);
+    background: #ffffff;
+  }
+  .solomd-search-input:focus {
+    border-color: var(--link, #0b5cad);
+    box-shadow: 0 0 0 2px rgba(11, 92, 173, 0.15);
+  }
+  .solomd-search-clear {
+    padding: 6px 12px;
+    font-size: 13px;
+    border: 1px solid #b8c0c8;
+    border-radius: 3px;
+    background: #f3f4f6;
+    color: var(--ink, #1f2328);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .solomd-search-clear:hover {
+    background: #e5e7eb;
+  }
+  .solomd-search-results {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    border: 1px solid #d0d7de;
+    background: #ffffff;
+    font-size: 13px;
+  }
+  .solomd-search-item {
+    padding: 6px 10px;
+    border-bottom: 1px solid #f0f2f4;
+    cursor: pointer;
+    user-select: none;
+  }
+  .solomd-search-item:hover {
+    background: #f3f4f6;
+  }
+  .solomd-search-item.is-active {
+    background: #2563eb;
+    color: #ffffff;
+  }
+  .solomd-search-item__title {
+    font-weight: 600;
+    font-size: 13px;
+    color: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .solomd-search-item__snippet {
+    font-size: 12px;
+    color: var(--ink-muted, #59636e);
+    margin-top: 2px;
+    line-height: 1.45;
+    word-break: break-all;
+  }
+  .solomd-search-item.is-active .solomd-search-item__snippet {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  .solomd-search-item mark {
+    background: #fef08a;
+    color: #854d0e;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+  .solomd-search-empty {
+    padding: 16px 10px;
+    text-align: center;
+    color: var(--ink-muted, #59636e);
+    font-size: 12px;
+  }
+  .solomd-export-main {
+    flex: 1;
+    min-width: 0;
+    height: 100vh;
+    overflow: auto;
+    background: var(--paper, #ffffff);
+    padding: 40px 56px 96px;
+    box-sizing: border-box;
+  }
+  .solomd-export-article {
+    max-width: var(--solomd-content-max-width, 960px);
+    margin: 0 auto;
+  }
+  .solomd-search-flash {
+    outline: 2px solid #f59e0b;
+    background-color: rgba(254, 240, 138, 0.65) !important;
+    border-radius: 4px;
+    transition: background-color 0.4s ease;
+  }
+  .solomd-toc-page__title {
+    font-size: 1.55em;
+    font-weight: 700;
+    color: var(--ink, #1f2328);
+    margin: 0 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  /* #598 — Subtle technical-documentation "< Previous / Next >" topic buttons */
+  .solomd-topic-nav--top {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 10px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid #e8ecf0;
+  }
+  .solomd-topic-nav--bottom {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 44px;
+    padding-top: 16px;
+    border-top: 1px solid #e8ecf0;
+  }
+  .solomd-topic-btn {
+    appearance: none;
+    font: 500 12.5px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #475569;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 4px 11px;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+  }
+  .solomd-topic-nav--bottom .solomd-topic-btn {
+    padding: 5px 14px;
+  }
+  .solomd-topic-btn:hover:not(:disabled) {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+  }
+  .solomd-topic-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+  @media print {
+    .solomd-topic-nav {
+      display: none !important;
+    }
+  }
+  @media (max-width: 768px) {
+    body {
+      max-width: 100% !important;
+      padding: 0 20px 64px;
+    }
+    body.has-solomd-nav {
+      flex-direction: column;
+      height: auto;
+      overflow: auto;
+    }
+    .solomd-export-sidebar {
+      width: 100% !important;
+      max-width: none;
+      height: 320px;
+      padding: 12px;
+      border-right: none;
+      border-bottom: 1px solid var(--rule, #d0d7de);
+    }
+    .solomd-sidebar-resizer {
+      display: none !important;
+    }
+    .solomd-export-main {
+      height: auto;
+      padding: 24px 20px 64px;
+    }
+    .solomd-export-article {
+      max-width: 100% !important;
+    }
+  }
+  @media print {
+    body.has-solomd-nav {
+      display: block;
+      height: auto;
+      overflow: visible;
+      background: #ffffff;
+    }
+    .solomd-export-sidebar,
+    .solomd-sidebar-resizer {
+      display: none !important;
+    }
+    .solomd-export-main {
+      height: auto;
+      overflow: visible;
+      padding: 0;
+    }
+    .solomd-export-article {
+      max-width: none;
+    }
+    .solomd-export-article section.page {
+      display: block !important;
+    }
+  }
+
+</style>
+<style id="solomd-custom-theme">
+
+p:has(> img:only-child), figure, .md-diagram, .mermaid-wrap, .katex-display, .katex-display > .katex {
+  text-align: center !important;
+}
+p:has(> img:only-child) > img, figure > img {
+  display: inline-block;
+}
+.mermaid-wrap, .md-diagram {
+  display: flex;
+  justify-content: center;
+}
+
+</style>
+</head>
+<body class="preview-content has-solomd-nav">
+<aside class="solomd-export-sidebar" aria-label="Document Navigation & Search">
+  <div class="solomd-export-tabs" role="tablist">
+    <button type="button" class="solomd-export-tab is-active" data-tab="nav" role="tab" aria-selected="true">Navigation</button>
+    <button type="button" class="solomd-export-tab" data-tab="search" role="tab" aria-selected="false">
+      <span>Search</span>
+      <span id="solomd-search-badge" class="solomd-search-badge" hidden>0</span>
+    </button>
+  </div>
+  <div class="solomd-export-panel">
+    <div id="solomd-nav-wrap" class="solomd-nav-wrap" role="tabpanel">
+      <div class="solomd-nav-toolbar">
+        <button id="solomd-nav-expand-btn" type="button" class="solomd-nav-tool-btn">Expand</button>
+        <button id="solomd-nav-collapse-btn" type="button" class="solomd-nav-tool-btn">Collapse</button>
+      </div>
+      <nav id="solomd-nav-pane" class="solomd-nav-pane"><ul class="md-toc__list">
+<li class="md-toc__item"><a href="#atlof-frontend" class="md-toc__link">ATLOF Frontend</a>
+<ul class="md-toc__list">
+<li class="md-toc__item"><a href="#daftar-isi" class="md-toc__link">Daftar isi</a></li>
+<li class="md-toc__item"><a href="#1-ringkasan" class="md-toc__link">1. Ringkasan</a></li>
+<li class="md-toc__item"><a href="#2-struktur-file" class="md-toc__link">2. Struktur file</a></li>
+<li class="md-toc__item"><a href="#3-cara-menjalankan" class="md-toc__link">3. Cara menjalankan</a></li>
+<li class="md-toc__item"><a href="#4-aturan-penamaan-yang-dipakai" class="md-toc__link">4. Aturan penamaan yang dipakai</a></li>
+<li class="md-toc__item"><a href="#5-referensi-class-css" class="md-toc__link">5. Referensi class CSS</a>
+<ul class="md-toc__list">
+<li class="md-toc__item"><a href="#51-class-global-dan-layout" class="md-toc__link">5.1 Class global dan layout</a></li>
+<li class="md-toc__item"><a href="#52-header-dan-navigasi" class="md-toc__link">5.2 Header dan navigasi</a></li>
+<li class="md-toc__item"><a href="#53-tombol-dan-baris-aksi" class="md-toc__link">5.3 Tombol dan baris aksi</a></li>
+<li class="md-toc__item"><a href="#54-beranda" class="md-toc__link">5.4 Beranda</a></li>
+<li class="md-toc__item"><a href="#55-katalog" class="md-toc__link">5.5 Katalog</a></li>
+<li class="md-toc__item"><a href="#56-form-dan-input" class="md-toc__link">5.6 Form dan input</a></li>
+<li class="md-toc__item"><a href="#57-kalender" class="md-toc__link">5.7 Kalender</a></li>
+<li class="md-toc__item"><a href="#58-kartu-barang" class="md-toc__link">5.8 Kartu barang</a></li>
+<li class="md-toc__item"><a href="#59-detail-barang" class="md-toc__link">5.9 Detail barang</a></li>
+<li class="md-toc__item"><a href="#510-profil" class="md-toc__link">5.10 Profil</a></li>
+<li class="md-toc__item"><a href="#511-autentikasi" class="md-toc__link">5.11 Autentikasi</a></li>
+<li class="md-toc__item"><a href="#512-dasbor-admin-cs" class="md-toc__link">5.12 Dasbor Admin CS</a></li>
+<li class="md-toc__item"><a href="#513-footer" class="md-toc__link">5.13 Footer</a></li>
+<li class="md-toc__item"><a href="#514-notifikasi-dan-status" class="md-toc__link">5.14 Notifikasi dan status</a></li>
+<li class="md-toc__item"><a href="#515-class-yang-dibuat-javascript" class="md-toc__link">5.15 Class yang dibuat JavaScript</a></li>
+</ul>
+</li>
+<li class="md-toc__item"><a href="#6-referensi-id-per-halaman" class="md-toc__link">6. Referensi ID per halaman</a>
+<ul class="md-toc__list">
+<li class="md-toc__item"><a href="#61-indexxhtml" class="md-toc__link">6.1 index.xhtml</a></li>
+<li class="md-toc__item"><a href="#62-katalogxhtml" class="md-toc__link">6.2 katalog.xhtml</a></li>
+<li class="md-toc__item"><a href="#63-buat_laporanxhtml" class="md-toc__link">6.3 buat_laporan.xhtml</a></li>
+<li class="md-toc__item"><a href="#64-edit_laporanxhtml" class="md-toc__link">6.4 edit_laporan.xhtml</a></li>
+<li class="md-toc__item"><a href="#65-laporan_sayaxhtml" class="md-toc__link">6.5 laporan_saya.xhtml</a></li>
+<li class="md-toc__item"><a href="#66-detailxhtml" class="md-toc__link">6.6 detail.xhtml</a></li>
+<li class="md-toc__item"><a href="#67-loginxhtml" class="md-toc__link">6.7 login.xhtml</a></li>
+<li class="md-toc__item"><a href="#68-pendaftaranxhtml" class="md-toc__link">6.8 pendaftaran.xhtml</a></li>
+<li class="md-toc__item"><a href="#69-profilxhtml" class="md-toc__link">6.9 profil.xhtml</a></li>
+<li class="md-toc__item"><a href="#610-admin_csxhtml" class="md-toc__link">6.10 admin_cs.xhtml</a></li>
+<li class="md-toc__item"><a href="#611-akses_akunxhtml" class="md-toc__link">6.11 akses_akun.xhtml</a></li>
+</ul>
+</li>
+<li class="md-toc__item"><a href="#7-id-yang-dibuat-javascript" class="md-toc__link">7. ID yang dibuat JavaScript</a></li>
+<li class="md-toc__item"><a href="#8-contoh-kombinasi-class" class="md-toc__link">8. Contoh kombinasi class</a></li>
+<li class="md-toc__item"><a href="#9-catatan-penting" class="md-toc__link">9. Catatan penting</a></li>
+<li class="md-toc__item"><a href="#10-perawatan-css" class="md-toc__link">10. Perawatan CSS</a>
+<ul class="md-toc__list">
+<li class="md-toc__item"><a href="#101-yang-sudah-dihapus" class="md-toc__link">10.1 Yang sudah dihapus</a></li>
+<li class="md-toc__item"><a href="#102-yang-sengaja-dipertahankan" class="md-toc__link">10.2 Yang sengaja dipertahankan</a></li>
+<li class="md-toc__item"><a href="#103-breakpoint-aktual" class="md-toc__link">10.3 Breakpoint aktual</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></nav>
+    </div>
+    <div id="solomd-search-pane" class="solomd-search-pane" role="tabpanel" hidden>
+      <div class="solomd-search-bar">
+        <input id="solomd-search-input" type="text" class="solomd-search-input" placeholder="Type keyword, press Enter" autocomplete="off" />
+        <button id="solomd-search-clear" type="button" class="solomd-search-clear">Clear</button>
+      </div>
+      <div id="solomd-search-results" class="solomd-search-results" data-empty-text="No matching results"></div>
+    </div>
+  </div>
+</aside>
+<div id="solomd-sidebar-resizer" class="solomd-sidebar-resizer" role="separator" aria-orientation="vertical" title="Drag to resize navigation panel"></div>
+<main id="solomd-export-main" class="solomd-export-main">
+  <article id="solomd-export-article" class="solomd-export-article">
+<nav class="md-toc" aria-label="Table of contents" data-source-line="1">
+<ul class="md-toc__list">
+<li class="md-toc__item"><a href="#atlof-frontend" class="md-toc__link">ATLOF Frontend</a>
+<ul class="md-toc__list">
+<li class="md-toc__item"><a href="#daftar-isi" class="md-toc__link">Daftar isi</a></li>
+<li class="md-toc__item"><a href="#1-ringkasan" class="md-toc__link">1. Ringkasan</a></li>
+<li class="md-toc__item"><a href="#2-struktur-file" class="md-toc__link">2. Struktur file</a></li>
+<li class="md-toc__item"><a href="#3-cara-menjalankan" class="md-toc__link">3. Cara menjalankan</a></li>
+<li class="md-toc__item"><a href="#4-aturan-penamaan-yang-dipakai" class="md-toc__link">4. Aturan penamaan yang dipakai</a></li>
+<li class="md-toc__item"><a href="#5-referensi-class-css" class="md-toc__link">5. Referensi class CSS</a>
+<ul class="md-toc__list">
+<li class="md-toc__item"><a href="#51-class-global-dan-layout" class="md-toc__link">5.1 Class global dan layout</a></li>
+<li class="md-toc__item"><a href="#52-header-dan-navigasi" class="md-toc__link">5.2 Header dan navigasi</a></li>
+<li class="md-toc__item"><a href="#53-tombol-dan-baris-aksi" class="md-toc__link">5.3 Tombol dan baris aksi</a></li>
+<li class="md-toc__item"><a href="#54-beranda" class="md-toc__link">5.4 Beranda</a></li>
+<li class="md-toc__item"><a href="#55-katalog" class="md-toc__link">5.5 Katalog</a></li>
+<li class="md-toc__item"><a href="#56-form-dan-input" class="md-toc__link">5.6 Form dan input</a></li>
+<li class="md-toc__item"><a href="#57-kalender" class="md-toc__link">5.7 Kalender</a></li>
+<li class="md-toc__item"><a href="#58-kartu-barang" class="md-toc__link">5.8 Kartu barang</a></li>
+<li class="md-toc__item"><a href="#59-detail-barang" class="md-toc__link">5.9 Detail barang</a></li>
+<li class="md-toc__item"><a href="#510-profil" class="md-toc__link">5.10 Profil</a></li>
+<li class="md-toc__item"><a href="#511-autentikasi" class="md-toc__link">5.11 Autentikasi</a></li>
+<li class="md-toc__item"><a href="#512-dasbor-admin-cs" class="md-toc__link">5.12 Dasbor Admin CS</a></li>
+<li class="md-toc__item"><a href="#513-footer" class="md-toc__link">5.13 Footer</a></li>
+<li class="md-toc__item"><a href="#514-notifikasi-dan-status" class="md-toc__link">5.14 Notifikasi dan status</a></li>
+<li class="md-toc__item"><a href="#515-class-yang-dibuat-javascript" class="md-toc__link">5.15 Class yang dibuat JavaScript</a></li>
+</ul>
+</li>
+<li class="md-toc__item"><a href="#6-referensi-id-per-halaman" class="md-toc__link">6. Referensi ID per halaman</a>
+<ul class="md-toc__list">
+<li class="md-toc__item"><a href="#61-indexxhtml" class="md-toc__link">6.1 index.xhtml</a></li>
+<li class="md-toc__item"><a href="#62-katalogxhtml" class="md-toc__link">6.2 katalog.xhtml</a></li>
+<li class="md-toc__item"><a href="#63-buat_laporanxhtml" class="md-toc__link">6.3 buat_laporan.xhtml</a></li>
+<li class="md-toc__item"><a href="#64-edit_laporanxhtml" class="md-toc__link">6.4 edit_laporan.xhtml</a></li>
+<li class="md-toc__item"><a href="#65-laporan_sayaxhtml" class="md-toc__link">6.5 laporan_saya.xhtml</a></li>
+<li class="md-toc__item"><a href="#66-detailxhtml" class="md-toc__link">6.6 detail.xhtml</a></li>
+<li class="md-toc__item"><a href="#67-loginxhtml" class="md-toc__link">6.7 login.xhtml</a></li>
+<li class="md-toc__item"><a href="#68-pendaftaranxhtml" class="md-toc__link">6.8 pendaftaran.xhtml</a></li>
+<li class="md-toc__item"><a href="#69-profilxhtml" class="md-toc__link">6.9 profil.xhtml</a></li>
+<li class="md-toc__item"><a href="#610-admin_csxhtml" class="md-toc__link">6.10 admin_cs.xhtml</a></li>
+<li class="md-toc__item"><a href="#611-akses_akunxhtml" class="md-toc__link">6.11 akses_akun.xhtml</a></li>
+</ul>
+</li>
+<li class="md-toc__item"><a href="#7-id-yang-dibuat-javascript" class="md-toc__link">7. ID yang dibuat JavaScript</a></li>
+<li class="md-toc__item"><a href="#8-contoh-kombinasi-class" class="md-toc__link">8. Contoh kombinasi class</a></li>
+<li class="md-toc__item"><a href="#9-catatan-penting" class="md-toc__link">9. Catatan penting</a></li>
+<li class="md-toc__item"><a href="#10-perawatan-css" class="md-toc__link">10. Perawatan CSS</a>
+<ul class="md-toc__list">
+<li class="md-toc__item"><a href="#101-yang-sudah-dihapus" class="md-toc__link">10.1 Yang sudah dihapus</a></li>
+<li class="md-toc__item"><a href="#102-yang-sengaja-dipertahankan" class="md-toc__link">10.2 Yang sengaja dipertahankan</a></li>
+<li class="md-toc__item"><a href="#103-breakpoint-aktual" class="md-toc__link">10.3 Breakpoint aktual</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+<h1 id="atlof-frontend" tabindex="-1" data-source-line="3">ATLOF Frontend</h1>
+<p data-source-line="5">Dokumentasi class CSS dan ID HTML untuk project <strong>ATLOF (Atma Lost &amp; Found)</strong>.</p>
+<p data-source-line="7">Dokumen ini memakai nama class dan ID yang <strong>sudah ada</strong>. Tidak ada rename pada project.</p>
+<p data-source-line="9">Dokumen ini mencakup seluruh class dan ID yang ditemukan di 13 halaman <code>.xhtml</code>, <code>css/style.css</code>, dan string HTML di <code>js/app.js</code>, termasuk nama yang dibuat secara dinamis.</p>
+<h2 id="daftar-isi" tabindex="-1" data-source-line="11">Daftar isi</h2>
+<ol data-source-line="13">
+<li data-source-line="13"><a href="#1-ringkasan">Ringkasan</a></li>
+<li data-source-line="14"><a href="#2-struktur-file">Struktur file</a></li>
+<li data-source-line="15"><a href="#3-cara-menjalankan">Cara menjalankan</a></li>
+<li data-source-line="16"><a href="#4-aturan-penamaan-yang-dipakai">Aturan penamaan yang dipakai</a></li>
+<li data-source-line="17"><a href="#5-referensi-class-css">Referensi class CSS</a></li>
+<li data-source-line="18"><a href="#6-referensi-id-per-halaman">Referensi ID per halaman</a></li>
+<li data-source-line="19"><a href="#7-id-yang-dibuat-javascript">ID yang dibuat JavaScript</a></li>
+<li data-source-line="20"><a href="#8-contoh-kombinasi-class">Contoh kombinasi class</a></li>
+<li data-source-line="21"><a href="#9-catatan-penting">Catatan penting</a></li>
+<li data-source-line="22"><a href="#10-perawatan-css">Perawatan CSS</a></li>
+</ol>
+<h2 id="1-ringkasan" tabindex="-1" data-source-line="24">1. Ringkasan</h2>
+<ul data-source-line="26">
+<li data-source-line="26">Frontend statis berbasis XHTML 1.0 Strict.</li>
+<li data-source-line="27">Styling ada di <code>css/style.css</code>.</li>
+<li data-source-line="28">Logika halaman ada di <code>js/app.js</code>.</li>
+<li data-source-line="29">Data akun dan laporan disimpan di <code>localStorage</code> dan <code>sessionStorage</code> untuk simulasi.</li>
+<li data-source-line="30">Halaman terdiri dari 11 file <code>.xhtml</code>.</li>
+</ul>
+<h2 id="2-struktur-file" tabindex="-1" data-source-line="32">2. Struktur file</h2>
+<pre class="cb-numbered"><code data-source-line="34" class="language-text"><span class="cb-line">ATLOF_Frontend_Revisi_5/</span>
+<span class="cb-line">├── index.xhtml</span>
+<span class="cb-line">├── katalog.xhtml</span>
+<span class="cb-line">├── buat_laporan.xhtml</span>
+<span class="cb-line">├── edit_laporan.xhtml</span>
+<span class="cb-line">├── laporan_saya.xhtml</span>
+<span class="cb-line">├── detail.xhtml</span>
+<span class="cb-line">├── login.xhtml</span>
+<span class="cb-line">├── pendaftaran.xhtml</span>
+<span class="cb-line">├── profil.xhtml</span>
+<span class="cb-line">├── admin_cs.xhtml</span>
+<span class="cb-line">├── akses_akun.xhtml</span>
+<span class="cb-line">├── css/</span>
+<span class="cb-line">│   └── style.css</span>
+<span class="cb-line">├── js/</span>
+<span class="cb-line">│   └── app.js</span>
+<span class="cb-line">├── fonts/</span>
+<span class="cb-line">│   ├── IBMPlexSans-latin.woff2</span>
+<span class="cb-line">│   ├── IBMPlexMono-400-latin.woff2</span>
+<span class="cb-line">│   └── IBMPlexMono-600-latin.woff2</span>
+<span class="cb-line">└── images/</span></code></pre>
+<p data-source-line="58">Folder <code>images/</code> berisi aset gambar dan ikon, termasuk <code>logo-atlof-ikon.svg</code> yang dipakai sebagai logo di header.</p>
+<h2 id="3-cara-menjalankan" tabindex="-1" data-source-line="60">3. Cara menjalankan</h2>
+<ol data-source-line="62">
+<li data-source-line="62">Letakkan folder project di <code>xampp/htdocs</code>.</li>
+<li data-source-line="63">Jalankan Apache dari XAMPP.</li>
+<li data-source-line="64">Buka <code>http://localhost/ATLOF_Frontend_Revisi_5/index.xhtml</code>.</li>
+</ol>
+<p data-source-line="66">Project juga bisa dibuka langsung lewat browser, tetapi beberapa browser membatasi <code>sessionStorage</code> dan <code>localStorage</code> pada protokol <code>file://</code>. Cara paling aman adalah lewat Apache.</p>
+<h2 id="4-aturan-penamaan-yang-dipakai" tabindex="-1" data-source-line="68">4. Aturan penamaan yang dipakai</h2>
+<ul data-source-line="70">
+<li data-source-line="70"><strong>Class</strong> dipakai untuk styling dan penanda struktur.</li>
+<li data-source-line="71"><strong>ID</strong> dipakai sebagai hook JavaScript, target <code>label for</code>, dan penanda elemen unik.</li>
+<li data-source-line="72">Sebagian class dan ID dibuat langsung oleh <code>js/app.js</code>, bukan ditulis di file <code>.xhtml</code>.</li>
+<li data-source-line="73">Prefix yang sudah dipakai:
+<ul data-source-line="74">
+<li data-source-line="74"><code>halaman-</code> untuk scope halaman.</li>
+<li data-source-line="75"><code>tombol-</code> untuk varian tombol.</li>
+<li data-source-line="76"><code>kartu-</code> untuk kartu.</li>
+<li data-source-line="77"><code>baris-</code> untuk baris layout.</li>
+<li data-source-line="78"><code>panel-</code> untuk panel.</li>
+<li data-source-line="79"><code>footer-</code> untuk bagian footer.</li>
+<li data-source-line="80"><code>admin-</code> dan <code>cs</code> untuk Dasbor Admin CS.</li>
+</ul>
+</li>
+<li data-source-line="81">ID harus unik dalam satu halaman. ID yang sama boleh muncul di halaman berbeda.</li>
+</ul>
+<h2 id="5-referensi-class-css" tabindex="-1" data-source-line="83">5. Referensi class CSS</h2>
+<h3 id="51-class-global-dan-layout" tabindex="-1" data-source-line="85">5.1 Class global dan layout</h3>
+<table data-source-line="87">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>container</code></td>
+<td>Pembungkus konten dengan lebar maksimum 1280px</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bagian</code></td>
+<td>Memberi padding atas dan bawah pada isi halaman</td>
+<td><code>admin_cs</code>, <code>buat_laporan</code>, <code>detail</code>, <code>edit_laporan</code>, <code>index</code>, <code>katalog</code>, <code>laporan_saya</code>, <code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>subjudul</code></td>
+<td>Teks pengantar abu-abu di bawah judul</td>
+<td><code>admin_cs</code>, <code>buat_laporan</code>, <code>edit_laporan</code>, <code>katalog</code>, <code>laporan_saya</code>, <code>login</code>, <code>pendaftaran</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>teks-abu</code></td>
+<td>Teks sekunder berwarna abu-abu</td>
+<td><code>admin_cs</code>, <code>detail</code>, <code>index</code>, <code>katalog</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>teks-emas</code></td>
+<td class="cell-nowrap">Teks aksen emas</td>
+<td>11 halaman; <code>pendaftaran</code> dan <code>profil</code> memakai <code>footer-pesan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>label-kecil</code></td>
+<td>Label kecil huruf kapital di atas judul</td>
+<td><code>admin_cs</code>, <code>login</code>, <code>pendaftaran</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>link-kembali</code></td>
+<td>Tautan kembali ke halaman sebelumnya</td>
+<td class="cell-nowrap"><code>akses_akun</code>, <code>detail</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>judul-bagian</code></td>
+<td>Baris judul dan tombol aksi di atas konten</td>
+<td><code>admin_cs</code>, <code>index</code>, <code>katalog</code>, <code>laporan_saya</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>judul-terpusat</code></td>
+<td>Judul dan deskripsi rata tengah</td>
+<td class="cell-nowrap"><code>index</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>pengantar</code></td>
+<td class="cell-nowrap">Blok pengantar halaman</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code>, <code>katalog</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>form-besar</code></td>
+<td class="cell-nowrap">Kartu form lebar</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code>, <code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>grid-barang</code></td>
+<td class="cell-nowrap">Grid kartu barang</td>
+<td><code>index</code>, <code>katalog</code>, <code>laporan_saya</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>grid-katalog</code></td>
+<td>Grid kartu khusus halaman katalog</td>
+<td class="cell-nowrap"><code>katalog</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>layout-katalog</code></td>
+<td>Grid dua kolom: panel filter dan daftar barang</td>
+<td class="cell-nowrap"><code>katalog</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>statistik</code></td>
+<td>Baris ringkasan angka laporan</td>
+<td class="cell-nowrap"><code>laporan_saya</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kosong</code></td>
+<td class="cell-nowrap">Kotak keadaan kosong</td>
+<td><code>admin_cs</code>, <code>katalog</code>, <code>laporan_saya</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>katalog-page</code></td>
+<td>Penanda halaman katalog; belum punya aturan CSS</td>
+<td class="cell-nowrap"><code>katalog</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-header-dan-navigasi" tabindex="-1" data-source-line="107">5.2 Header dan navigasi</h3>
+<table data-source-line="109">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>header-utama</code></td>
+<td>Header biru yang menempel di atas saat scroll</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>navbar</code></td>
+<td class="cell-nowrap">Baris navigasi utama</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>logo</code></td>
+<td>Blok merek ATLOF berisi ikon SVG dan teks</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>menu-links</code></td>
+<td class="cell-nowrap">Menu navigasi utama</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Area tombol akun di kanan header</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>aktif</code></td>
+<td>Menandai link navigasi yang sedang dibuka</td>
+<td><code>buat_laporan</code>, <code>detail</code>, <code>edit_laporan</code>, <code>index</code>, <code>katalog</code>, <code>laporan_saya</code>, dan link Dasbor CS yang dibuat JavaScript</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-keluar</code></td>
+<td>Varian tombol keluar di header</td>
+<td>Dibuat JavaScript setelah login</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-tombol-dan-baris-aksi" tabindex="-1" data-source-line="119">5.3 Tombol dan baris aksi</h3>
+<table data-source-line="121">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>tombol</code></td>
+<td class="cell-nowrap">Class dasar semua tombol</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-kuning</code></td>
+<td>Tombol utama berwarna kuning</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-outline</code></td>
+<td class="cell-nowrap">Tombol sekunder bergaris</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-putih</code></td>
+<td>Tombol putih untuk latar gelap</td>
+<td class="cell-nowrap"><code>index</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-kecil</code></td>
+<td class="cell-nowrap">Tombol ukuran kecil</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-bahaya</code></td>
+<td>Tombol untuk aksi berbahaya seperti hapus</td>
+<td><code>profil</code> dan tombol Hapus yang dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-kalender</code></td>
+<td class="cell-nowrap">Tombol pembuka kalender</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>lebar-penuh</code></td>
+<td>Membuat tombol atau tautan selebar container</td>
+<td><code>katalog</code>, <code>login</code>, <code>pendaftaran</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>aksi</code></td>
+<td>Baris berisi beberapa tombol</td>
+<td><code>akses_akun</code>, <code>buat_laporan</code>, <code>edit_laporan</code>, <code>index</code>, <code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>aksi-form</code></td>
+<td>Baris aksi di bagian bawah form</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>aksi-tengah</code></td>
+<td class="cell-nowrap">Baris aksi rata tengah</td>
+<td class="cell-nowrap"><code>akses_akun</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>aksi-kelola</code></td>
+<td>Baris tombol Edit dan Hapus pada kartu laporan</td>
+<td>Dibuat <code>app.js</code> di <code>laporan_saya</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>batal-profil</code></td>
+<td>Penanda tombol Batal pada form profil; belum punya aturan CSS</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>lihat-password</code></td>
+<td>Hook checkbox untuk menampilkan password; belum punya aturan CSS</td>
+<td class="cell-nowrap"><code>login</code>, <code>pendaftaran</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="54-beranda" tabindex="-1" data-source-line="138">5.4 Beranda</h3>
+<table data-source-line="140">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>hero</code></td>
+<td>Bagian pembuka berwarna biru</td>
+<td class="cell-nowrap"><code>index</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>hero-isi</code></td>
+<td>Isi teks dan tombol di dalam hero</td>
+<td class="cell-nowrap"><code>index</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bagian-cara</code></td>
+<td>Seksi penjelasan cara kerja ATLOF</td>
+<td class="cell-nowrap"><code>index</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bagian-terbaru</code></td>
+<td>Seksi laporan barang terbaru</td>
+<td class="cell-nowrap"><code>index</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tiga-langkah</code></td>
+<td class="cell-nowrap">Grid tiga langkah</td>
+<td class="cell-nowrap"><code>index</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kartu-langkah</code></td>
+<td class="cell-nowrap">Kartu satu langkah</td>
+<td class="cell-nowrap"><code>index</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nomor-langkah</code></td>
+<td class="cell-nowrap">Nomor urut langkah</td>
+<td class="cell-nowrap"><code>index</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="55-katalog" tabindex="-1" data-source-line="150">5.5 Katalog</h3>
+<table data-source-line="152">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>pencarian</code></td>
+<td class="cell-nowrap">Kotak form pencarian</td>
+<td class="cell-nowrap"><code>katalog</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>baris-pencarian</code></td>
+<td>Baris input pencarian dan tombol cari</td>
+<td class="cell-nowrap"><code>katalog</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>panel-filter</code></td>
+<td>Panel filter yang menempel saat scroll</td>
+<td class="cell-nowrap"><code>katalog</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>daftar-barang</code></td>
+<td>Pembungkus daftar hasil pencarian; belum punya aturan CSS</td>
+<td class="cell-nowrap"><code>katalog</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>field</code></td>
+<td>Grup label dan input pada filter</td>
+<td class="cell-nowrap"><code>katalog</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="56-form-dan-input" tabindex="-1" data-source-line="160">5.6 Form dan input</h3>
+<table data-source-line="162">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>halaman-form</code></td>
+<td>Scope halaman form buat dan edit laporan</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>field</code></td>
+<td>Grup label, input, dan teks bantuan</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code>, <code>katalog</code>, <code>login</code>, <code>pendaftaran</code>, <code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>dua-kolom</code></td>
+<td>Grid dua kolom untuk field</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>pilih-jenis</code></td>
+<td>Grup radio untuk jenis laporan</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>judul-form</code></td>
+<td>Judul di dalam kartu form</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bantuan</code></td>
+<td>Teks bantuan kecil di bawah input</td>
+<td><code>buat_laporan</code>, <code>detail</code>, <code>edit_laporan</code>, <code>login</code>, <code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bantuan-penting</code></td>
+<td>Teks bantuan yang diberi garis peringatan</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>centang</code></td>
+<td class="cell-nowrap">Label untuk checkbox</td>
+<td class="cell-nowrap"><code>login</code>, <code>pendaftaran</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>panel-form</code></td>
+<td>Panel form yang bisa dibuka dan ditutup</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>catatan</code></td>
+<td>Kotak catatan verifikasi barang</td>
+<td class="cell-nowrap"><code>detail</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="57-kalender" tabindex="-1" data-source-line="175">5.7 Kalender</h3>
+<table data-source-line="177">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>tanggal-pilih</code></td>
+<td>Pembungkus input tanggal dan tombol kalender</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kalender</code></td>
+<td>Panel kalender yang muncul di bawah input</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kalender-atas</code></td>
+<td>Header kalender berisi tombol bulan dan nama bulan</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kalender-grid</code></td>
+<td>Grid tujuh kolom untuk tanggal</td>
+<td><code>buat_laporan</code>, <code>edit_laporan</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nama-hari</code></td>
+<td>Label nama hari di kalender</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>pilih-hari</code></td>
+<td>Tombol satu tanggal di kalender</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tanggal-kosong</code></td>
+<td>Sel kosong sebelum tanggal pertama; belum punya aturan CSS</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="58-kartu-barang" tabindex="-1" data-source-line="187">5.8 Kartu barang</h3>
+<table data-source-line="189">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>kartu-barang</code></td>
+<td class="cell-nowrap">Kartu satu barang</td>
+<td>Dibuat <code>app.js</code> untuk beranda, katalog, dan laporan saya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>gambar-barang</code></td>
+<td>Tautan pembungkus gambar barang</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>isi-kartu</code></td>
+<td>Bagian teks di dalam kartu barang</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>lencana-baris</code></td>
+<td>Baris berisi lencana jenis dan status</td>
+<td class="cell-nowrap"><code>detail</code> dan dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>lencana</code></td>
+<td>Lencana kecil untuk jenis atau status</td>
+<td class="cell-nowrap"><code>detail</code> dan dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>hilang</code></td>
+<td>Modifier lencana untuk laporan hilang</td>
+<td>Dibuat <code>app.js</code> melalui <code>class="lencana ' + b.jenis + '"</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>ditemukan</code></td>
+<td>Modifier lencana untuk laporan ditemukan</td>
+<td>Dibuat <code>app.js</code> melalui <code>class="lencana ' + b.jenis + '"</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kartu-kelola</code></td>
+<td>Kartu laporan di halaman Laporan Saya</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>pengaturan-status</code></td>
+<td>Panel dropdown dan tombol simpan status</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>catatan-status</code></td>
+<td>Catatan bahwa status dikelola CS</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="59-detail-barang" tabindex="-1" data-source-line="202">5.9 Detail barang</h3>
+<table data-source-line="204">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>detail-grid</code></td>
+<td>Grid dua kolom: foto dan informasi barang</td>
+<td class="cell-nowrap"><code>detail</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>foto-detail</code></td>
+<td>Kartu pembungkus foto barang</td>
+<td class="cell-nowrap"><code>detail</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kotak-detail</code></td>
+<td>Kartu informasi detail barang</td>
+<td class="cell-nowrap"><code>detail</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tabel-detail</code></td>
+<td class="cell-nowrap">Tabel spesifikasi barang</td>
+<td class="cell-nowrap"><code>detail</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kontak-detail</code></td>
+<td>Blok kontak pelapor atau CS</td>
+<td class="cell-nowrap"><code>detail</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kontak-whatsapp</code></td>
+<td class="cell-nowrap">Kotak kontak WhatsApp</td>
+<td class="cell-nowrap"><code>detail</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>catatan</code></td>
+<td>Catatan verifikasi kepemilikan</td>
+<td class="cell-nowrap"><code>detail</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="510-profil" tabindex="-1" data-source-line="214">5.10 Profil</h3>
+<table data-source-line="216">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>halaman-profil</code></td>
+<td class="cell-nowrap">Scope halaman profil</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>profil-container</code></td>
+<td class="cell-nowrap">Pembungkus konten profil</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>profil-atas-judul</code></td>
+<td class="cell-nowrap">Judul halaman profil</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>profil-kartu</code></td>
+<td class="cell-nowrap">Kartu utama profil</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>profil-atas</code></td>
+<td>Header kartu berisi avatar dan nama</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>avatar</code></td>
+<td>Lingkaran inisial pengguna</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>profil-identitas</code></td>
+<td class="cell-nowrap">Grid data identitas</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-identitas</code></td>
+<td>Satu baris data identitas</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>label-peran</code></td>
+<td class="cell-nowrap">Lencana peran Admin CS</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>profil-tombol</code></td>
+<td>Pembungkus tombol profil; belum punya aturan CSS</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-bahaya</code></td>
+<td>Tombol Keluar berwarna merah</td>
+<td class="cell-nowrap"><code>profil</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="511-autentikasi" tabindex="-1" data-source-line="230">5.11 Autentikasi</h3>
+<table data-source-line="232">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>grid-akun</code></td>
+<td>Grid dua kolom: panel informasi dan kartu form</td>
+<td class="cell-nowrap"><code>login</code>, <code>pendaftaran</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>panel-samping</code></td>
+<td>Panel informasi berwarna biru di kiri</td>
+<td class="cell-nowrap"><code>login</code>, <code>pendaftaran</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kotak-form</code></td>
+<td class="cell-nowrap">Kartu form autentikasi</td>
+<td class="cell-nowrap"><code>login</code>, <code>pendaftaran</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>halaman-akses</code></td>
+<td>Scope halaman persyaratan akses</td>
+<td class="cell-nowrap"><code>akses_akun</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kotak-akses</code></td>
+<td>Kartu ajakan masuk atau daftar</td>
+<td class="cell-nowrap"><code>akses_akun</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>aksi-tengah</code></td>
+<td class="cell-nowrap">Baris tombol rata tengah</td>
+<td class="cell-nowrap"><code>akses_akun</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="512-dasbor-admin-cs" tabindex="-1" data-source-line="241">5.12 Dasbor Admin CS</h3>
+<table data-source-line="243">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>halaman-admin</code></td>
+<td>Scope halaman Dasbor Admin CS</td>
+<td class="cell-nowrap"><code>admin_cs</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>ringkasan-admin</code></td>
+<td>Grid empat kartu ringkasan</td>
+<td class="cell-nowrap"><code>admin_cs</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>angka-admin</code></td>
+<td>Satu kartu angka ringkasan</td>
+<td class="cell-nowrap"><code>admin_cs</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>panel-admin</code></td>
+<td>Panel judul dan kontak CS</td>
+<td class="cell-nowrap"><code>admin_cs</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>baris-kontak-cs</code></td>
+<td>Baris nomor WhatsApp layanan CS</td>
+<td class="cell-nowrap"><code>admin_cs</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>daftar-admin</code></td>
+<td>Wadah daftar barang titipan</td>
+<td class="cell-nowrap"><code>admin_cs</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>baris-admin</code></td>
+<td>Satu baris barang titipan</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>info-admin</code></td>
+<td>Bagian foto dan info barang</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kontrol-admin</code></td>
+<td>Dropdown dan tombol status penanganan</td>
+<td class="cell-nowrap">Dibuat <code>app.js</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="513-footer" tabindex="-1" data-source-line="255">5.13 Footer</h3>
+<table data-source-line="257">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>footer-utama</code></td>
+<td class="cell-nowrap">Footer biru tua</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>footer-isi</code></td>
+<td class="cell-nowrap">Grid isi footer</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>footer-tentang</code></td>
+<td>Kolom tentang ATLOF; belum punya aturan CSS</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>footer-merk</code></td>
+<td class="cell-nowrap">Blok merek di footer</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>footer-menu</code></td>
+<td class="cell-nowrap">Kolom menu footer</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>footer-kampus</code></td>
+<td class="cell-nowrap">Kolom informasi kampus</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>footer-bawah</code></td>
+<td>Baris copyright di dasar footer</td>
+<td class="cell-nowrap">Semua halaman</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>footer-pesan</code></td>
+<td>Slogan footer berwarna emas</td>
+<td class="cell-nowrap"><code>pendaftaran</code>, <code>profil</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="514-notifikasi-dan-status" tabindex="-1" data-source-line="268">5.14 Notifikasi dan status</h3>
+<table data-source-line="270">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Fungsi</th>
+<th class="cell-nowrap">Dipakai di</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>pesan-form</code></td>
+<td>Kotak notifikasi global di kanan bawah</td>
+<td>Dibuat <code>app.js</code> melalui <code>pesan()</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>gagal</code></td>
+<td>Modifier merah untuk notifikasi gagal</td>
+<td>Dibuat <code>app.js</code> melalui <code>pesan()</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="515-class-yang-dibuat-javascript" tabindex="-1" data-source-line="275">5.15 Class yang dibuat JavaScript</h3>
+<p data-source-line="277">Tabel ini merangkum class yang tidak selalu terlihat di file <code>.xhtml</code>.</p>
+<table data-source-line="279">
+<thead>
+<tr>
+<th class="cell-nowrap">Class</th>
+<th class="cell-nowrap">Dibuat oleh</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>kartu-barang</code></td>
+<td class="cell-nowrap"><code>buatKartu()</code></td>
+<td class="cell-nowrap">Kartu barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>gambar-barang</code></td>
+<td class="cell-nowrap"><code>buatKartu()</code></td>
+<td class="cell-nowrap">Tautan gambar barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>isi-kartu</code></td>
+<td class="cell-nowrap"><code>buatKartu()</code></td>
+<td class="cell-nowrap">Isi teks kartu</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>lencana-baris</code></td>
+<td class="cell-nowrap"><code>buatKartu()</code></td>
+<td class="cell-nowrap">Baris lencana</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>lencana</code></td>
+<td><code>buatKartu()</code>, <code>tampilkanDashboardCS()</code></td>
+<td class="cell-nowrap">Lencana status</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>hilang</code></td>
+<td class="cell-nowrap"><code>buatKartu()</code></td>
+<td>Modifier lencana jenis hilang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>ditemukan</code></td>
+<td class="cell-nowrap"><code>buatKartu()</code></td>
+<td>Modifier lencana jenis ditemukan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kartu-kelola</code></td>
+<td class="cell-nowrap"><code>perbaruiLaporanSaya()</code></td>
+<td>Kartu laporan di Laporan Saya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>aksi-kelola</code></td>
+<td class="cell-nowrap"><code>perbaruiLaporanSaya()</code></td>
+<td class="cell-nowrap">Tombol Edit dan Hapus</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>pengaturan-status</code></td>
+<td class="cell-nowrap"><code>perbaruiLaporanSaya()</code></td>
+<td class="cell-nowrap">Panel ubah status</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>catatan-status</code></td>
+<td class="cell-nowrap"><code>perbaruiLaporanSaya()</code></td>
+<td class="cell-nowrap">Catatan status CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>baris-admin</code></td>
+<td class="cell-nowrap"><code>tampilkanDashboardCS()</code></td>
+<td class="cell-nowrap">Baris barang titipan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>info-admin</code></td>
+<td class="cell-nowrap"><code>tampilkanDashboardCS()</code></td>
+<td class="cell-nowrap">Info barang titipan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kontrol-admin</code></td>
+<td class="cell-nowrap"><code>tampilkanDashboardCS()</code></td>
+<td class="cell-nowrap">Kontrol status barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nama-hari</code></td>
+<td class="cell-nowrap"><code>pasangKalender()</code></td>
+<td class="cell-nowrap">Label hari kalender</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>pilih-hari</code></td>
+<td class="cell-nowrap"><code>pasangKalender()</code></td>
+<td class="cell-nowrap">Tombol tanggal kalender</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tanggal-kosong</code></td>
+<td class="cell-nowrap"><code>pasangKalender()</code></td>
+<td class="cell-nowrap">Sel kosong kalender</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>pesan-form</code></td>
+<td class="cell-nowrap"><code>pesan()</code></td>
+<td class="cell-nowrap">Notifikasi global</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>gagal</code></td>
+<td class="cell-nowrap"><code>pesan()</code></td>
+<td>Modifier notifikasi gagal</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-keluar</code></td>
+<td class="cell-nowrap">Header setelah login</td>
+<td class="cell-nowrap">Tombol keluar</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>aktif</code></td>
+<td class="cell-nowrap">Header admin</td>
+<td class="cell-nowrap">Menandai link Dasbor CS</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-referensi-id-per-halaman" tabindex="-1" data-source-line="303">6. Referensi ID per halaman</h2>
+<p data-source-line="305">Semua halaman memiliki <code>#menu-akun</code> di header. ID tersebut dipakai <code>app.js</code> untuk mengganti tombol Masuk/Daftar menjadi Profil/Keluar setelah login.</p>
+<h3 id="61-indexxhtml" tabindex="-1" data-source-line="307">6.1 <code>index.xhtml</code></h3>
+<table data-source-line="309">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>aksi-beranda-tamu</code></td>
+<td>Blok tombol untuk pengunjung</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>aksi-beranda-masuk</code></td>
+<td>Blok tombol untuk pengguna yang sudah masuk</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bagian-cara</code></td>
+<td class="cell-nowrap">Seksi cara kerja ATLOF</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bagian-terbaru</code></td>
+<td class="cell-nowrap">Seksi laporan terbaru</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>barang-terbaru</code></td>
+<td class="cell-nowrap">Grid laporan terbaru</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-katalogxhtml" tabindex="-1" data-source-line="318">6.2 <code>katalog.xhtml</code></h3>
+<table data-source-line="320">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>form-cari</code></td>
+<td class="cell-nowrap">Form pencarian barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>cari</code></td>
+<td>Input kata kunci; target <code>label for</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>filter-jenis</code></td>
+<td class="cell-nowrap">Dropdown jenis laporan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>filter-kategori</code></td>
+<td class="cell-nowrap">Dropdown kategori</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>filter-lokasi</code></td>
+<td class="cell-nowrap">Dropdown lokasi kampus</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>filter-status</code></td>
+<td class="cell-nowrap">Dropdown status barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-filter</code></td>
+<td class="cell-nowrap">Tombol terapkan filter</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-reset</code></td>
+<td class="cell-nowrap">Tombol bersihkan filter</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>jumlah-barang</code></td>
+<td>Teks jumlah hasil pencarian</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>semua-barang</code></td>
+<td class="cell-nowrap">Grid semua hasil laporan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tidak-ada</code></td>
+<td>Pesan saat tidak ada hasil</td>
+</tr>
+</tbody>
+</table>
+<h3 id="63-buat_laporanxhtml" tabindex="-1" data-source-line="335">6.3 <code>buat_laporan.xhtml</code></h3>
+<table data-source-line="337">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>form-laporan</code></td>
+<td class="cell-nowrap">Form buat laporan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nama-barang</code></td>
+<td class="cell-nowrap">Input nama barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kategori</code></td>
+<td class="cell-nowrap">Dropdown kategori</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tanggal</code></td>
+<td>Input tanggal kejadian, readonly</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>label-lokasi</code></td>
+<td>Label lokasi yang berubah sesuai jenis laporan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>lokasi</code></td>
+<td class="cell-nowrap">Dropdown lokasi kampus</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>wadah-detail-lokasi</code></td>
+<td>Grup keterangan lokasi lainnya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-lokasi</code></td>
+<td>Input keterangan lokasi lainnya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>wadah-penyimpanan</code></td>
+<td>Grup lokasi penyimpanan barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>penyimpanan</code></td>
+<td>Dropdown lokasi penyimpanan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>deskripsi</code></td>
+<td>Textarea deskripsi barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>foto</code></td>
+<td class="cell-nowrap">Input file foto barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>telepon</code></td>
+<td>Input nomor WhatsApp alternatif</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bantuan-telepon</code></td>
+<td>Teks bantuan nomor WhatsApp</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>buka-kalender</code></td>
+<td class="cell-nowrap">Tombol membuka kalender</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kotak-kalender</code></td>
+<td class="cell-nowrap">Panel kalender</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bulan-sebelum</code></td>
+<td class="cell-nowrap">Tombol bulan sebelumnya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bulan-berikut</code></td>
+<td class="cell-nowrap">Tombol bulan berikutnya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nama-bulan</code></td>
+<td class="cell-nowrap">Label bulan dan tahun</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>hari-kalender</code></td>
+<td class="cell-nowrap">Grid tanggal kalender</td>
+</tr>
+</tbody>
+</table>
+<h3 id="64-edit_laporanxhtml" tabindex="-1" data-source-line="361">6.4 <code>edit_laporan.xhtml</code></h3>
+<p data-source-line="363">ID di halaman ini sama dengan <code>buat_laporan.xhtml</code>, kecuali form utama memakai <code>form-edit</code>.</p>
+<table data-source-line="365">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>form-edit</code></td>
+<td class="cell-nowrap">Form edit laporan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nama-barang</code></td>
+<td class="cell-nowrap">Input nama barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kategori</code></td>
+<td class="cell-nowrap">Dropdown kategori</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tanggal</code></td>
+<td>Input tanggal kejadian, readonly</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>label-lokasi</code></td>
+<td>Label lokasi yang berubah sesuai jenis laporan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>lokasi</code></td>
+<td class="cell-nowrap">Dropdown lokasi kampus</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>wadah-detail-lokasi</code></td>
+<td>Grup keterangan lokasi lainnya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-lokasi</code></td>
+<td>Input keterangan lokasi lainnya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>wadah-penyimpanan</code></td>
+<td>Grup lokasi penyimpanan barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>penyimpanan</code></td>
+<td>Dropdown lokasi penyimpanan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>deskripsi</code></td>
+<td>Textarea deskripsi barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>foto</code></td>
+<td class="cell-nowrap">Input file foto barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>telepon</code></td>
+<td>Input nomor WhatsApp alternatif</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bantuan-telepon</code></td>
+<td>Teks bantuan nomor WhatsApp</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>buka-kalender</code></td>
+<td class="cell-nowrap">Tombol membuka kalender</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kotak-kalender</code></td>
+<td class="cell-nowrap">Panel kalender</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bulan-sebelum</code></td>
+<td class="cell-nowrap">Tombol bulan sebelumnya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>bulan-berikut</code></td>
+<td class="cell-nowrap">Tombol bulan berikutnya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nama-bulan</code></td>
+<td class="cell-nowrap">Label bulan dan tahun</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>hari-kalender</code></td>
+<td class="cell-nowrap">Grid tanggal kalender</td>
+</tr>
+</tbody>
+</table>
+<h3 id="65-laporan_sayaxhtml" tabindex="-1" data-source-line="389">6.5 <code>laporan_saya.xhtml</code></h3>
+<table data-source-line="391">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>total-saya</code></td>
+<td>Jumlah total laporan pengguna</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>jumlah-hilang</code></td>
+<td>Jumlah laporan barang hilang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>jumlah-ditemukan</code></td>
+<td>Jumlah laporan barang ditemukan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>barang-saya</code></td>
+<td>Grid laporan milik pengguna</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kosong-saya</code></td>
+<td>Keadaan kosong saat belum ada laporan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>status-&lt;id&gt;</code></td>
+<td>Dropdown status per laporan, dibuat <code>app.js</code></td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kelola-&lt;id&gt;</code></td>
+<td>Pembungkus kartu per laporan, dibuat <code>app.js</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="66-detailxhtml" tabindex="-1" data-source-line="402">6.6 <code>detail.xhtml</code></h3>
+<table data-source-line="404">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-foto</code></td>
+<td class="cell-nowrap">Gambar barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-nama</code></td>
+<td class="cell-nowrap">Nama barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-jenis</code></td>
+<td>Jenis laporan: hilang atau ditemukan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-status</code></td>
+<td class="cell-nowrap">Status barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-pelapor</code></td>
+<td class="cell-nowrap">Nama pelapor</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-kategori</code></td>
+<td class="cell-nowrap">Kategori barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-lokasi</code></td>
+<td class="cell-nowrap">Lokasi kampus barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-tanggal</code></td>
+<td class="cell-nowrap">Tanggal kejadian</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-simpan</code></td>
+<td>Lokasi penyimpanan barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-deskripsi</code></td>
+<td class="cell-nowrap">Deskripsi barang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-info-kontak</code></td>
+<td>Keterangan cara menghubungi</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-teams</code></td>
+<td class="cell-nowrap">Tautan Microsoft Teams</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-whatsapp</code></td>
+<td class="cell-nowrap">Kotak kontak WhatsApp</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-nomor</code></td>
+<td>Nomor WhatsApp yang ditampilkan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>detail-whatsapp-link</code></td>
+<td class="cell-nowrap">Tautan WhatsApp</td>
+</tr>
+</tbody>
+</table>
+<h3 id="67-loginxhtml" tabindex="-1" data-source-line="423">6.7 <code>login.xhtml</code></h3>
+<table data-source-line="425">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>form-login</code></td>
+<td class="cell-nowrap">Form masuk</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>email</code></td>
+<td class="cell-nowrap">Input email</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>password</code></td>
+<td class="cell-nowrap">Input password</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>link-daftar</code></td>
+<td>Tautan ke halaman pendaftaran</td>
+</tr>
+</tbody>
+</table>
+<h3 id="68-pendaftaranxhtml" tabindex="-1" data-source-line="433">6.8 <code>pendaftaran.xhtml</code></h3>
+<table data-source-line="435">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>form-daftar</code></td>
+<td class="cell-nowrap">Form pendaftaran akun</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nama</code></td>
+<td class="cell-nowrap">Input nama lengkap</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>email</code></td>
+<td class="cell-nowrap">Input email</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>teams</code></td>
+<td>Input kontak Microsoft Teams</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>password</code></td>
+<td class="cell-nowrap">Input password</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>konfirmasi</code></td>
+<td>Input konfirmasi password</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>link-login</code></td>
+<td class="cell-nowrap">Tautan ke halaman masuk</td>
+</tr>
+</tbody>
+</table>
+<h3 id="69-profilxhtml" tabindex="-1" data-source-line="446">6.9 <code>profil.xhtml</code></h3>
+<table data-source-line="448">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nama-profil</code></td>
+<td>Nama pengguna di kartu profil</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>email-profil</code></td>
+<td>Email pengguna di kartu profil</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>avatar-profil</code></td>
+<td class="cell-nowrap">Inisial avatar pengguna</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>label-peran-profil</code></td>
+<td class="cell-nowrap">Label peran Admin CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>data-profil</code></td>
+<td class="cell-nowrap">Grid data identitas</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>info-nama</code></td>
+<td class="cell-nowrap">Nilai nama lengkap</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>info-email</code></td>
+<td class="cell-nowrap">Nilai email</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>info-teams</code></td>
+<td class="cell-nowrap">Nilai kontak Teams</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>identitas-admin</code></td>
+<td>Baris lokasi pelayanan CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>info-kampus-cs</code></td>
+<td class="cell-nowrap">Nilai kampus CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>identitas-wa</code></td>
+<td>Baris WhatsApp layanan CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>info-telepon</code></td>
+<td>Nilai WhatsApp layanan CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>profil-tombol</code></td>
+<td class="cell-nowrap">Baris tombol profil</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-edit-profil</code></td>
+<td class="cell-nowrap">Tombol ubah profil</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-ganti-password</code></td>
+<td class="cell-nowrap">Tombol ubah password</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>tombol-logout</code></td>
+<td class="cell-nowrap">Tombol keluar</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>form-profil</code></td>
+<td class="cell-nowrap">Form edit profil</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nama</code></td>
+<td class="cell-nowrap">Input nama lengkap</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>email</code></td>
+<td class="cell-nowrap">Input email, readonly</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>teams</code></td>
+<td class="cell-nowrap">Input kontak Teams</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>form-nomor-cs</code></td>
+<td class="cell-nowrap">Grup WhatsApp layanan CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nomor-cs</code></td>
+<td>Input WhatsApp layanan CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>form-password</code></td>
+<td>Form ubah password dari profil</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>password-lama</code></td>
+<td class="cell-nowrap">Input password sekarang</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>password-baru</code></td>
+<td class="cell-nowrap">Input password baru</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>konfirmasi-password</code></td>
+<td>Input konfirmasi password baru</td>
+</tr>
+</tbody>
+</table>
+<h3 id="610-admin_csxhtml" tabindex="-1" data-source-line="478">6.10 <code>admin_cs.xhtml</code></h3>
+<table data-source-line="480">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>subjudul-admin</code></td>
+<td>Subjudul dasbor sesuai kampus</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>admin-total</code></td>
+<td>Jumlah total barang titipan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>admin-menunggu</code></td>
+<td>Jumlah barang menunggu diterima</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>admin-diterima</code></td>
+<td>Jumlah barang diterima CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>admin-selesai</code></td>
+<td>Jumlah barang sudah dikembalikan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>nomor-wa-admin</code></td>
+<td>Nomor WhatsApp layanan CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>daftar-admin</code></td>
+<td>Wadah daftar barang titipan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kosong-admin</code></td>
+<td>Keadaan kosong saat belum ada titipan</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>status-cs-&lt;id&gt;</code></td>
+<td>Dropdown status penanganan per barang, dibuat <code>app.js</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="611-akses_akunxhtml" tabindex="-1" data-source-line="493">6.11 <code>akses_akun.xhtml</code></h3>
+<table data-source-line="495">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>menu-akun</code></td>
+<td>Wadah tombol akun di header</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>akses-masuk</code></td>
+<td>Tombol menuju halaman masuk</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>akses-daftar</code></td>
+<td>Tombol menuju halaman pendaftaran</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-id-yang-dibuat-javascript" tabindex="-1" data-source-line="501">7. ID yang dibuat JavaScript</h2>
+<table data-source-line="503">
+<thead>
+<tr>
+<th class="cell-nowrap">ID</th>
+<th class="cell-nowrap">Dibuat oleh</th>
+<th class="cell-nowrap">Fungsi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>status-&lt;id&gt;</code></td>
+<td><code>pilihanStatus()</code> dipanggil <code>perbaruiLaporanSaya()</code></td>
+<td>Dropdown status laporan pengguna</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>status-cs-&lt;id&gt;</code></td>
+<td class="cell-nowrap"><code>tampilkanDashboardCS()</code></td>
+<td>Dropdown status penanganan barang CS</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>kelola-&lt;id&gt;</code></td>
+<td class="cell-nowrap"><code>perbaruiLaporanSaya()</code></td>
+<td>Pembungkus kartu laporan di Laporan Saya</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>pesan-global</code></td>
+<td class="cell-nowrap"><code>pesan()</code></td>
+<td class="cell-nowrap">Kotak notifikasi global</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>keluar-header</code></td>
+<td class="cell-nowrap">Header setelah login</td>
+<td class="cell-nowrap">Tombol keluar di header</td>
+</tr>
+</tbody>
+</table>
+<p data-source-line="511">Keterangan: <code>&lt;id&gt;</code> adalah ID laporan. Laporan contoh memakai angka 1 sampai 10, sedangkan laporan baru memakai <code>Date.now()</code>.</p>
+<h2 id="8-contoh-kombinasi-class" tabindex="-1" data-source-line="513">8. Contoh kombinasi class</h2>
+<p data-source-line="515">Tombol utama:</p>
+<pre class="cb-numbered"><code data-source-line="517" class="language-html"><span class="cb-line"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"tombol tombol-kuning tombol-kecil"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"katalog.xhtml"</span>&gt;</span>Lihat katalog<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></span></code></pre>
+<p data-source-line="521">Field form:</p>
+<pre class="cb-numbered"><code data-source-line="523" class="language-html"><span class="cb-line"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"field"</span>&gt;</span></span>
+<span class="cb-line">  <span class="hljs-tag">&lt;<span class="hljs-name">label</span> <span class="hljs-attr">for</span>=<span class="hljs-string">"nama-barang"</span>&gt;</span>Nama barang <span class="hljs-tag">&lt;<span class="hljs-name">em</span>&gt;</span>*<span class="hljs-tag">&lt;/<span class="hljs-name">em</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span></span>
+<span class="cb-line">  <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"nama-barang"</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"nama-barang"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span> /&gt;</span></span>
+<span class="cb-line"><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span></code></pre>
+<p data-source-line="530">Kartu barang yang dibuat <code>app.js</code>:</p>
+<pre class="cb-numbered"><code data-source-line="532" class="language-html"><span class="cb-line"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"kartu-barang"</span>&gt;</span></span>
+<span class="cb-line">  <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"gambar-barang"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"detail.xhtml?id=1"</span>&gt;</span></span>
+<span class="cb-line">    <span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"images/ph-tumbler.png"</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">"Gambar barang"</span> /&gt;</span></span>
+<span class="cb-line">  <span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></span>
+<span class="cb-line">  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"isi-kartu"</span>&gt;</span></span>
+<span class="cb-line">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"lencana-baris"</span>&gt;</span></span>
+<span class="cb-line">      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"lencana hilang"</span>&gt;</span>Hilang<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+<span class="cb-line">      <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"lencana"</span>&gt;</span>Masih dicari<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+<span class="cb-line">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="cb-line">    <span class="hljs-tag">&lt;<span class="hljs-name">h3</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"detail.xhtml?id=1"</span>&gt;</span>Tumbler Hitam<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">h3</span>&gt;</span></span>
+<span class="cb-line">    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Tumbler<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+<span class="cb-line">  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="cb-line"><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span></code></pre>
+<p data-source-line="548">Lencana jenis dan status:</p>
+<pre class="cb-numbered"><code data-source-line="550" class="language-html"><span class="cb-line"><span class="hljs-comment">&lt;!-- Pilih salah satu sesuai jenis laporan. --&gt;</span></span>
+<span class="cb-line"><span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"lencana hilang"</span>&gt;</span>Hilang<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+<span class="cb-line"><span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"lencana ditemukan"</span>&gt;</span>Ditemukan<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span></code></pre>
+<p data-source-line="556">Notifikasi gagal yang dibuat <code>app.js</code>:</p>
+<pre class="cb-numbered"><code data-source-line="558" class="language-html"><span class="cb-line"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"pesan-form gagal"</span>&gt;</span>Lengkapi formulir terlebih dahulu.<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span></code></pre>
+<h2 id="9-catatan-penting" tabindex="-1" data-source-line="562">9. Catatan penting</h2>
+<ul data-source-line="564">
+<li data-source-line="564"><code>hilang</code> dan <code>ditemukan</code> bukan class mandiri. Keduanya modifier untuk <code>lencana</code>, sehingga di HTML menjadi <code>class="lencana hilang"</code> atau <code>class="lencana ditemukan"</code>.</li>
+<li data-source-line="565"><code>pesan-form</code> dan <code>gagal</code> juga dipakai bersama, sehingga notifikasi gagal menjadi <code>class="pesan-form gagal"</code>.</li>
+<li data-source-line="566"><code>#detail-lokasi</code> punya arti berbeda di halaman berbeda:
+<ul data-source-line="567">
+<li data-source-line="567">Di <code>buat_laporan.xhtml</code> dan <code>edit_laporan.xhtml</code>: input keterangan lokasi lainnya.</li>
+<li data-source-line="568">Di <code>detail.xhtml</code>: sel tabel lokasi kampus.</li>
+</ul>
+</li>
+<li data-source-line="569"><code>#email</code>, <code>#password</code>, <code>#nama</code>, dan <code>#teams</code> muncul di beberapa halaman. Ini aman karena setiap halaman dimuat terpisah.</li>
+<li data-source-line="570"><code>#menu-akun</code> ada di semua halaman dan isinya diganti oleh <code>app.js</code> setelah login.</li>
+<li data-source-line="571">Class berikut dipakai di HTML atau dibuat JavaScript, tetapi belum punya aturan CSS:
+<ul data-source-line="572">
+<li data-source-line="572"><code>batal-profil</code></li>
+<li data-source-line="573"><code>daftar-barang</code></li>
+<li data-source-line="574"><code>footer-tentang</code></li>
+<li data-source-line="575"><code>katalog-page</code></li>
+<li data-source-line="576"><code>lihat-password</code></li>
+<li data-source-line="577"><code>profil-tombol</code></li>
+<li data-source-line="578"><code>tanggal-kosong</code></li>
+</ul>
+</li>
+<li data-source-line="579"><code>teks-emas</code> dan <code>footer-pesan</code> sama-sama memberi warna aksen pada slogan footer, tetapi warnanya berbeda. Saat ini <code>pendaftaran</code> dan <code>profil</code> memakai <code>footer-pesan</code>, halaman lain memakai <code>teks-emas</code>.</li>
+<li data-source-line="580">ID <code>status-&lt;id&gt;</code>, <code>status-cs-&lt;id&gt;</code>, dan <code>kelola-&lt;id&gt;</code> harus unik dalam satu halaman. Jangan memakai ID laporan yang sama dua kali.</li>
+<li data-source-line="581">Jika nanti ada rename class atau ID, file yang perlu diperbarui adalah semua <code>.xhtml</code>, <code>css/style.css</code>, dan string HTML di <code>js/app.js</code>.</li>
+</ul>
+<h2 id="10-perawatan-css" tabindex="-1" data-source-line="583">10. Perawatan CSS</h2>
+<p data-source-line="585"><code>css/style.css</code> sudah dirapikan dari aturan yang tidak berefek pada tampilan.</p>
+<h3 id="101-yang-sudah-dihapus" tabindex="-1" data-source-line="587">10.1 Yang sudah dihapus</h3>
+<ul data-source-line="589">
+<li data-source-line="589"><code>.footer-kampus img</code> dan <code>@media 480px .footer-kampus img</code>: tidak ada gambar di dalam footer kampus.</li>
+<li data-source-line="590"><code>.footer-isi h3</code>: semua <code>h3</code> footer ada di dalam <code>.footer-merk</code>, dan warnanya ditentukan <code>.footer-merk h3</code>.</li>
+<li data-source-line="591"><code>input[type="email"]</code>, <code>input[type="search"]</code>, <code>input[type="date"]</code>, <code>input[type="tel"]</code>: tidak ada input dengan tipe tersebut.</li>
+<li data-source-line="592"><code>position: relative</code> dan <code>overflow: hidden</code> pada <code>.hero</code>.</li>
+<li data-source-line="593"><code>position: relative</code> dan <code>z-index: 1</code> pada <code>.hero-isi</code>.</li>
+<li data-source-line="594"><code>overflow: hidden</code> pada <code>.gambar-barang</code>; parent <code>.kartu-barang</code> sudah memotong gambar.</li>
+<li data-source-line="595">Properti flex pada elemen yang hanya punya satu anak: <code>.footer-merk</code>, <code>.footer-bawah</code>, dan <code>.footer-kampus</code>.</li>
+<li data-source-line="596"><code>.hero h1 { font-size: 34px; }</code> di <code>@media 700px</code>; ditimpa <code>.hero h1 { font-size: 35px; }</code> di <code>@media 760px</code>.</li>
+<li data-source-line="597"><code>.footer-isi</code> di dalam <code>@media 700px</code>; sudah diatur <code>@media 760px</code>.</li>
+<li data-source-line="598"><code>.grid-katalog</code> di dalam <code>@media 1000px</code> dan <code>@media 700px</code>; aturan dua kolom sudah diatur <code>@media 1170px</code>.</li>
+</ul>
+<h3 id="102-yang-sengaja-dipertahankan" tabindex="-1" data-source-line="600">10.2 Yang sengaja dipertahankan</h3>
+<ul data-source-line="602">
+<li data-source-line="602"><code>display: flex</code> pada <code>.footer-kampus</code> tetap ada karena memengaruhi lebar konten; yang dihapus hanya <code>gap</code> dan <code>align-items</code>.</li>
+<li data-source-line="603"><code>.logo</code> kembali memakai <code>align-items: center</code> dan <code>gap: 10px</code> karena sekarang memiliki dua anak: ikon SVG dan teks.</li>
+<li data-source-line="604">Logo SVG memakai <code>alt=""</code> karena teks “ATLOF” di sebelahnya sudah memberi nama yang dapat dibaca pembaca layar.</li>
+<li data-source-line="605"><code>@media 480px .grid-katalog { grid-template-columns: 1fr; }</code> tetap ada karena mengembalikan katalog ke satu kolom di layar kecil setelah aturan dua kolom yang lebih lebar.</li>
+<li data-source-line="606"><code>input[type="text"]</code>, <code>input[type="password"]</code>, <code>select</code>, dan <code>textarea</code> tetap dipakai.</li>
+<li data-source-line="607"><code>overflow: hidden</code> pada <code>.kartu-barang</code> tetap dipakai untuk memotong gambar dan sudut kartu.</li>
+</ul>
+<h3 id="103-breakpoint-aktual" tabindex="-1" data-source-line="609">10.3 Breakpoint aktual</h3>
+<table data-source-line="611">
+<thead>
+<tr>
+<th class="cell-nowrap">Selector</th>
+<th class="cell-nowrap">Perilaku</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="cell-nowrap"><code>.grid-barang</code></td>
+<td>3 kolom di atas 1000px, 2 kolom 701-1000px, 1 kolom 700px ke bawah</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>.grid-katalog</code></td>
+<td>3 kolom di atas 1170px, 2 kolom 481-1170px, 1 kolom 480px ke bawah</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>.footer-isi</code></td>
+<td>3 kolom di atas 760px, 1 kolom 760px ke bawah</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>.hero h1</code></td>
+<td>48px di atas 760px, 35px 760px ke bawah</td>
+</tr>
+<tr>
+<td class="cell-nowrap"><code>.hero-isi</code></td>
+<td>padding 76px 0 74px di atas 700px, 62px 0 700px ke bawah</td>
+</tr>
+</tbody>
+</table>
+<p data-source-line="619">Ukuran ikon logo di header adalah 32px, lalu 28px pada layar 480px ke bawah.</p>
+<p data-source-line="621">Catatan: aturan satu kolom <code>.grid-katalog</code> di <code>@media 700px</code> dihapus karena sudah ditimpa oleh aturan dua kolom <code>@media 1170px</code>. Jangan menambahkannya kembali sebelum urutan media query diperbaiki. Perbaikan urutan media query sengaja tidak dilakukan sekarang agar tampilan dan perilaku responsif tetap sama.</p>
+
+  </article>
+</main>
+<script>
+(function () {
+  var tabs = document.querySelectorAll('.solomd-export-tab');
+  var sidebarEl = document.querySelector('.solomd-export-sidebar');
+  var resizerEl = document.getElementById('solomd-sidebar-resizer');
+  var navWrap = document.getElementById('solomd-nav-wrap');
+  var navPane = document.getElementById('solomd-nav-pane');
+  var expandBtn = document.getElementById('solomd-nav-expand-btn');
+  var collapseBtn = document.getElementById('solomd-nav-collapse-btn');
+  var searchPane = document.getElementById('solomd-search-pane');
+  var searchInput = document.getElementById('solomd-search-input');
+  var searchClear = document.getElementById('solomd-search-clear');
+  var searchResults = document.getElementById('solomd-search-results');
+  var searchBadge = document.getElementById('solomd-search-badge');
+  var mainEl = document.getElementById('solomd-export-main');
+  var articleEl = document.getElementById('solomd-export-article');
+  if (!navPane || !searchPane || !mainEl || !articleEl) return;
+
+  // 1) Resizable navigation sidebar (#574)
+  if (resizerEl && sidebarEl) {
+    var dragging = false;
+    resizerEl.addEventListener('mousedown', function (e) {
+      if (e.button !== 0) return;
+      dragging = true;
+      resizerEl.classList.add('is-dragging');
+      document.body.style.cursor = 'col-resize';
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      var maxW = Math.max(260, Math.floor(window.innerWidth * 0.72));
+      var nextW = Math.min(maxW, Math.max(180, e.clientX));
+      sidebarEl.style.width = nextW + 'px';
+    });
+    window.addEventListener('mouseup', function () {
+      if (!dragging) return;
+      dragging = false;
+      resizerEl.classList.remove('is-dragging');
+      document.body.style.cursor = '';
+    });
+  }
+
+  function switchTab(tabName) {
+    for (var i = 0; i < tabs.length; i++) {
+      var btn = tabs[i];
+      var active = btn.getAttribute('data-tab') === tabName;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    }
+    if (tabName === 'search') {
+      if (navWrap) navWrap.hidden = true;
+      else navPane.hidden = true;
+      searchPane.hidden = false;
+      if (searchInput) searchInput.focus();
+    } else {
+      searchPane.hidden = true;
+      if (navWrap) navWrap.hidden = false;
+      navPane.hidden = false;
+    }
+  }
+
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].addEventListener('click', function () {
+      switchTab(this.getAttribute('data-tab') || 'nav');
+    });
+  }
+
+  // 2) Tree expand / collapse icons (+/-) & toolbar recursive expand/collapse (#574)
+  function findDirectChildList(li) {
+    for (var c = 0; c < li.children.length; c++) {
+      if (li.children[c].tagName === 'UL') return li.children[c];
+    }
+    return null;
+  }
+
+  function setNodeExpanded(li, expanded) {
+    if (!li) return;
+    var childUl = findDirectChildList(li);
+    if (!childUl) return;
+    li.classList.toggle('is-collapsed', !expanded);
+    var toggle = li.querySelector(':scope > .solomd-toc-toggle');
+    if (toggle) {
+      toggle.textContent = expanded ? '-' : '+';
+      toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    }
+  }
+
+  function setSubtreeExpanded(rootContainer, expanded) {
+    if (!rootContainer) return;
+    if (rootContainer.tagName === 'LI') {
+      setNodeExpanded(rootContainer, expanded);
+    }
+    var descendants = rootContainer.querySelectorAll('li.md-toc__item');
+    for (var d = 0; d < descendants.length; d++) {
+      setNodeExpanded(descendants[d], expanded);
+    }
+  }
+
+  var allItems = Array.prototype.slice.call(navPane.querySelectorAll('li.md-toc__item'));
+  for (var idx = 0; idx < allItems.length; idx++) {
+    var li = allItems[idx];
+    if (li.querySelector(':scope > .solomd-toc-toggle, :scope > .solomd-toc-spacer')) continue;
+    var hasSub = !!findDirectChildList(li);
+    if (hasSub) {
+      var toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.className = 'solomd-toc-toggle';
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      toggleBtn.textContent = '-';
+      (function (ownerLi) {
+        toggleBtn.addEventListener('click', function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          var collapsed = ownerLi.classList.contains('is-collapsed');
+          setNodeExpanded(ownerLi, collapsed);
+        });
+      })(li);
+      li.insertBefore(toggleBtn, li.firstChild);
+    } else {
+      var spacer = document.createElement('span');
+      spacer.className = 'solomd-toc-spacer';
+      spacer.setAttribute('aria-hidden', 'true');
+      li.insertBefore(spacer, li.firstChild);
+    }
+  }
+
+  var activeNavLink = null;
+  var navLinks = Array.prototype.slice.call(navPane.querySelectorAll('a.md-toc__link'));
+  function setActiveNavLink(link) {
+    activeNavLink = link || null;
+    for (var j = 0; j < navLinks.length; j++) {
+      navLinks[j].classList.toggle('is-active', navLinks[j] === link);
+    }
+  }
+
+  function expandAncestorsOfLink(link) {
+    var p = link ? link.parentElement : null;
+    while (p && p !== navPane) {
+      if (p.tagName === 'LI' && p.classList.contains('md-toc__item')) {
+        setNodeExpanded(p, true);
+      }
+      p = p.parentElement;
+    }
+  }
+
+  if (expandBtn) {
+    expandBtn.addEventListener('click', function () {
+      var selectedLi = activeNavLink && activeNavLink.closest ? activeNavLink.closest('li.md-toc__item') : null;
+      setSubtreeExpanded(selectedLi || navPane, true);
+    });
+  }
+
+  if (collapseBtn) {
+    collapseBtn.addEventListener('click', function () {
+      var selectedLi = activeNavLink && activeNavLink.closest ? activeNavLink.closest('li.md-toc__item') : null;
+      setSubtreeExpanded(selectedLi || navPane, false);
+    });
+  }
+
+  // 3) Paginated <section class="page"> switching (#574, #594, #598)
+  var pageSections = Array.prototype.slice.call(articleEl.querySelectorAll('section.page'));
+  var topicSections = pageSections.filter(function (s) {
+    return s.getAttribute('data-toc-section') !== '1';
+  });
+  function activatePageSection(sec) {
+    if (!sec || !pageSections.length) return false;
+    var changed = false;
+    for (var p = 0; p < pageSections.length; p++) {
+      var show = pageSections[p] === sec;
+      var curHidden = pageSections[p].style.display === 'none';
+      if (show && curHidden) changed = true;
+      pageSections[p].style.display = show ? 'block' : 'none';
+    }
+    if (changed) mainEl.scrollTop = 0;
+    return changed;
+  }
+
+  function activatePageForElement(el) {
+    if (!el || !pageSections.length) return;
+    if (el.tagName === 'SECTION' && el.classList && el.classList.contains('page')) {
+      activatePageSection(el);
+      return;
+    }
+    var sec = el.closest ? el.closest('section.page') : null;
+    if (sec) activatePageSection(sec);
+  }
+
+  function syncNavToSection(sec) {
+    if (!sec || !navLinks.length) return;
+    if (sec.id === 'solomd-page-toc') {
+      setActiveNavLink(navLinks[0]);
+      return;
+    }
+    var firstHeading = sec.querySelector('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]');
+    if (!firstHeading) return;
+    for (var ni = 0; ni < navLinks.length; ni++) {
+      var nh = navLinks[ni].getAttribute('href') || '';
+      var decodedNh = nh;
+      try { decodedNh = decodeURIComponent(nh); } catch (_) {}
+      if (nh === '#' + firstHeading.id || decodedNh === '#' + firstHeading.id) {
+        expandAncestorsOfLink(navLinks[ni]);
+        setActiveNavLink(navLinks[ni]);
+        if (navLinks[ni].scrollIntoView) navLinks[ni].scrollIntoView({ block: 'nearest' });
+        break;
+      }
+    }
+  }
+
+  if (pageSections.length > 0) {
+    var tocSec = document.getElementById('solomd-page-toc');
+    if (tocSec) {
+      activatePageSection(tocSec);
+      if (navLinks.length > 0) setActiveNavLink(navLinks[0]);
+    } else {
+      activatePageSection(topicSections[0] || pageSections[0]);
+      syncNavToSection(topicSections[0] || pageSections[0]);
+    }
+  }
+
+  var flashTimer = null;
+  var lastFlashed = null;
+  function flashTarget(el) {
+    if (!el) return;
+    if (el.tagName === 'SECTION' && el.classList && el.classList.contains('page')) return;
+    if (lastFlashed) lastFlashed.classList.remove('solomd-search-flash');
+    if (flashTimer) clearTimeout(flashTimer);
+    lastFlashed = el;
+    el.classList.add('solomd-search-flash');
+    flashTimer = setTimeout(function () {
+      el.classList.remove('solomd-search-flash');
+      if (lastFlashed === el) lastFlashed = null;
+    }, 2200);
+  }
+
+  for (var k = 0; k < navLinks.length; k++) {
+    navLinks[k].addEventListener('click', function (e) {
+      e.preventDefault();
+      setActiveNavLink(this);
+      if (this.getAttribute('data-no-jump') === '1') return;
+      var href = this.getAttribute('href') || '';
+      if (href.charAt(0) !== '#') return;
+      var rawId = href.slice(1);
+      if (!rawId) return;
+      var decodedId = rawId;
+      try { decodedId = decodeURIComponent(rawId); } catch (_) {}
+      var target = document.getElementById(decodedId) || document.getElementById(rawId);
+      if (target) {
+        activatePageForElement(target);
+        if (!(target.tagName === 'SECTION' && target.classList && target.classList.contains('page'))) {
+          target.scrollIntoView({ behavior: pageSections.length ? 'auto' : 'smooth', block: 'start' });
+          flashTarget(target);
+        }
+      }
+    });
+  }
+
+  articleEl.addEventListener('click', function (e) {
+    var targetEl = e.target;
+    if (!targetEl || !targetEl.closest) return;
+    var topicBtn = targetEl.closest('button.solomd-topic-btn');
+    if (topicBtn && !topicBtn.disabled) {
+      var curSec = topicBtn.closest('section.page');
+      var curIdx = topicSections.indexOf(curSec);
+      var dir = topicBtn.getAttribute('data-topic-dir');
+      var nextIdx = dir === 'prev' ? curIdx - 1 : curIdx + 1;
+      if (curIdx >= 0 && nextIdx >= 0 && nextIdx < topicSections.length) {
+        activatePageSection(topicSections[nextIdx]);
+        syncNavToSection(topicSections[nextIdx]);
+      }
+      return;
+    }
+    var inPageAnchor = targetEl.closest('a[href^="#"]');
+    if (inPageAnchor) {
+      var href = inPageAnchor.getAttribute('href') || '';
+      var rawId = href.slice(1);
+      if (!rawId) return;
+      var decodedId = rawId;
+      try { decodedId = decodeURIComponent(rawId); } catch (_) {}
+      var dest = document.getElementById(decodedId) || document.getElementById(rawId);
+      if (dest) {
+        e.preventDefault();
+        activatePageForElement(dest);
+        dest.scrollIntoView({ behavior: pageSections.length ? 'auto' : 'smooth', block: 'start' });
+        flashTarget(dest);
+        var destSec = dest.closest ? dest.closest('section.page') : null;
+        for (var li = 0; li < navLinks.length; li++) {
+          var nh = navLinks[li].getAttribute('href') || '';
+          var decNh = nh;
+          try { decNh = decodeURIComponent(nh); } catch (_) {}
+          if (nh === '#' + dest.id || decNh === '#' + dest.id) {
+            expandAncestorsOfLink(navLinks[li]);
+            setActiveNavLink(navLinks[li]);
+            return;
+          }
+        }
+        if (destSec) syncNavToSection(destSec);
+      }
+    }
+  });
+
+  var headings = Array.prototype.slice.call(articleEl.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]'));
+  mainEl.addEventListener('scroll', function () {
+    if (!headings.length || !navLinks.length) return;
+    var mainRect = mainEl.getBoundingClientRect();
+    var currentId = '';
+    for (var h = 0; h < headings.length; h++) {
+      if (headings[h].offsetParent === null) continue;
+      if (!currentId) currentId = headings[h].id;
+      var r = headings[h].getBoundingClientRect();
+      if (r.top - mainRect.top <= 80) {
+        currentId = headings[h].id;
+      } else {
+        break;
+      }
+    }
+    if (!currentId) return;
+    for (var m = 0; m < navLinks.length; m++) {
+      var href = navLinks[m].getAttribute('href') || '';
+      var linkId = href.charAt(0) === '#' ? href.slice(1) : '';
+      try { linkId = decodeURIComponent(linkId); } catch (_) {}
+      if (linkId === currentId) {
+        setActiveNavLink(navLinks[m]);
+        break;
+      }
+    }
+  }, { passive: true });
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] || c;
+    });
+  }
+
+  function escapeRegex(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  var searchBlocks = Array.prototype.slice.call(
+    articleEl.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, td, th, blockquote, pre, dt, dd')
+  ).filter(function (el) {
+    return !el.closest('.md-toc');
+  });
+
+  function nearestHeadingTitle(el) {
+    if (/^H[1-6]$/.test(el.tagName)) {
+      return (el.textContent || '').trim();
+    }
+    var cur = el;
+    while (cur && cur !== articleEl) {
+      var prev = cur.previousElementSibling;
+      while (prev) {
+        if (/^H[1-6]$/.test(prev.tagName)) {
+          return (prev.textContent || '').trim();
+        }
+        prev = prev.previousElementSibling;
+      }
+      cur = cur.parentElement;
+    }
+    return document.title || '';
+  }
+
+  function runSearch() {
+    if (!searchInput || !searchResults) return;
+    var kw = (searchInput.value || '').trim();
+    if (!kw) {
+      searchResults.innerHTML = '';
+      if (searchBadge) {
+        searchBadge.textContent = '0';
+        searchBadge.hidden = true;
+      }
+      return;
+    }
+    var lowerKw = kw.toLowerCase();
+    var re = new RegExp(escapeRegex(kw), 'gi');
+    var matches = [];
+    for (var idx = 0; idx < searchBlocks.length; idx++) {
+      var blk = searchBlocks[idx];
+      if (blk.querySelector && blk.querySelector('p, li, td, th, pre, blockquote')) continue;
+      var text = (blk.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!text) continue;
+      var pos = text.toLowerCase().indexOf(lowerKw);
+      if (pos < 0) continue;
+      var start = Math.max(0, pos - 24);
+      var end = Math.min(text.length, pos + kw.length + 44);
+      var rawSlice = (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+      re.lastIndex = 0;
+      var snippet = '';
+      var lastIdx = 0;
+      var hitMatch;
+      while ((hitMatch = re.exec(rawSlice)) !== null) {
+        if (!hitMatch[0].length) { re.lastIndex += 1; continue; }
+        snippet += escapeHtml(rawSlice.slice(lastIdx, hitMatch.index));
+        snippet += '<mark>' + escapeHtml(hitMatch[0]) + '</mark>';
+        lastIdx = hitMatch.index + hitMatch[0].length;
+      }
+      snippet += escapeHtml(rawSlice.slice(lastIdx));
+      var secTitle = nearestHeadingTitle(blk) || text.slice(0, 32);
+      matches.push({
+        el: blk,
+        title: secTitle,
+        snippet: snippet
+      });
+    }
+
+    if (searchBadge) {
+      if (matches.length > 0) {
+        searchBadge.textContent = String(matches.length);
+        searchBadge.hidden = false;
+      } else {
+        searchBadge.textContent = '0';
+        searchBadge.hidden = true;
+      }
+    }
+
+    if (matches.length === 0) {
+      var emptyMsg = searchResults.getAttribute('data-empty-text') || '没有匹配结果';
+      searchResults.innerHTML = '<div class="solomd-search-empty">' + escapeHtml(emptyMsg) + '</div>';
+      return;
+    }
+
+    var html = '';
+    for (var r = 0; r < matches.length; r++) {
+      html += '<div class="solomd-search-item" data-match-index="' + r + '">' +
+        '<div class="solomd-search-item__title">' + escapeHtml(matches[r].title) + '</div>' +
+        '<div class="solomd-search-item__snippet">' + matches[r].snippet + '</div>' +
+        '</div>';
+    }
+    searchResults.innerHTML = html;
+
+    var items = searchResults.querySelectorAll('.solomd-search-item');
+    for (var c = 0; c < items.length; c++) {
+      items[c].addEventListener('click', function () {
+        for (var x = 0; x < items.length; x++) {
+          items[x].classList.toggle('is-active', items[x] === this);
+        }
+        var mIdx = parseInt(this.getAttribute('data-match-index') || '0', 10);
+        var matchObj = matches[mIdx];
+        if (matchObj && matchObj.el) {
+          activatePageForElement(matchObj.el);
+          matchObj.el.scrollIntoView({ behavior: pageSections.length ? 'auto' : 'smooth', block: 'center' });
+          flashTarget(matchObj.el);
+        }
+      });
+    }
+  }
+
+  var debounceTimer = null;
+  if (searchInput) {
+    searchInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (debounceTimer) clearTimeout(debounceTimer);
+        runSearch();
+      }
+    });
+    searchInput.addEventListener('input', function () {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(runSearch, 120);
+    });
+  }
+
+  if (searchClear) {
+    searchClear.addEventListener('click', function () {
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+      if (searchResults) searchResults.innerHTML = '';
+      if (searchBadge) {
+        searchBadge.textContent = '0';
+        searchBadge.hidden = true;
+      }
+      if (lastFlashed) {
+        lastFlashed.classList.remove('solomd-search-flash');
+        lastFlashed = null;
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>

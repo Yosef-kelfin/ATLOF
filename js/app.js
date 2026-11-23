@@ -262,13 +262,13 @@ if (sudahMasuk() && sekarang == "admin_cs.xhtml" && !adalahAdmin()) {
 if (ambil("menu-akun") && sudahMasuk()) {
     ambil("menu-akun").innerHTML =
         '<a href="profil.xhtml" class="tombol tombol-outline tombol-kecil">Profil</a>' +
-        '<button id="keluar-header" type="button" class="tombol tombol-kecil tombol-logout-header">Keluar</button>';
+        '<button id="keluar-header" type="button" class="tombol tombol-kecil tombol-keluar">Keluar</button>';
     ambil("keluar-header").onclick = keluar;
     if (adalahAdmin()) {
         var daftarMenu = document.querySelector(".menu-links");
         if (daftarMenu) {
             daftarMenu.innerHTML += '<a href="admin_cs.xhtml"' +
-                (sekarang == "admin_cs.xhtml" ? ' class="active"' : '') + '>Dasbor CS</a>';
+                (sekarang == "admin_cs.xhtml" ? ' class="aktif"' : '') + '>Dasbor CS</a>';
         }
     }
 }
@@ -389,7 +389,7 @@ if (ambil("form-daftar")) {
             return;
         }
         if (cariAkunAdmin(email) || semuaAkunLokal()[email]) {
-            pesan("Email ini sudah terdaftar. Silakan masuk atau gunakan Lupa password.");
+            pesan("Email ini sudah terdaftar. Silakan masuk.");
             return;
         }
         if (password != ambil("konfirmasi").value) {
@@ -423,7 +423,7 @@ if (ambil("form-login")) {
         if (akun.password != password) {
             pesan(akun.role == "admin_cs"
                 ? "Password akun CS tidak sesuai."
-                : "Password tidak sesuai. Gunakan Lupa password jika kamu lupa.");
+                : "Password tidak sesuai.");
             return;
         }
         if (akun.role == "admin_cs") {
@@ -435,73 +435,6 @@ if (ambil("form-login")) {
             sessionStorage.setItem("atlofMasuk", "ya");
             window.location.href = tujuanSebelumnya() == "admin_cs.xhtml" ? "index.xhtml" : tujuanSebelumnya();
         }
-    };
-}
-
-// Lupa password: cari akun di localStorage atau daftar Admin CS.
-if (ambil("form-lupa")) {
-    ambil("form-lupa").onsubmit = function (event) {
-        event.preventDefault();
-        var email = ambil("email-lupa").value.trim().toLowerCase();
-        var hasil = ambil("hasil-lupa");
-        hasil.style.display = "none";
-        if (!cekEmail(email)) {
-            teks("pesan-lupa", "Masukkan alamat email yang valid.");
-            ambil("pesan-lupa").className = "bantuan pesan-gagal";
-            return;
-        }
-        var akun = cariAkunTerdaftar(email);
-        if (!akun) {
-            teks("pesan-lupa", "Akun dengan email tersebut tidak ditemukan.");
-            ambil("pesan-lupa").className = "bantuan pesan-gagal";
-            return;
-        }
-        teks("pesan-lupa", "Akun ditemukan: " + akun.nama + ".");
-        ambil("pesan-lupa").className = "bantuan pesan-berhasil";
-        ambil("link-ubah-password").href = "ubah_password.xhtml?email=" + encodeURIComponent(email);
-        hasil.style.display = "block";
-    };
-}
-
-// Ubah password setelah akun ditemukan pada halaman Lupa password.
-if (ambil("form-ubah-password")) {
-    var parameterReset = new URLSearchParams(window.location.search);
-    var emailReset = (parameterReset.get("email") || "").trim().toLowerCase();
-    var akunReset = cariAkunTerdaftar(emailReset);
-    if (akunReset) {
-        teks("email-target", akunReset.email + " (" + akunReset.nama + ")");
-    } else {
-        teks("email-target", "Akun tidak ditemukan.");
-        teks("pesan-ubah", "Buka halaman Lupa password dan masukkan email akun kamu terlebih dahulu.");
-        ambil("pesan-ubah").className = "bantuan pesan-gagal";
-        ambil("form-ubah-password").style.display = "none";
-    }
-    if (ambil("tampilkan-password-baru")) {
-        ambil("tampilkan-password-baru").onchange = function () {
-            var tipe = this.checked ? "text" : "password";
-            ambil("password-baru").type = tipe;
-            ambil("konfirmasi-ubah").type = tipe;
-        };
-    }
-    ambil("form-ubah-password").onsubmit = function (event) {
-        event.preventDefault();
-        if (!akunReset) return;
-        var passwordBaru = ambil("password-baru").value;
-        if (passwordBaru.length < 8) {
-            teks("pesan-ubah", "Password baru minimal 8 karakter.");
-            ambil("pesan-ubah").className = "bantuan pesan-gagal";
-            return;
-        }
-        if (passwordBaru != ambil("konfirmasi-ubah").value) {
-            teks("pesan-ubah", "Konfirmasi password baru tidak sama.");
-            ambil("pesan-ubah").className = "bantuan pesan-gagal";
-            return;
-        }
-        simpanKataSandi(emailReset, passwordBaru);
-        teks("pesan-ubah", "");
-        ambil("pesan-ubah").className = "bantuan";
-        ambil("form-ubah-password").style.display = "none";
-        ambil("hasil-ubah").style.display = "block";
     };
 }
 
@@ -905,7 +838,7 @@ function perbaruiProfil() {
     teks("info-teams", akun.teams || "-");
     teks("avatar-profil", akun.nama.charAt(0).toUpperCase());
     if (adalahAdmin()) {
-        ambil("label-peran").style.display = "inline-block";
+        ambil("label-peran-profil").style.display = "inline-block";
         ambil("identitas-admin").style.display = "grid";
         ambil("identitas-wa").style.display = "grid";
         ambil("form-nomor-cs").style.display = "block";
@@ -915,14 +848,14 @@ function perbaruiProfil() {
 }
 
 function tampilkanForm(id) {
-    ambil("profil-identitas").style.display = "none";
+    ambil("data-profil").style.display = "none";
     ambil("profil-tombol").style.display = "none";
     ambil("form-profil").style.display = id == "form-profil" ? "block" : "none";
     ambil("form-password").style.display = id == "form-password" ? "block" : "none";
 }
 
 function tutupFormProfil() {
-    ambil("profil-identitas").style.display = "grid";
+    ambil("data-profil").style.display = "grid";
     ambil("profil-tombol").style.display = "flex";
     ambil("form-profil").style.display = "none";
     ambil("form-password").style.display = "none";
