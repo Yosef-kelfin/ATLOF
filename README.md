@@ -443,7 +443,7 @@ Pembacaan data dilakukan **sekali di awal halaman**, lalu dipakai ulang oleh beb
 
 Catatan: filter katalog (kata kunci, jenis, kategori, lokasi, status) dilakukan di browser, bukan query ulang ke database. Untuk jumlah data kecil ini lebih cepat dan tetap bersumber dari MySQL.
 
-Jika `cacheLaporan` masih `null` karena server gagal, `semuaLaporan()` memakai array contoh di `app.js` dan perubahan status lokal di `sessionStorage`.
+Jika `cacheLaporan` masih `null` karena server gagal, `semuaLaporan()` memakai laporan lokal buatan pengguna di `sessionStorage`, atau mengembalikan daftar kosong bila belum ada.
 
 ### 6.7 Alur tulis laporan
 
@@ -622,7 +622,7 @@ Kode HTTP yang dipakai:
 - Jika `fetch()` gagal total:
   - Login/daftar memakai fallback offline.
   - Operasi tulis menampilkan pesan “Gagal menghubungi server.”
-  - Halaman baca memakai data contoh di `app.js`.
+  - Halaman baca menampilkan keadaan kosong atau laporan lokal yang dibuat pengguna saat offline.
 - Setelah operasi tulis berhasil, frontend biasanya memuat ulang data dari server (`muatLaporanServer`, `muatSerahServer`) atau memperbarui `cacheLaporan` secara langsung.
 
 ### 6.13 Ringkasan komunikasi per file
@@ -830,7 +830,6 @@ Yang **belum** ada: token CSRF, pembatasan percobaan login, dan verifikasi email
 | `sessionStorage.atlofAkun` | Nama, email, role, kampus, Teams, telepon, foto. |
 | `sessionStorage.atlofSesiServer` | Penanda bahwa sesi berasal dari login PHP. |
 | `sessionStorage.atlofLaporan` | Laporan buatan pengguna saat offline. |
-| `sessionStorage.atlofPerubahanContoh` | Perubahan status pada data contoh. |
 | `sessionStorage.atlofSerahTerima` | Catatan serah terima saat offline. |
 | `sessionStorage.atlofKontakAdmin` | Nomor layanan CS saat offline. |
 | `localStorage.atlofAkunLokal` | Akun uji offline. |
@@ -839,7 +838,7 @@ Yang **belum** ada: token CSRF, pembatasan percobaan login, dan verifikasi email
 Aturan fallback:
 
 - `muatSesiServer()` dipanggil lebih dulu; jika sesi PHP berakhir dan penanda `atlofSesiServer` ada, sesi lokal dihapus.
-- `muatLaporanServer()` mengisi `cacheLaporan`; bila gagal, `cacheLaporan` tetap `null` dan `semuaLaporan()` memakai data contoh/local.
+- `muatLaporanServer()` mengisi `cacheLaporan`; bila gagal, `cacheLaporan` tetap `null` dan `semuaLaporan()` memakai data lokal pengguna.
 - `muatSerahServer()` melakukan hal yang sama untuk `cacheSerah`.
 - Katalog, beranda, detail, dan dashboard memakai `cacheLaporan` bila tersedia; filter katalog dilakukan di browser atas data yang sudah dimuat dari database.
 
@@ -939,7 +938,9 @@ Endpoint `laporan.php?aksi=status_cs` dipakai untuk status penanganan CS; endpoi
 | `aksi-tengah` | Baris aksi rata tengah | `akses_akun` |
 | `aksi-kelola` | Baris tombol Edit dan Hapus di bawah panel status, masih dalam satu kartu laporan | Dibuat `app.js` di `laporan_saya` |
 | `batal-profil` | Penanda tombol Batal pada form profil; belum punya aturan CSS | `profil` |
-| `lihat-password` | Hook checkbox untuk menampilkan password; belum punya aturan CSS | `login`, `pendaftaran` |
+| `tombol-mata` | Tombol mata untuk menampilkan/menyembunyikan password | `login`, `pendaftaran`, `profil` |
+| `ikon-mata-buka` | Ikon mata terbuka, ditampilkan saat password terlihat | `login`, `pendaftaran`, `profil` |
+| `ikon-mata-tutup` | Ikon mata tertutup, ditampilkan saat password tersembunyi | `login`, `pendaftaran`, `profil` |
 
 ### 15.4 Beranda
 
@@ -973,8 +974,8 @@ Endpoint `laporan.php?aksi=status_cs` dipakai untuk status penanganan CS; endpoi
 | `pilih-jenis` | Grup radio untuk jenis laporan | `buat_laporan`, `edit_laporan` |
 | `judul-form` | Judul di dalam kartu form | `buat_laporan`, `edit_laporan` |
 | `bantuan` | Teks bantuan kecil di bawah input | `buat_laporan`, `detail`, `edit_laporan`, `login`, `profil` |
-
-| `centang` | Label untuk checkbox | `login`, `pendaftaran` |
+| `wadah-password` | Pembungkus input password dan tombol mata agar ikon berada di dalam kolom input | `login`, `pendaftaran`, `profil` |
+| `centang` | Label untuk checkbox | `serah_terima` |
 | `panel-form` | Panel form yang bisa dibuka dan ditutup | `profil` |
 | `catatan` | Kotak catatan verifikasi barang | `detail` |
 
@@ -1256,6 +1257,7 @@ ID di halaman ini sama dengan `buat_laporan.xhtml`, kecuali form utama memakai `
 | --- | --- |
 | `menu-akun` | Wadah tombol akun di header |
 | `form-login` | Form masuk |
+| `input-tujuan` | Halaman tujuan setelah login |
 | `email` | Input email |
 | `password` | Input password |
 | `link-daftar` | Tautan ke halaman pendaftaran |
@@ -1265,6 +1267,7 @@ ID di halaman ini sama dengan `buat_laporan.xhtml`, kecuali form utama memakai `
 | ID | Fungsi |
 | --- | --- |
 | `menu-akun` | Wadah tombol akun di header |
+| `input-tujuan-daftar` | Halaman tujuan setelah pendaftaran |
 | `form-daftar` | Form pendaftaran akun |
 | `nama` | Input nama lengkap |
 | `email` | Input email |
@@ -1469,7 +1472,6 @@ Notifikasi gagal yang dibuat `app.js`:
   - `daftar-barang`
   - `footer-tentang`
   - `katalog-page`
-  - `lihat-password`
   - `profil-tombol`
   - `tanggal-kosong`
 - `teks-emas` dan `footer-pesan` sama-sama memberi warna aksen pada slogan footer, tetapi warnanya berbeda. Saat ini `pendaftaran` dan `profil` memakai `footer-pesan`, halaman lain memakai `teks-emas`.

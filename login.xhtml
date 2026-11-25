@@ -47,9 +47,18 @@
                     <input type="hidden" id="input-tujuan" name="tujuan" value="" />
                     <div class="field"><label for="email">Email <em>*</em></label><input id="email" name="email"
                             type="text" /></div>
-                    <div class="field"><label for="password">Password <em>*</em></label><input id="password"
-                            name="password" type="password" /><label class="centang"><input type="checkbox"
-                                class="lihat-password" /> Tampilkan password</label></div><button
+                    <div class="field"><label for="password">Password <em>*</em></label>
+                        <div class="wadah-password">
+                            <input id="password" name="password" type="password" />
+                            <button type="button" class="tombol-mata" data-target="password"
+                                title="Lihat/Sembunyikan password" aria-label="Tampilkan password">
+                                <img src="images/ikon-mata-tutup.svg" class="ikon-mata-tutup" alt="Tampilkan password"
+                                    width="16" height="16" />
+                                <img src="images/ikon-mata-buka.svg" class="ikon-mata-buka" alt="Sembunyikan password"
+                                    width="16" height="16" style="display:none;" />
+                            </button>
+                        </div>
+                    </div><button
                         class="tombol tombol-kuning lebar-penuh" type="submit">Masuk</button>
                 </form>
             </div>

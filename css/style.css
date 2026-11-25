@@ -556,6 +556,61 @@ input[readonly] {
     background: #f1f5f9;
 }
 
+/* Sembunyikan tombol intip password bawaan browser Edge / Chrome agar tidak tumpang tindih */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none !important;
+}
+
+.wadah-password {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.wadah-password input[type="password"],
+.wadah-password input[type="text"] {
+    width: 100%;
+    padding-right: 44px;
+}
+
+.tombol-mata {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    opacity: 0.75;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
+    z-index: 2;
+}
+
+.tombol-mata:hover {
+    opacity: 1;
+    background-color: rgba(10, 88, 150, 0.08);
+}
+
+.tombol-mata:focus {
+    outline: 2px solid #0a5896;
+    outline-offset: 1px;
+}
+
+.tombol-mata img {
+    width: 16px;
+    height: 16px;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+}
+
 textarea {
     resize: vertical;
 }

@@ -7,19 +7,6 @@
     fallback offline (protokol file://) saat server tidak aktif.
 */
 
-var barang = [
-    { id: 1, nama: "Tumbler Hitam", jenis: "hilang", kategori: "tumbler", lokasi: "Kampus 1", tanggal: "10-11-2026", status: "masih_dicari", penyimpanan: "-", pelapor: "Kelvin Utama", deskripsi: "Tumbler warna hitam, ukuran sedang.", gambar: "images/ph-tumbler.png", teams: "kelvin@students.uajy.ac.id" },
-    { id: 2, nama: "Jaket Hoodie Abu-abu", jenis: "ditemukan", kategori: "pakaian_jaket", lokasi: "Kampus 2", tanggal: "09-11-2026", status: "belum_dikembalikan", penyimpanan: "CS Kampus 2", pelapor: "Petugas Kampus", deskripsi: "Jaket hoodie warna abu-abu polos.", gambar: "images/ph-pakaian_jaket.png", teams: "cs@uajy.ac.id" },
-    { id: 3, nama: "Kotak Earphone Putih", jenis: "ditemukan", kategori: "elektronik", lokasi: "Kampus 3", tanggal: "08-11-2026", status: "belum_dikembalikan", penyimpanan: "CS Kampus 3", pelapor: "Petugas Kampus", deskripsi: "Kotak earphone putih tanpa isi.", gambar: "images/ph-elektronik.png", teams: "cs@uajy.ac.id" },
-    { id: 4, nama: "Dompet Cokelat", jenis: "hilang", kategori: "dompet_kartu", lokasi: "Kampus 4", tanggal: "07-11-2026", status: "masih_dicari", penyimpanan: "-", pelapor: "Nadia Putri", deskripsi: "Dompet berwarna cokelat tua.", gambar: "images/ph-dompet_kartu.png", teams: "nadia@students.uajy.ac.id" },
-    { id: 5, nama: "Kunci Motor", jenis: "ditemukan", kategori: "kunci", lokasi: "Kampus 1", tanggal: "06-11-2026", status: "belum_dikembalikan", penyimpanan: "Dibawa penemu", pelapor: "Nadia Putri", deskripsi: "Satu kunci motor dengan gantungan biru.", gambar: "images/ph-kunci.png", teams: "nadia@students.uajy.ac.id" },
-    { id: 6, nama: "Kalkulator Ilmiah", jenis: "hilang", kategori: "elektronik", lokasi: "Kampus 2", tanggal: "05-11-2026", status: "sudah_ditemukan", penyimpanan: "-", pelapor: "Nadia Putri", deskripsi: "Kalkulator ilmiah warna hitam.", gambar: "images/ph-elektronik.png", teams: "nadia@students.uajy.ac.id" },
-    { id: 7, nama: "Botol Minum Stainless", jenis: "ditemukan", kategori: "tumbler", lokasi: "Kampus 3", tanggal: "04-11-2026", status: "sudah_dikembalikan", penyimpanan: "CS Kampus 3", pelapor: "Petugas Kampus", deskripsi: "Botol stainless warna perak.", gambar: "images/ph-tumbler.png", teams: "cs@uajy.ac.id" },
-    { id: 8, nama: "Payung Lipat Biru", jenis: "ditemukan", kategori: "lainnya", lokasi: "Kampus 4", tanggal: "03-11-2026", status: "belum_dikembalikan", penyimpanan: "CS Kampus 4", pelapor: "Petugas Kampus", deskripsi: "Payung lipat biru tua.", gambar: "images/ph-lainnya.png", teams: "cs@uajy.ac.id" },
-    { id: 9, nama: "Tote Bag Kanvas", jenis: "hilang", kategori: "lainnya", lokasi: "Lainnya", tanggal: "02-11-2026", status: "masih_dicari", penyimpanan: "-", pelapor: "Kelvin Utama", deskripsi: "Tas kain warna krem.", gambar: "images/ph-lainnya.png", teams: "kelvin@students.uajy.ac.id" },
-    { id: 10, nama: "Flashdisk 32 GB", jenis: "ditemukan", kategori: "elektronik", lokasi: "Kampus 1", tanggal: "01-11-2026", status: "sudah_dikembalikan", penyimpanan: "CS Kampus 1", pelapor: "Nadia Putri", deskripsi: "Flashdisk hitam ukuran kecil.", gambar: "images/ph-elektronik.png", teams: "nadia@students.uajy.ac.id" }
-];
-
 // ========================================================
 // Lapisan data server (MySQL melalui PHP)
 // ========================================================
@@ -220,8 +207,9 @@ function simpanKataSandi(email, password) {
     }
 }
 
-// Empat identitas admin untuk mencoba tampilan sebelum backend dibuat.
-// Password uji: ATLOFcs2026! (jangan digunakan sebagai password sungguhan).
+// Akun Admin CS khusus mode offline/fallback (protokol file://).
+// Untuk login lewat Apache, akun diambil dari tabel users di database.
+// Password uji offline: ATLOFcs2026! (jangan digunakan sebagai password sungguhan).
 var adminCS = [
     { email: "cs1@atlof.test", nama: "Admin CS Kampus 1", kampus: "Kampus 1" },
     { email: "cs2@atlof.test", nama: "Admin CS Kampus 2", kampus: "Kampus 2" },
@@ -411,21 +399,12 @@ function namaStatus(status) {
 }
 
 function semuaLaporan() {
-    // Saat data server sudah dimuat, pakai data MySQL sebagai sumber utama.
+    // Data laporan selalu diambil dari server; bila server tidak aktif,
+    // pakai laporan yang tersimpan lokal oleh pengguna saat mode offline.
     if (cacheLaporan !== null) {
         return cacheLaporan;
     }
-    var contoh = bacaSesi("atlofPerubahanContoh", {});
-    var daftarContoh = [];
-    for (var i = 0; i < barang.length; i++) {
-        var laporan = Object.assign({}, barang[i]);
-        if (contoh[laporan.id]) {
-            laporan.status = contoh[laporan.id].status;
-            laporan.status_cs = contoh[laporan.id].status_cs;
-        }
-        daftarContoh.push(laporan);
-    }
-    return laporanSaya().concat(daftarContoh);
+    return laporanSaya();
 }
 
 function gambarKategori(kategori) {
@@ -538,32 +517,32 @@ if (ambil("form-daftar")) {
                 body: dataKirim,
                 headers: { "X-Requested-With": "XMLHttpRequest" }
             })
-            .then(function (res) {
-                return res.json().then(function (data) {
-                    return { ok: res.ok, data: data };
+                .then(function (res) {
+                    return res.json().then(function (data) {
+                        return { ok: res.ok, data: data };
+                    });
+                })
+                .then(function (hasil) {
+                    var data = hasil.data;
+                    if (!hasil.ok || data.status !== "success") {
+                        pesan(data.message || "Pendaftaran gagal.");
+                        return;
+                    }
+                    var user = data.user;
+                    simpanSesi("atlofAkun", {
+                        nama: user.nama,
+                        email: user.email,
+                        teams: user.teams || "",
+                        telepon: user.telepon || "",
+                        role: user.role || "user"
+                    });
+                    sessionStorage.setItem("atlofMasuk", "ya");
+                    sessionStorage.setItem("atlofSesiServer", "ya");
+                    window.location.href = data.redirect || tujuan;
+                })
+                .catch(function () {
+                    fallbackDaftarOffline();
                 });
-            })
-            .then(function (hasil) {
-                var data = hasil.data;
-                if (!hasil.ok || data.status !== "success") {
-                    pesan(data.message || "Pendaftaran gagal.");
-                    return;
-                }
-                var user = data.user;
-                simpanSesi("atlofAkun", {
-                    nama: user.nama,
-                    email: user.email,
-                    teams: user.teams || "",
-                    telepon: user.telepon || "",
-                    role: user.role || "user"
-                });
-                sessionStorage.setItem("atlofMasuk", "ya");
-                sessionStorage.setItem("atlofSesiServer", "ya");
-                window.location.href = data.redirect || tujuan;
-            })
-            .catch(function () {
-                fallbackDaftarOffline();
-            });
         } else {
             fallbackDaftarOffline();
         }
@@ -628,58 +607,78 @@ if (ambil("form-login")) {
                 body: dataKirim,
                 headers: { "X-Requested-With": "XMLHttpRequest" }
             })
-            .then(function (res) {
-                return res.json().then(function (data) {
-                    return { ok: res.ok, data: data };
+                .then(function (res) {
+                    return res.json().then(function (data) {
+                        return { ok: res.ok, data: data };
+                    });
+                })
+                .then(function (hasil) {
+                    var data = hasil.data;
+                    if (!hasil.ok || data.status !== "success") {
+                        pesan(data.message || "Email atau password salah.");
+                        return;
+                    }
+                    var user = data.user;
+                    if (user.role === "admin_cs") {
+                        simpanSesi("atlofAkun", {
+                            nama: user.nama,
+                            email: user.email,
+                            teams: user.teams || "",
+                            telepon: user.telepon || "",
+                            role: "admin_cs",
+                            kampus_cs: user.kampus_cs
+                        });
+                        sessionStorage.setItem("atlofMasuk", "ya");
+                        sessionStorage.setItem("atlofSesiServer", "ya");
+                        window.location.href = data.redirect || "admin_cs.xhtml";
+                    } else {
+                        simpanSesi("atlofAkun", {
+                            nama: user.nama,
+                            email: user.email,
+                            teams: user.teams || "",
+                            telepon: user.telepon || "",
+                            role: "user"
+                        });
+                        sessionStorage.setItem("atlofMasuk", "ya");
+                        sessionStorage.setItem("atlofSesiServer", "ya");
+                        window.location.href = data.redirect || (tujuan == "admin_cs.xhtml" ? "index.xhtml" : tujuan);
+                    }
+                })
+                .catch(function () {
+                    fallbackLoginOffline();
                 });
-            })
-            .then(function (hasil) {
-                var data = hasil.data;
-                if (!hasil.ok || data.status !== "success") {
-                    pesan(data.message || "Email atau password salah.");
-                    return;
-                }
-                var user = data.user;
-                if (user.role === "admin_cs") {
-                    simpanSesi("atlofAkun", {
-                        nama: user.nama,
-                        email: user.email,
-                        teams: user.teams || "",
-                        telepon: user.telepon || "",
-                        role: "admin_cs",
-                        kampus_cs: user.kampus_cs
-                    });
-                    sessionStorage.setItem("atlofMasuk", "ya");
-                    sessionStorage.setItem("atlofSesiServer", "ya");
-                    window.location.href = data.redirect || "admin_cs.xhtml";
-                } else {
-                    simpanSesi("atlofAkun", {
-                        nama: user.nama,
-                        email: user.email,
-                        teams: user.teams || "",
-                        telepon: user.telepon || "",
-                        role: "user"
-                    });
-                    sessionStorage.setItem("atlofMasuk", "ya");
-                    sessionStorage.setItem("atlofSesiServer", "ya");
-                    window.location.href = data.redirect || (tujuan == "admin_cs.xhtml" ? "index.xhtml" : tujuan);
-                }
-            })
-            .catch(function () {
-                fallbackLoginOffline();
-            });
         } else {
             fallbackLoginOffline();
         }
     };
 }
 
-var kotakPassword = document.querySelectorAll(".lihat-password");
-for (var i = 0; i < kotakPassword.length; i++) {
-    kotakPassword[i].onchange = function () {
-        // Checkbox login atau register sama-sama mengarah ke id password.
-        if (ambil("password")) ambil("password").type = this.checked ? "text" : "password";
-    };
+// Tombol mata untuk menampilkan/menyembunyikan semua input password.
+var tombolMataList = document.querySelectorAll(".tombol-mata");
+for (var i = 0; i < tombolMataList.length; i++) {
+    (function (tombol) {
+        tombol.onclick = function (event) {
+            event.preventDefault();
+            var targetId = this.getAttribute("data-target");
+            var inputTarget = ambil(targetId);
+            if (!inputTarget) return;
+
+            var ikonBuka = this.querySelector(".ikon-mata-buka");
+            var ikonTutup = this.querySelector(".ikon-mata-tutup");
+
+            if (inputTarget.type === "password") {
+                inputTarget.type = "text";
+                if (ikonBuka) ikonBuka.style.display = "block";
+                if (ikonTutup) ikonTutup.style.display = "none";
+                this.setAttribute("aria-label", "Sembunyikan password");
+            } else {
+                inputTarget.type = "password";
+                if (ikonBuka) ikonBuka.style.display = "none";
+                if (ikonTutup) ikonTutup.style.display = "block";
+                this.setAttribute("aria-label", "Tampilkan password");
+            }
+        };
+    })(tombolMataList[i]);
 }
 
 // Katalog: pencarian, kategori, jenis, lokasi dan status.
@@ -1259,26 +1258,26 @@ if (ambil("form-profil")) {
                 body: dataKirim,
                 headers: { "X-Requested-With": "XMLHttpRequest" }
             })
-            .then(function (res) {
-                return res.json().then(function (data) {
-                    return { ok: res.ok, data: data };
+                .then(function (res) {
+                    return res.json().then(function (data) {
+                        return { ok: res.ok, data: data };
+                    });
+                })
+                .then(function (hasil) {
+                    if (!hasil.ok || hasil.data.status !== "success") {
+                        pesan(hasil.data.message || "Gagal mengubah password.");
+                        return;
+                    }
+                    suksesUbah();
+                })
+                .catch(function () {
+                    var tersimpan = cariAkunTerdaftar(akun.email);
+                    if (!tersimpan || tersimpan.password != passwordLama) {
+                        pesan("Password sekarang tidak sesuai.");
+                        return;
+                    }
+                    suksesUbah();
                 });
-            })
-            .then(function (hasil) {
-                if (!hasil.ok || hasil.data.status !== "success") {
-                    pesan(hasil.data.message || "Gagal mengubah password.");
-                    return;
-                }
-                suksesUbah();
-            })
-            .catch(function () {
-                var tersimpan = cariAkunTerdaftar(akun.email);
-                if (!tersimpan || tersimpan.password != passwordLama) {
-                    pesan("Password sekarang tidak sesuai.");
-                    return;
-                }
-                suksesUbah();
-            });
             return;
         }
 
@@ -1479,10 +1478,6 @@ function sesuaikanStatusLaporan(idLaporan) {
     }
     if (ditemukan) {
         simpanSesi("atlofLaporan", laporan);
-    } else {
-        var contoh = bacaSesi("atlofPerubahanContoh", {});
-        contoh[idLaporan] = { status_cs: statusCSBaru, status: statusLaporan };
-        simpanSesi("atlofPerubahanContoh", contoh);
     }
 }
 
