@@ -1,51 +1,17 @@
-ATLOF - Frontend XHTML 1.0 Strict (Revisi 3)
-==================================================
-Buka index.xhtml lewat browser, atau letakkan folder ini di xampp/htdocs.
+ATLOF - Catatan Frontend (Legacy)
+=================================
 
-FONT
-- IBM Plex Sans (semua teks sans), IBM Plex Mono (label/ID), dan Poppins
-  (khusus navbar: logo, menu, dan tombol akun) disimpan lokal di folder
-  fonts/. Tidak perlu internet; jangan hapus folder fonts/.
-- Tidak ada aturan @media: layout desktop dipakai di semua lebar layar.
+Panduan lengkap aplikasi sudah digabung ke README.md.
 
-AKUN PREVIEW ADMIN CS (hanya untuk menguji frontend lokal)
-- cs1@atlof.test  : Kampus 1 - Gedung Alfonsus Mrican
-- cs2@atlof.test  : Kampus 2 - Gedung Thomas Aquinas
-- cs3@atlof.test  : Kampus 3 - Gedung Bonaventura
-- cs4@atlof.test  : Kampus 4 - Gedung Theresa
-Password uji untuk keempat akun: ATLOFcs2026!
-Alamat .test adalah alamat contoh, BUKAN email resmi UAJY.
+File ini dipertahankan hanya sebagai penanda lama. Gunakan README.md untuk:
 
-Setelah login sebagai CS, buka Profil dan isi nomor WhatsApp layanan
-masing-masing kampus. Nomor tersimpan secara terpisah di sessionStorage.
-Nomor WhatsApp sebenarnya belum ditentukan: jangan memakai nomor palsu atau
-nomor pribadi tanpa izin pemilik. Bila kosong, kontak WA tidak muncul pada detail.
+- Cara menjalankan Apache, MySQL, dan import database (bagian 3).
+- Akun uji Admin CS dan pengguna (bagian 4).
+- Struktur database dan endpoint PHP (bagian 5-10).
+- Alur komunikasi frontend-backend dan serah terima (bagian 6 dan 9).
+- Panduan pengujian cepat (bagian 13).
+- Referensi class CSS dan ID halaman (bagian 15-16).
 
-PENGUJIAN STATUS
-- Pengguna biasa: buat laporan, buka Laporan Saya, ubah pilihan di dropdown
-  dan klik Simpan status. Status bisa diubah lagi (untuk barang yang tidak dititipkan ke CS).
-- Admin CS: buka Dashboard CS, cari/filter barang titipan, lalu klik
-  "Kelola serah terima". Catat penerimaan lebih dahulu, baru pengembalian.
-  Status laporan mengikuti catatan serah terima.
-- Admin dapat membuat laporan lewat form yang sama dengan pengguna biasa.
-- Tiap dashboard CS hanya menampilkan barang yang dititipkan pada kampusnya.
-
-SERAH TERIMA BARANG (ADMIN CS)
-- Dashboard CS punya pencarian nama/ID, filter status, dan navigasi halaman.
-- Tombol "Kelola serah terima" membuka serah_terima.xhtml?id=ID_LAPORAN.
-- Catat penerimaan (nama penyerah), lalu pengembalian (nama penerima dan centang
-  verifikasi kepemilikan). Pengembalian tidak bisa dicatat sebelum penerimaan.
-- Catatan bisa diedit atau dihapus. Penerimaan hanya bisa dihapus setelah
-  catatan pengembaliannya dihapus.
-- "Riwayat serah terima" (riwayat_serah_terima.xhtml) menampilkan semua catatan
-  kampus CS yang sedang login, lengkap dengan pencarian, filter jenis, dan
-  navigasi halaman.
-- Catatan disimpan di sessionStorage (atlofSerahTerima) untuk simulasi frontend.
-
-PENTING
-Semua login, peran, dan perubahan data ini masih berupa interaksi frontend.
-JavaScript dan sessionStorage TIDAK memberikan keamanan akun atau kontrol hak akses
-sebenarnya. Saat backend PHP + MySQL dibuat, autentikasi, pengecekan role, status,
-kepemilikan laporan, dan validasi harus diterapkan ulang di SERVER.
-Jangan menggunakan password uji di sistem sebenarnya.
-
+Catatan: akun offline cs1@atlof.test sampai cs4@atlof.test dengan password
+ATLOFcs2026! hanya berlaku untuk mode file:// (fallback). Untuk login ke
+database lewat Apache, gunakan akun di README.md bagian 4.

@@ -2,8 +2,9 @@
     ATLOF - JavaScript Frontend
     Pemrograman Web Dasar
 
-    Tampilan ini belum menggunakan backend PHP atau MySQL.
-    Akun CS di bawah ini hanya untuk pengembangan dan tidak boleh dipakai di server publik.
+    Data utama (akun, laporan, serah terima) disimpan di MySQL dan diakses
+    lewat endpoint PHP. localStorage/sessionStorage hanya dipakai sebagai
+    fallback offline (protokol file://) saat server tidak aktif.
 */
 
 var barang = [
@@ -18,6 +19,87 @@ var barang = [
     { id: 9, nama: "Tote Bag Kanvas", jenis: "hilang", kategori: "lainnya", lokasi: "Lainnya", tanggal: "02-11-2026", status: "masih_dicari", penyimpanan: "-", pelapor: "Kelvin Utama", deskripsi: "Tas kain warna krem.", gambar: "images/ph-lainnya.png", teams: "kelvin@students.uajy.ac.id" },
     { id: 10, nama: "Flashdisk 32 GB", jenis: "ditemukan", kategori: "elektronik", lokasi: "Kampus 1", tanggal: "01-11-2026", status: "sudah_dikembalikan", penyimpanan: "CS Kampus 1", pelapor: "Nadia Putri", deskripsi: "Flashdisk hitam ukuran kecil.", gambar: "images/ph-elektronik.png", teams: "nadia@students.uajy.ac.id" }
 ];
+
+// ========================================================
+// Lapisan data server (MySQL melalui PHP)
+// ========================================================
+var modeServer = window.location.protocol === "http:" || window.location.protocol === "https:";
+var cacheLaporan = null; // null = belum dimuat dari server
+var cacheSerah = null;   // null = belum dimuat dari server
+
+function mintaJson(url, opsi) {
+    return fetch(url, opsi || {}).then(function (res) {
+        return res.json().then(function (data) {
+            return { ok: res.ok, data: data };
+        });
+    });
+}
+
+function kirimData(url, data) {
+    return mintaJson(url, {
+        method: "POST",
+        body: data,
+        headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" }
+    });
+}
+
+// Sesi PHP adalah sumber kebenaran saat aplikasi berjalan lewat Apache.
+function muatSesiServer() {
+    if (!modeServer) return Promise.resolve();
+    return mintaJson("cek_sesi.php", {
+        headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" },
+        cache: "no-store"
+    }).then(function (hasil) {
+        var data = hasil.data;
+        if (hasil.ok && data && data.is_logged && data.user) {
+            sessionStorage.setItem("atlofMasuk", "ya");
+            sessionStorage.setItem("atlofSesiServer", "ya");
+            simpanSesi("atlofAkun", {
+                nama: data.user.nama,
+                email: data.user.email,
+                teams: data.user.teams || "",
+                telepon: data.user.telepon || "",
+                role: data.user.role || "user",
+                kampus_cs: data.user.kampus_cs || null,
+                foto: data.user.foto || ""
+            });
+        } else if (sessionStorage.getItem("atlofSesiServer") === "ya") {
+            sessionStorage.removeItem("atlofMasuk");
+            sessionStorage.removeItem("atlofAkun");
+            sessionStorage.removeItem("atlofSesiServer");
+        }
+    }).catch(function () {
+        // Server tidak dapat dihubungi: biarkan mode lokal tetap berjalan.
+    });
+}
+
+function muatLaporanServer() {
+    if (!modeServer || !sudahMasuk()) return Promise.resolve();
+    return mintaJson("laporan.php?aksi=list", {
+        headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" },
+        cache: "no-store"
+    }).then(function (hasil) {
+        if (hasil.ok && hasil.data && hasil.data.status === "success" && Array.isArray(hasil.data.data)) {
+            cacheLaporan = hasil.data.data;
+        }
+    }).catch(function () {
+        // Tetap gunakan data lokal bila server gagal.
+    });
+}
+
+function muatSerahServer() {
+    if (!modeServer || !adalahAdmin()) return Promise.resolve();
+    return mintaJson("serah_terima.php?aksi=list", {
+        headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" },
+        cache: "no-store"
+    }).then(function (hasil) {
+        if (hasil.ok && hasil.data && hasil.data.status === "success" && Array.isArray(hasil.data.data)) {
+            cacheSerah = hasil.data.data;
+        }
+    }).catch(function () {
+        // Tetap gunakan data lokal bila server gagal.
+    });
+}
 
 function ambil(id) {
     return document.getElementById(id);
@@ -195,7 +277,7 @@ function laporanSaya() {
 }
 
 function laporanMilikSaya() {
-    var daftar = laporanSaya();
+    var daftar = semuaLaporan();
     var email = dataAkun().email;
     var hasil = [];
     for (var i = 0; i < daftar.length; i++) {
@@ -244,23 +326,41 @@ function pergiKeAkses(tujuan) {
 
 function keluar() {
     sessionStorage.removeItem("atlofMasuk");
-    window.location.href = "index.xhtml";
+    sessionStorage.removeItem("atlofAkun");
+    sessionStorage.removeItem("atlofSesiServer");
+    if (window.fetch && modeServer) {
+        fetch("logout.php", {
+            method: "POST",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        }).finally(function () {
+            window.location.href = "index.xhtml";
+        });
+    } else {
+        window.location.href = "index.xhtml";
+    }
 }
 
 // Cegah kunjungan langsung ke halaman khusus pengguna sebelum masuk.
+// Pemeriksaan dijalankan setelah sesi PHP selesai dimuat.
 var halamanKhusus = ["katalog.xhtml", "detail.xhtml", "buat_laporan.xhtml", "edit_laporan.xhtml", "laporan_saya.xhtml", "profil.xhtml", "admin_cs.xhtml", "serah_terima.xhtml", "riwayat_serah_terima.xhtml"];
 var halamanAdminSaja = ["admin_cs.xhtml", "serah_terima.xhtml", "riwayat_serah_terima.xhtml"];
 var sekarang = halamanIni();
-if (!sudahMasuk() && halamanKhusus.indexOf(sekarang) != -1) {
-    var tujuanHalaman = sekarang + window.location.search;
-    pergiKeAkses(tujuanHalaman);
-}
-if (sudahMasuk() && !adalahAdmin() && halamanAdminSaja.indexOf(sekarang) != -1) {
-    window.location.href = "index.xhtml";
+
+function cekAksesHalaman() {
+    if (!sudahMasuk() && halamanKhusus.indexOf(sekarang) != -1) {
+        pergiKeAkses(sekarang + window.location.search);
+        return false;
+    }
+    if (sudahMasuk() && !adalahAdmin() && halamanAdminSaja.indexOf(sekarang) != -1) {
+        window.location.href = "index.xhtml";
+        return false;
+    }
+    return true;
 }
 
 // Atur tombol Masuk/Daftar pada header.
-if (ambil("menu-akun") && sudahMasuk()) {
+function pasangHeaderAkun() {
+    if (!ambil("menu-akun") || !sudahMasuk()) return;
     ambil("menu-akun").innerHTML =
         '<a href="profil.xhtml" class="tombol tombol-outline tombol-kecil">Profil</a>' +
         '<button id="keluar-header" type="button" class="tombol tombol-kecil tombol-keluar">Keluar</button>';
@@ -275,17 +375,19 @@ if (ambil("menu-akun") && sudahMasuk()) {
 }
 
 // Tautan katalog / laporan dari beranda harus melewati halaman akun.
-var tautan = document.getElementsByTagName("a");
-for (var t = 0; t < tautan.length; t++) {
-    (function (link) {
-        var halaman = link.getAttribute("href") || "";
-        if (!sudahMasuk() && /^(katalog|detail|buat_laporan|edit_laporan|laporan_saya|profil|admin_cs)\.xhtml/.test(halaman)) {
-            link.onclick = function (event) {
-                event.preventDefault();
-                pergiKeAkses(halaman);
-            };
-        }
-    })(tautan[t]);
+function pasangTautanAkses() {
+    var tautan = document.getElementsByTagName("a");
+    for (var t = 0; t < tautan.length; t++) {
+        (function (link) {
+            var halaman = link.getAttribute("href") || "";
+            if (!sudahMasuk() && /^(katalog|detail|buat_laporan|edit_laporan|laporan_saya|profil|admin_cs|serah_terima|riwayat_serah_terima)\.xhtml/.test(halaman)) {
+                link.onclick = function (event) {
+                    event.preventDefault();
+                    pergiKeAkses(halaman);
+                };
+            }
+        })(tautan[t]);
+    }
 }
 
 // Ubah teks pengguna menjadi teks aman sebelum dimasukkan ke innerHTML.
@@ -309,6 +411,10 @@ function namaStatus(status) {
 }
 
 function semuaLaporan() {
+    // Saat data server sudah dimuat, pakai data MySQL sebagai sumber utama.
+    if (cacheLaporan !== null) {
+        return cacheLaporan;
+    }
     var contoh = bacaSesi("atlofPerubahanContoh", {});
     var daftarContoh = [];
     for (var i = 0; i < barang.length; i++) {
@@ -348,14 +454,13 @@ function tampilkanBarang(id, daftar) {
 }
 
 // Beranda: pengunjung melihat petunjuk, pengguna masuk melihat laporan terbaru.
-if (ambil("bagian-cara")) {
-    if (sudahMasuk()) {
-        ambil("bagian-cara").style.display = "none";
-        ambil("bagian-terbaru").style.display = "block";
-        ambil("aksi-beranda-tamu").style.display = "none";
-        ambil("aksi-beranda-masuk").style.display = "flex";
-        tampilkanBarang("barang-terbaru", semuaLaporan().slice(0, 6));
-    }
+function tampilkanBeranda() {
+    if (!ambil("bagian-cara") || !sudahMasuk()) return;
+    ambil("bagian-cara").style.display = "none";
+    ambil("bagian-terbaru").style.display = "block";
+    ambil("aksi-beranda-tamu").style.display = "none";
+    ambil("aksi-beranda-masuk").style.display = "flex";
+    tampilkanBarang("barang-terbaru", semuaLaporan().slice(0, 6));
 }
 
 // Halaman pilihan masuk / daftar.
@@ -377,64 +482,194 @@ function cekEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// Pendaftaran hanya membuat akun pengguna biasa di browser.
+// Pendaftaran akun pengguna baru (mendukung backend PHP & fallback offline).
 if (ambil("form-daftar")) {
+    if (ambil("input-tujuan-daftar")) {
+        ambil("input-tujuan-daftar").value = tujuanSebelumnya();
+    }
+    var paramDaftar = new URLSearchParams(window.location.search);
+    if (paramDaftar.has("error")) {
+        pesan(paramDaftar.get("error"));
+    }
+
     ambil("form-daftar").onsubmit = function (event) {
         event.preventDefault();
         var nama = ambil("nama").value.trim();
         var email = ambil("email").value.trim().toLowerCase();
         var teams = ambil("teams").value.trim();
         var password = ambil("password").value;
+        var konfirmasi = ambil("konfirmasi") ? ambil("konfirmasi").value : "";
+        var tujuan = tujuanSebelumnya();
+
         if (!nama || !cekEmail(email) || !teams || password.length < 8) {
             pesan("Lengkapi data dengan benar. Password minimal 8 karakter.");
             return;
         }
-        if (cariAkunAdmin(email) || semuaAkunLokal()[email]) {
-            pesan("Email ini sudah terdaftar. Silakan masuk.");
-            return;
-        }
-        if (password != ambil("konfirmasi").value) {
+        if (password !== konfirmasi) {
             pesan("Konfirmasi password tidak sama.");
             return;
         }
-        var akunBaru = { nama: nama, email: email, teams: teams, password: password, role: "user" };
-        var daftar = semuaAkunLokal();
-        daftar[email] = akunBaru;
-        simpanLokal("atlofAkunLokal", daftar);
-        simpanSesi("atlofAkun", { nama: nama, email: email, teams: teams, role: "user" });
-        sessionStorage.setItem("atlofMasuk", "ya");
-        window.location.href = tujuanSebelumnya();
+
+        function fallbackDaftarOffline() {
+            if (cariAkunAdmin(email) || semuaAkunLokal()[email]) {
+                pesan("Email ini sudah terdaftar. Silakan masuk.");
+                return;
+            }
+            var akunBaru = { nama: nama, email: email, teams: teams, password: password, role: "user" };
+            var daftar = semuaAkunLokal();
+            daftar[email] = akunBaru;
+            simpanLokal("atlofAkunLokal", daftar);
+            simpanSesi("atlofAkun", { nama: nama, email: email, teams: teams, role: "user" });
+            sessionStorage.setItem("atlofMasuk", "ya");
+            window.location.href = tujuan;
+        }
+
+        if (modeServer) {
+            var dataKirim = new FormData();
+            dataKirim.append("nama", nama);
+            dataKirim.append("email", email);
+            dataKirim.append("teams", teams);
+            dataKirim.append("password", password);
+            dataKirim.append("konfirmasi", konfirmasi);
+            dataKirim.append("tujuan", tujuan);
+
+            fetch("proses_daftar.php", {
+                method: "POST",
+                body: dataKirim,
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(function (res) {
+                return res.json().then(function (data) {
+                    return { ok: res.ok, data: data };
+                });
+            })
+            .then(function (hasil) {
+                var data = hasil.data;
+                if (!hasil.ok || data.status !== "success") {
+                    pesan(data.message || "Pendaftaran gagal.");
+                    return;
+                }
+                var user = data.user;
+                simpanSesi("atlofAkun", {
+                    nama: user.nama,
+                    email: user.email,
+                    teams: user.teams || "",
+                    telepon: user.telepon || "",
+                    role: user.role || "user"
+                });
+                sessionStorage.setItem("atlofMasuk", "ya");
+                sessionStorage.setItem("atlofSesiServer", "ya");
+                window.location.href = data.redirect || tujuan;
+            })
+            .catch(function () {
+                fallbackDaftarOffline();
+            });
+        } else {
+            fallbackDaftarOffline();
+        }
     };
 }
 
+// Login pengguna dan Admin CS (mendukung backend PHP & fallback offline).
 if (ambil("form-login")) {
+    if (ambil("input-tujuan")) {
+        ambil("input-tujuan").value = tujuanSebelumnya();
+    }
+    var paramUrl = new URLSearchParams(window.location.search);
+    if (paramUrl.has("error")) {
+        pesan(paramUrl.get("error"));
+    }
+    if (paramUrl.has("pesan")) {
+        pesan(paramUrl.get("pesan"));
+    }
+
     ambil("form-login").onsubmit = function (event) {
         event.preventDefault();
         var email = ambil("email").value.trim().toLowerCase();
         var password = ambil("password").value;
+        var tujuan = tujuanSebelumnya();
+
         if (!cekEmail(email) || !password) {
             pesan("Masukkan email dan password yang benar.");
             return;
         }
-        var akun = cariAkunTerdaftar(email);
-        if (!akun) {
-            pesan("Email belum terdaftar. Silakan daftar terlebih dahulu.");
-            return;
+
+        function fallbackLoginOffline() {
+            var akun = cariAkunTerdaftar(email);
+            if (!akun) {
+                pesan("Email belum terdaftar. Silakan daftar terlebih dahulu.");
+                return;
+            }
+            if (akun.password != password) {
+                pesan(akun.role == "admin_cs"
+                    ? "Password akun CS tidak sesuai."
+                    : "Password tidak sesuai.");
+                return;
+            }
+            if (akun.role == "admin_cs") {
+                simpanSesi("atlofAkun", akunAdmin(cariAkunAdmin(email)));
+                sessionStorage.setItem("atlofMasuk", "ya");
+                window.location.href = "admin_cs.xhtml";
+            } else {
+                simpanSesi("atlofAkun", { nama: akun.nama, email: akun.email, teams: akun.teams, role: "user" });
+                sessionStorage.setItem("atlofMasuk", "ya");
+                window.location.href = tujuan == "admin_cs.xhtml" ? "index.xhtml" : tujuan;
+            }
         }
-        if (akun.password != password) {
-            pesan(akun.role == "admin_cs"
-                ? "Password akun CS tidak sesuai."
-                : "Password tidak sesuai.");
-            return;
-        }
-        if (akun.role == "admin_cs") {
-            simpanSesi("atlofAkun", akunAdmin(cariAkunAdmin(email)));
-            sessionStorage.setItem("atlofMasuk", "ya");
-            window.location.href = "admin_cs.xhtml";
+
+        if (modeServer) {
+            var dataKirim = new FormData();
+            dataKirim.append("email", email);
+            dataKirim.append("password", password);
+            dataKirim.append("tujuan", tujuan);
+
+            fetch("proses_login.php", {
+                method: "POST",
+                body: dataKirim,
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(function (res) {
+                return res.json().then(function (data) {
+                    return { ok: res.ok, data: data };
+                });
+            })
+            .then(function (hasil) {
+                var data = hasil.data;
+                if (!hasil.ok || data.status !== "success") {
+                    pesan(data.message || "Email atau password salah.");
+                    return;
+                }
+                var user = data.user;
+                if (user.role === "admin_cs") {
+                    simpanSesi("atlofAkun", {
+                        nama: user.nama,
+                        email: user.email,
+                        teams: user.teams || "",
+                        telepon: user.telepon || "",
+                        role: "admin_cs",
+                        kampus_cs: user.kampus_cs
+                    });
+                    sessionStorage.setItem("atlofMasuk", "ya");
+                    sessionStorage.setItem("atlofSesiServer", "ya");
+                    window.location.href = data.redirect || "admin_cs.xhtml";
+                } else {
+                    simpanSesi("atlofAkun", {
+                        nama: user.nama,
+                        email: user.email,
+                        teams: user.teams || "",
+                        telepon: user.telepon || "",
+                        role: "user"
+                    });
+                    sessionStorage.setItem("atlofMasuk", "ya");
+                    sessionStorage.setItem("atlofSesiServer", "ya");
+                    window.location.href = data.redirect || (tujuan == "admin_cs.xhtml" ? "index.xhtml" : tujuan);
+                }
+            })
+            .catch(function () {
+                fallbackLoginOffline();
+            });
         } else {
-            simpanSesi("atlofAkun", { nama: akun.nama, email: akun.email, teams: akun.teams, role: "user" });
-            sessionStorage.setItem("atlofMasuk", "ya");
-            window.location.href = tujuanSebelumnya() == "admin_cs.xhtml" ? "index.xhtml" : tujuanSebelumnya();
+            fallbackLoginOffline();
         }
     };
 }
@@ -472,7 +707,6 @@ function filterBarang() {
 }
 
 if (ambil("semua-barang")) {
-    filterBarang();
     ambil("tombol-filter").onclick = filterBarang;
     ambil("form-cari").onsubmit = function (event) {
         event.preventDefault();
@@ -497,7 +731,8 @@ function cariBarang(id) {
 }
 
 // Detail barang.
-if (ambil("detail-nama") && sudahMasuk()) {
+function tampilkanDetail() {
+    if (!ambil("detail-nama") || !sudahMasuk()) return;
     var detailId = Number(new URLSearchParams(window.location.search).get("id"));
     var detail = cariBarang(detailId);
     if (detail) {
@@ -516,7 +751,7 @@ if (ambil("detail-nama") && sudahMasuk()) {
         var teams = detail.teams || "";
         if (titipCS) {
             var lokasiCS = detail.penyimpanan.replace("CS ", "");
-            telepon = nomorAdmin(lokasiCS);
+            telepon = detail.telepon_cs || nomorAdmin(lokasiCS);
             teks("detail-info-kontak", "Barang ditangani oleh " + namaKampus(detail.penyimpanan) +
                 ". Hubungi CS kampus untuk proses pengambilan dan verifikasi kepemilikan.");
             ambil("detail-teams").style.display = "none";
@@ -591,15 +826,36 @@ function perbaruiLaporanSaya() {
 }
 
 function simpanStatus(id) {
+    var baru = ambil("status-" + id).value;
+    var laporan = cariBarang(id);
+    if (!laporan || laporan.pelaporEmail != dataAkun().email) return;
+    if (laporan.status == baru) {
+        pesan("Status laporan belum berubah.");
+        return;
+    }
+    if (!confirm("Ubah status laporan menjadi '" + namaStatus(baru) + "'?")) return;
+
+    if (modeServer && cacheLaporan !== null) {
+        var dataKirim = new FormData();
+        dataKirim.append("id", id);
+        dataKirim.append("status", baru);
+        kirimData("laporan.php?aksi=status", dataKirim).then(function (hasil) {
+            if (!hasil.ok || hasil.data.status !== "success") {
+                pesan(hasil.data.message || "Gagal memperbarui status laporan.");
+                return;
+            }
+            laporan.status = baru;
+            perbaruiLaporanSaya();
+            pesan("Status laporan berhasil diperbarui.");
+        }).catch(function () {
+            pesan("Gagal menghubungi server.");
+        });
+        return;
+    }
+
     var daftar = laporanSaya();
     for (var i = 0; i < daftar.length; i++) {
         if (daftar[i].id == id && daftar[i].pelaporEmail == dataAkun().email) {
-            var baru = ambil("status-" + id).value;
-            if (daftar[i].status == baru) {
-                pesan("Status laporan belum berubah.");
-                return;
-            }
-            if (!confirm("Ubah status laporan menjadi '" + namaStatus(baru) + "'?")) return;
             daftar[i].status = baru;
             simpanSesi("atlofLaporan", daftar);
             perbaruiLaporanSaya();
@@ -610,6 +866,28 @@ function simpanStatus(id) {
 
 function hapusLaporan(id) {
     if (!confirm("Yakin ingin menghapus laporan ini?")) return;
+
+    if (modeServer && cacheLaporan !== null) {
+        var dataKirim = new FormData();
+        dataKirim.append("id", id);
+        kirimData("laporan.php?aksi=delete", dataKirim).then(function (hasil) {
+            if (!hasil.ok || hasil.data.status !== "success") {
+                pesan(hasil.data.message || "Gagal menghapus laporan.");
+                return;
+            }
+            var sisa = [];
+            for (var i = 0; i < cacheLaporan.length; i++) {
+                if (cacheLaporan[i].id != id) sisa.push(cacheLaporan[i]);
+            }
+            cacheLaporan = sisa;
+            perbaruiLaporanSaya();
+            pesan("Laporan berhasil dihapus.");
+        }).catch(function () {
+            pesan("Gagal menghubungi server.");
+        });
+        return;
+    }
+
     var lama = laporanSaya();
     var baru = [];
     for (var i = 0; i < lama.length; i++) {
@@ -618,8 +896,6 @@ function hapusLaporan(id) {
     simpanSesi("atlofLaporan", baru);
     perbaruiLaporanSaya();
 }
-
-if (ambil("barang-saya")) perbaruiLaporanSaya();
 
 function tanggalBenar(input) {
     var bagian = input.split("-");
@@ -797,6 +1073,22 @@ function aturFormLaporan(idForm) {
             pesan("Ukuran foto maksimal 1 MB.");
             return;
         }
+
+        if (modeServer) {
+            var dataKirim = new FormData(form);
+            if (dataEdit) dataKirim.append("id", dataEdit.id);
+            kirimData("laporan.php?aksi=" + (dataEdit ? "update" : "create"), dataKirim).then(function (hasil) {
+                if (!hasil.ok || hasil.data.status !== "success") {
+                    pesan(hasil.data.message || "Gagal menyimpan laporan.");
+                    return;
+                }
+                window.location.href = "laporan_saya.xhtml";
+            }).catch(function () {
+                pesan("Gagal menghubungi server.");
+            });
+            return;
+        }
+
         var akun = dataAkun();
         var daftar = laporanSaya();
         var laporan = {
@@ -830,8 +1122,6 @@ function aturFormLaporan(idForm) {
     };
 }
 
-aturFormLaporan("form-laporan");
-aturFormLaporan("form-edit");
 
 // Profil: user melihat identitas; admin juga melihat kampus dan nomor layanan.
 function perbaruiProfil() {
@@ -869,7 +1159,6 @@ function tutupFormProfil() {
 }
 
 if (ambil("form-profil")) {
-    perbaruiProfil();
     ambil("tombol-edit-profil").onclick = function () {
         var akun = dataAkun();
         ambil("nama").value = akun.nama;
@@ -888,19 +1177,44 @@ if (ambil("form-profil")) {
         event.preventDefault();
         var nama = ambil("nama").value.trim();
         var teams = ambil("teams").value.trim();
+        var telepon = adalahAdmin() ? ambil("nomor-cs").value.trim() : "";
         if (!nama || (!adalahAdmin() && !teams)) {
             pesan("Lengkapi nama dan kontak Teams.");
             return;
         }
+        if (adalahAdmin() && telepon && !/^(\+?\d[\d\s-]{7,17})$/.test(telepon)) {
+            pesan("Masukkan nomor WhatsApp layanan yang valid.");
+            return;
+        }
+
+        if (modeServer) {
+            var dataKirim = new FormData();
+            dataKirim.append("nama", nama);
+            dataKirim.append("teams", teams);
+            dataKirim.append("telepon", telepon);
+            kirimData("simpan_profil.php", dataKirim).then(function (hasil) {
+                if (!hasil.ok || hasil.data.status !== "success") {
+                    pesan(hasil.data.message || "Gagal memperbarui profil.");
+                    return;
+                }
+                var akun = dataAkun();
+                akun.nama = hasil.data.user.nama;
+                akun.teams = hasil.data.user.teams || "";
+                akun.telepon = hasil.data.user.telepon || "";
+                simpanSesi("atlofAkun", akun);
+                perbaruiProfil();
+                tutupFormProfil();
+                pesan("Profil berhasil diperbarui.");
+            }).catch(function () {
+                pesan("Gagal menghubungi server.");
+            });
+            return;
+        }
+
         var akun = dataAkun();
         akun.nama = nama;
         akun.teams = teams;
         if (adalahAdmin()) {
-            var telepon = ambil("nomor-cs").value.trim();
-            if (telepon && !/^(\+?\d[\d\s-]{7,17})$/.test(telepon)) {
-                pesan("Masukkan nomor WhatsApp layanan yang valid.");
-                return;
-            }
             akun.telepon = telepon;
             var semua = kontakAdmin();
             semua[akun.email] = { nama: nama, teams: teams, telepon: telepon };
@@ -914,23 +1228,66 @@ if (ambil("form-profil")) {
     ambil("form-password").onsubmit = function (event) {
         event.preventDefault();
         var akun = dataAkun();
-        var tersimpan = cariAkunTerdaftar(akun.email);
-        if (!tersimpan || tersimpan.password != ambil("password-lama").value) {
-            pesan("Password sekarang tidak sesuai.");
-            return;
-        }
-        if (ambil("password-baru").value.length < 8) {
+        var passwordLama = ambil("password-lama").value;
+        var passwordBaru = ambil("password-baru").value;
+        var konfirmasi = ambil("konfirmasi-password").value;
+
+        if (passwordBaru.length < 8) {
             pesan("Password baru minimal 8 karakter.");
             return;
         }
-        if (ambil("password-baru").value != ambil("konfirmasi-password").value) {
+        if (passwordBaru != konfirmasi) {
             pesan("Konfirmasi password baru tidak sama.");
             return;
         }
-        simpanKataSandi(akun.email, ambil("password-baru").value);
-        ambil("form-password").reset();
-        tutupFormProfil();
-        pesan("Password berhasil diubah.");
+
+        function suksesUbah() {
+            simpanKataSandi(akun.email, passwordBaru);
+            ambil("form-password").reset();
+            tutupFormProfil();
+            pesan("Password berhasil diubah.");
+        }
+
+        if (modeServer) {
+            var dataKirim = new FormData();
+            dataKirim.append("password_lama", passwordLama);
+            dataKirim.append("password_baru", passwordBaru);
+            dataKirim.append("konfirmasi", konfirmasi);
+
+            fetch("ubah_password.php", {
+                method: "POST",
+                body: dataKirim,
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(function (res) {
+                return res.json().then(function (data) {
+                    return { ok: res.ok, data: data };
+                });
+            })
+            .then(function (hasil) {
+                if (!hasil.ok || hasil.data.status !== "success") {
+                    pesan(hasil.data.message || "Gagal mengubah password.");
+                    return;
+                }
+                suksesUbah();
+            })
+            .catch(function () {
+                var tersimpan = cariAkunTerdaftar(akun.email);
+                if (!tersimpan || tersimpan.password != passwordLama) {
+                    pesan("Password sekarang tidak sesuai.");
+                    return;
+                }
+                suksesUbah();
+            });
+            return;
+        }
+
+        var tersimpan = cariAkunTerdaftar(akun.email);
+        if (!tersimpan || tersimpan.password != passwordLama) {
+            pesan("Password sekarang tidak sesuai.");
+            return;
+        }
+        suksesUbah();
     };
 }
 
@@ -1021,7 +1378,8 @@ function tampilkanDashboardCS() {
     ambil("admin-berikutnya").disabled = halamanAdmin == totalHalaman;
 }
 
-if (ambil("daftar-admin") && adalahAdmin()) {
+function siapkanDashboardCS() {
+    if (!ambil("daftar-admin") || !adalahAdmin()) return;
     ambil("cari-admin").oninput = function () {
         halamanAdmin = 1;
         tampilkanDashboardCS();
@@ -1046,6 +1404,7 @@ if (ambil("daftar-admin") && adalahAdmin()) {
 // Catatan terpisah dari laporan barang, memakai id laporan sebagai penghubung.
 // Pada versi frontend, data disimpan di sessionStorage.
 function semuaCatatan() {
+    if (cacheSerah !== null) return cacheSerah;
     return bacaSesi("atlofSerahTerima", []);
 }
 
@@ -1098,6 +1457,16 @@ function sesuaikanStatusLaporan(idLaporan) {
     var kembali = adaCatatan(daftar, idLaporan, "pengembalian", null);
     var statusCSBaru = kembali ? "dikembalikan" : (diterima ? "diterima" : "menunggu");
     var statusLaporan = kembali ? "sudah_dikembalikan" : "belum_dikembalikan";
+
+    if (cacheLaporan !== null) {
+        for (var k = 0; k < cacheLaporan.length; k++) {
+            if (cacheLaporan[k].id == idLaporan) {
+                cacheLaporan[k].status_cs = statusCSBaru;
+                cacheLaporan[k].status = statusLaporan;
+            }
+        }
+        return;
+    }
 
     var laporan = laporanSaya();
     var ditemukan = false;
@@ -1246,6 +1615,26 @@ function hapusCatatanSerah(idCatatan) {
         return;
     }
     if (!confirm("Hapus catatan " + namaJenisSerah(c.jenis).toLowerCase() + " ini?")) return;
+
+    if (modeServer && cacheSerah !== null) {
+        var dataKirim = new FormData();
+        dataKirim.append("id", idCatatan);
+        kirimData("serah_terima.php?aksi=delete", dataKirim).then(function (hasil) {
+            if (!hasil.ok || hasil.data.status !== "success") {
+                pesan(hasil.data.message || "Gagal menghapus catatan.");
+                return;
+            }
+            return muatLaporanServer().then(muatSerahServer).then(function () {
+                idCatatanEditSerah = 0;
+                tampilkanHalamanSerah();
+                pesan("Catatan berhasil dihapus.");
+            });
+        }).catch(function () {
+            pesan("Gagal menghubungi server.");
+        });
+        return;
+    }
+
     var hasil = [];
     for (var i = 0; i < daftar.length; i++) {
         if (Number(daftar[i].id) !== Number(idCatatan)) hasil.push(daftar[i]);
@@ -1258,36 +1647,39 @@ function hapusCatatanSerah(idCatatan) {
 }
 
 // Halaman Kelola Serah Terima dibuka dengan serah_terima.xhtml?id=ID_LAPORAN.
-if (ambil("serah-konten")) {
+function siapkanHalamanSerah() {
+    if (!ambil("serah-konten") || !adalahAdmin()) return;
+
     var parameterSerah = new URLSearchParams(window.location.search);
     var idDariAlamat = parameterSerah.get("id");
     idSerahSekarang = /^\d+$/.test(idDariAlamat || "") ? Number(idDariAlamat) : 0;
 
-    if (adalahAdmin()) {
-        tampilkanHalamanSerah();
-        ambil("batal-edit-serah").onclick = batalEditSerah;
-        ambil("form-serah-baru").onsubmit = function (event) {
-            event.preventDefault();
-            var barangCS = barangSerahSaya(idSerahSekarang);
-            if (!barangCS) return;
+    tampilkanHalamanSerah();
+    ambil("batal-edit-serah").onclick = batalEditSerah;
+    ambil("form-serah-baru").onsubmit = function (event) {
+        event.preventDefault();
+        var barangCS = barangSerahSaya(idSerahSekarang);
+        if (!barangCS) return;
 
-            var nama = ambil("nama-pihak-serah").value.trim();
-            var keterangan = ambil("keterangan-serah-baru").value.trim();
-            if (!nama) {
-                pesan("Nama penyerah atau penerima harus diisi.");
-                return;
-            }
-            var daftar = semuaCatatan();
+        var nama = ambil("nama-pihak-serah").value.trim();
+        var keterangan = ambil("keterangan-serah-baru").value.trim();
+        if (!nama) {
+            pesan("Nama penyerah atau penerima harus diisi.");
+            return;
+        }
+
+        if (modeServer && cacheSerah !== null) {
+            var dataKirim = new FormData();
+            dataKirim.append("nama_pihak", nama);
+            dataKirim.append("catatan", keterangan);
+            var aksi = "create";
+
             if (idCatatanEditSerah) {
-                var lama = cariCatatan(idCatatanEditSerah);
-                if (!lama || Number(lama.id_laporan) !== idSerahSekarang) return;
+                var lamaCatatan = cariCatatan(idCatatanEditSerah);
+                if (!lamaCatatan || Number(lamaCatatan.id_laporan) !== idSerahSekarang) return;
                 if (!confirm("Simpan perubahan catatan ini?")) return;
-                for (var i = 0; i < daftar.length; i++) {
-                    if (Number(daftar[i].id) === idCatatanEditSerah) {
-                        daftar[i].nama_pihak = nama;
-                        daftar[i].catatan = keterangan;
-                    }
-                }
+                aksi = "update";
+                dataKirim.append("id", idCatatanEditSerah);
             } else {
                 var jenis = jenisBerikutnyaSerah(riwayatUntukBarang(idSerahSekarang));
                 if (jenis === "selesai") {
@@ -1299,29 +1691,72 @@ if (ambil("serah-konten")) {
                     return;
                 }
                 if (!confirm("Simpan catatan " + namaJenisSerah(jenis).toLowerCase() + " ini?")) return;
-                var idBaru = Date.now();
-                for (var j = 0; j < daftar.length; j++) {
-                    if (Number(daftar[j].id) >= idBaru) idBaru = Number(daftar[j].id) + 1;
+                dataKirim.append("laporan_id", idSerahSekarang);
+                if (ambil("cek-verifikasi-serah").checked) {
+                    dataKirim.append("cek_verifikasi", "1");
                 }
-                daftar.push({
-                    id: idBaru,
-                    id_laporan: idSerahSekarang,
-                    kampus_cs: dataAkun().kampus_cs,
-                    email_cs: dataAkun().email,
-                    jenis: jenis,
-                    nama_pihak: nama,
-                    catatan: keterangan,
-                    petugas: dataAkun().nama,
-                    waktu: waktuCatatan()
-                });
             }
-            simpanCatatan(daftar);
-            sesuaikanStatusLaporan(idSerahSekarang);
-            idCatatanEditSerah = 0;
-            tampilkanHalamanSerah();
-            pesan("Catatan berhasil disimpan.");
-        };
-    }
+
+            kirimData("serah_terima.php?aksi=" + aksi, dataKirim).then(function (hasil) {
+                if (!hasil.ok || hasil.data.status !== "success") {
+                    pesan(hasil.data.message || "Gagal menyimpan catatan.");
+                    return;
+                }
+                return muatLaporanServer().then(muatSerahServer).then(function () {
+                    idCatatanEditSerah = 0;
+                    tampilkanHalamanSerah();
+                    pesan("Catatan berhasil disimpan.");
+                });
+            }).catch(function () {
+                pesan("Gagal menghubungi server.");
+            });
+            return;
+        }
+
+        var daftar = semuaCatatan();
+        if (idCatatanEditSerah) {
+            var lama = cariCatatan(idCatatanEditSerah);
+            if (!lama || Number(lama.id_laporan) !== idSerahSekarang) return;
+            if (!confirm("Simpan perubahan catatan ini?")) return;
+            for (var i = 0; i < daftar.length; i++) {
+                if (Number(daftar[i].id) === idCatatanEditSerah) {
+                    daftar[i].nama_pihak = nama;
+                    daftar[i].catatan = keterangan;
+                }
+            }
+        } else {
+            var jenis = jenisBerikutnyaSerah(riwayatUntukBarang(idSerahSekarang));
+            if (jenis === "selesai") {
+                pesan("Penerimaan dan pengembalian barang sudah dicatat.");
+                return;
+            }
+            if (jenis === "pengembalian" && !ambil("cek-verifikasi-serah").checked) {
+                pesan("Centang konfirmasi verifikasi kepemilikan sebelum mencatat pengembalian.");
+                return;
+            }
+            if (!confirm("Simpan catatan " + namaJenisSerah(jenis).toLowerCase() + " ini?")) return;
+            var idBaru = Date.now();
+            for (var j = 0; j < daftar.length; j++) {
+                if (Number(daftar[j].id) >= idBaru) idBaru = Number(daftar[j].id) + 1;
+            }
+            daftar.push({
+                id: idBaru,
+                id_laporan: idSerahSekarang,
+                kampus_cs: dataAkun().kampus_cs,
+                email_cs: dataAkun().email,
+                jenis: jenis,
+                nama_pihak: nama,
+                catatan: keterangan,
+                petugas: dataAkun().nama,
+                waktu: waktuCatatan()
+            });
+        }
+        simpanCatatan(daftar);
+        sesuaikanStatusLaporan(idSerahSekarang);
+        idCatatanEditSerah = 0;
+        tampilkanHalamanSerah();
+        pesan("Catatan berhasil disimpan.");
+    };
 }
 
 // Halaman Riwayat Serah Terima: tampilkan semua transaksi kampus yang sedang login.
@@ -1374,7 +1809,8 @@ function tampilkanRiwayatCS() {
     ambil("riwayat-berikutnya").disabled = halamanRiwayatCS === jumlahHalaman;
 }
 
-if (ambil("daftar-riwayat-cs") && adalahAdmin()) {
+function siapkanRiwayatCS() {
+    if (!ambil("daftar-riwayat-cs") || !adalahAdmin()) return;
     ambil("cari-riwayat-cs").oninput = function () {
         halamanRiwayatCS = 1;
         tampilkanRiwayatCS();
@@ -1393,3 +1829,44 @@ if (ambil("daftar-riwayat-cs") && adalahAdmin()) {
     };
     tampilkanRiwayatCS();
 }
+
+// ========================================================
+// Mulai aplikasi: sinkronkan sesi, muat data MySQL, lalu render halaman.
+// ========================================================
+function renderHalaman() {
+    if (ambil("akses-masuk") && sudahMasuk()) {
+        window.location.href = tujuanSebelumnya();
+        return;
+    }
+
+    tampilkanBeranda();
+
+    if (ambil("semua-barang")) filterBarang();
+    if (ambil("detail-nama")) tampilkanDetail();
+    if (ambil("barang-saya")) perbaruiLaporanSaya();
+    if (ambil("form-laporan")) aturFormLaporan("form-laporan");
+    if (ambil("form-edit")) aturFormLaporan("form-edit");
+    if (ambil("form-profil")) perbaruiProfil();
+
+    siapkanDashboardCS();
+    siapkanHalamanSerah();
+    siapkanRiwayatCS();
+}
+
+function mulai() {
+    var bolehLanjut = true;
+    muatSesiServer().then(function () {
+        bolehLanjut = cekAksesHalaman();
+        if (bolehLanjut) {
+            pasangHeaderAkun();
+            pasangTautanAkses();
+        }
+        return bolehLanjut ? muatLaporanServer() : null;
+    }).then(function () {
+        return bolehLanjut ? muatSerahServer() : null;
+    }).then(function () {
+        if (bolehLanjut) renderHalaman();
+    });
+}
+
+mulai();
