@@ -58,7 +58,7 @@ if (strlen($nama) > 100 || strlen($teams) > 100) {
 if ($role !== 'admin_cs' && $teams === '') {
     balasProfil('error', 'Kontak Microsoft Teams wajib diisi.', null, 400);
 }
-if ($telepon !== '' && !preg_match('/^\+?[0-9][0-9\s-]{7,17}$/', $telepon)) {
+if ($telepon !== '' && !preg_match('/^\+?[\d\s-]{8,20}$/', $telepon)) {
     balasProfil('error', 'Nomor WhatsApp layanan tidak valid.', null, 400);
 }
 if ($role !== 'admin_cs') {

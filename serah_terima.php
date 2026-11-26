@@ -22,9 +22,9 @@ function balasSerah($status, $pesan, $data = null, $kode = 200)
 {
     http_response_code($kode);
     echo json_encode([
-        'status'  => $status,
+        'status' => $status,
         'message' => $pesan,
-        'data'    => $data
+        'data' => $data
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -53,15 +53,15 @@ function ambilInputSerah($kunci, $bawaan = '')
 function ubahCatatanSerah($baris)
 {
     return [
-        'id'          => (int)$baris['id'],
-        'id_laporan'  => (int)$baris['laporan_id'],
-        'kampus_cs'   => $baris['kampus_cs'],
-        'email_cs'    => $baris['email_cs'],
-        'jenis'       => $baris['jenis'],
-        'nama_pihak'  => $baris['nama_pihak'],
-        'catatan'     => $baris['catatan'] ?? '',
-        'petugas'     => $baris['petugas'],
-        'waktu'       => date('d-m-Y H:i', strtotime($baris['waktu'])),
+        'id' => (int) $baris['id'],
+        'id_laporan' => (int) $baris['laporan_id'],
+        'kampus_cs' => $baris['kampus_cs'],
+        'email_cs' => $baris['email_cs'],
+        'jenis' => $baris['jenis'],
+        'nama_pihak' => $baris['nama_pihak'],
+        'catatan' => $baris['catatan'] ?? '',
+        'petugas' => $baris['petugas'],
+        'waktu' => date('d-m-Y H:i', strtotime($baris['waktu'])),
         'nama_barang' => $baris['nama_barang'] ?? ''
     ];
 }
@@ -91,7 +91,7 @@ function sinkronStatusLaporan($conn, $laporanId)
     $hasil = mysqli_stmt_get_result($stmt);
 
     $diterima = false;
-    $kembali  = false;
+    $kembali = false;
     while ($baris = mysqli_fetch_assoc($hasil)) {
         if ($baris['jenis'] === 'penerimaan') {
             $diterima = true;
@@ -102,7 +102,7 @@ function sinkronStatusLaporan($conn, $laporanId)
     mysqli_stmt_close($stmt);
 
     $statusCs = $kembali ? 'dikembalikan' : ($diterima ? 'diterima' : 'menunggu');
-    $status   = $kembali ? 'sudah_dikembalikan' : 'belum_dikembalikan';
+    $status = $kembali ? 'sudah_dikembalikan' : 'belum_dikembalikan';
 
     $update = mysqli_prepare($conn, 'UPDATE laporan SET status_cs = ?, status = ? WHERE id = ?');
     mysqli_stmt_bind_param($update, 'ssi', $statusCs, $status, $laporanId);
@@ -117,8 +117,8 @@ if (empty($_SESSION['is_logged_in'])) {
     balasSerah('error', 'Silakan masuk terlebih dahulu.', null, 401);
 }
 
-$userId = (int)($_SESSION['user_id'] ?? 0);
-$role   = $_SESSION['role'] ?? 'user';
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+$role = $_SESSION['role'] ?? 'user';
 $kampus = $_SESSION['kampus_cs'] ?? '';
 
 if ($role !== 'admin_cs' || $kampus === '' || $userId <= 0) {
@@ -131,11 +131,11 @@ $aksi = $_GET['aksi'] ?? 'list';
 // Baca riwayat
 // ---------------------------------------------------------
 if ($aksi === 'list') {
-    $where  = ['s.kampus_cs = ?'];
+    $where = ['s.kampus_cs = ?'];
     $params = [$kampus];
-    $types  = 's';
+    $types = 's';
 
-    $laporanId = (int)($_GET['laporan_id'] ?? 0);
+    $laporanId = (int) ($_GET['laporan_id'] ?? 0);
     if ($laporanId > 0) {
         $where[] = 's.laporan_id = ?';
         $params[] = $laporanId;
@@ -174,9 +174,9 @@ if ($aksi === 'create') {
         balasSerah('error', 'Metode permintaan tidak valid.', null, 405);
     }
 
-    $laporanId = (int)ambilInputSerah('laporan_id', 0);
+    $laporanId = (int) ambilInputSerah('laporan_id', 0);
     $namaPihak = trim(ambilInputSerah('nama_pihak'));
-    $catatan   = trim(ambilInputSerah('catatan'));
+    $catatan = trim(ambilInputSerah('catatan'));
     $verifikasi = ambilInputSerah('cek_verifikasi', '');
 
     if ($laporanId <= 0 || $namaPihak === '') {
@@ -221,7 +221,7 @@ if ($aksi === 'create') {
     }
 
     $jenis = $adaPenerimaan ? 'pengembalian' : 'penerimaan';
-    if ($jenis === 'pengembalian' && !in_array(strtolower((string)$verifikasi), ['1', 'on', 'true', 'ya'], true)) {
+    if ($jenis === 'pengembalian' && !in_array(strtolower((string) $verifikasi), ['1', 'on', 'true', 'ya'], true)) {
         balasSerah('error', 'Centang konfirmasi verifikasi kepemilikan sebelum mencatat pengembalian.', null, 400);
     }
 
@@ -251,9 +251,9 @@ if ($aksi === 'update') {
         balasSerah('error', 'Metode permintaan tidak valid.', null, 405);
     }
 
-    $id = (int)ambilInputSerah('id', 0);
+    $id = (int) ambilInputSerah('id', 0);
     $namaPihak = trim(ambilInputSerah('nama_pihak'));
-    $catatan   = trim(ambilInputSerah('catatan'));
+    $catatan = trim(ambilInputSerah('catatan'));
 
     if ($id <= 0 || $namaPihak === '') {
         balasSerah('error', 'Nama penyerah/penerima wajib diisi.', null, 400);
@@ -288,7 +288,7 @@ if ($aksi === 'delete') {
         balasSerah('error', 'Metode permintaan tidak valid.', null, 405);
     }
 
-    $id = (int)ambilInputSerah('id', 0);
+    $id = (int) ambilInputSerah('id', 0);
     $lama = ambilCatatanSerah($conn, $id);
     if (!$lama) {
         balasSerah('error', 'Catatan tidak ditemukan.', null, 404);
@@ -302,7 +302,7 @@ if ($aksi === 'delete') {
         mysqli_stmt_bind_param($stmt, 'i', $lama['laporan_id']);
         mysqli_stmt_execute($stmt);
         $hasil = mysqli_stmt_get_result($stmt);
-        $adaKembali = (bool)mysqli_fetch_assoc($hasil);
+        $adaKembali = (bool) mysqli_fetch_assoc($hasil);
         mysqli_stmt_close($stmt);
         if ($adaKembali) {
             balasSerah('error', 'Hapus catatan pengembalian terlebih dahulu sebelum menghapus penerimaan.', null, 400);
@@ -317,7 +317,7 @@ if ($aksi === 'delete') {
     }
     mysqli_stmt_close($stmt);
 
-    sinkronStatusLaporan($conn, (int)$lama['laporan_id']);
+    sinkronStatusLaporan($conn, (int) $lama['laporan_id']);
 
     balasSerah('success', 'Catatan berhasil dihapus.');
 }

@@ -11,8 +11,10 @@
 // Lapisan data server (MySQL melalui PHP)
 // ========================================================
 var modeServer = window.location.protocol === "http:" || window.location.protocol === "https:";
-var cacheLaporan = null; // null = belum dimuat dari server
-var cacheSerah = null;   // null = belum dimuat dari server
+// Cache sesi dipakai agar render pertama memakai data dari halaman sebelumnya,
+// sehingga tinggi halaman (termasuk footer) tidak bergeser setelah fetch selesai.
+var cacheLaporan = bacaSesi("atlofCacheLaporan", null); // null = belum dimuat dari server
+var cacheSerah = bacaSesi("atlofCacheSerah", null);     // null = belum dimuat dari server
 
 function mintaJson(url, opsi) {
     return fetch(url, opsi || {}).then(function (res) {
@@ -54,6 +56,10 @@ function muatSesiServer() {
             sessionStorage.removeItem("atlofMasuk");
             sessionStorage.removeItem("atlofAkun");
             sessionStorage.removeItem("atlofSesiServer");
+            sessionStorage.removeItem("atlofCacheLaporan");
+            sessionStorage.removeItem("atlofCacheSerah");
+            cacheLaporan = null;
+            cacheSerah = null;
         }
     }).catch(function () {
         // Server tidak dapat dihubungi: biarkan mode lokal tetap berjalan.
@@ -68,6 +74,7 @@ function muatLaporanServer() {
     }).then(function (hasil) {
         if (hasil.ok && hasil.data && hasil.data.status === "success" && Array.isArray(hasil.data.data)) {
             cacheLaporan = hasil.data.data;
+            simpanSesi("atlofCacheLaporan", cacheLaporan);
         }
     }).catch(function () {
         // Tetap gunakan data lokal bila server gagal.
@@ -82,6 +89,7 @@ function muatSerahServer() {
     }).then(function (hasil) {
         if (hasil.ok && hasil.data && hasil.data.status === "success" && Array.isArray(hasil.data.data)) {
             cacheSerah = hasil.data.data;
+            simpanSesi("atlofCacheSerah", cacheSerah);
         }
     }).catch(function () {
         // Tetap gunakan data lokal bila server gagal.
@@ -109,6 +117,8 @@ function pesan(isi) {
             : document.createElement("div");
         kotak.id = "pesan-global";
         kotak.title = "Klik untuk menutup pesan";
+        kotak.setAttribute("role", "status");
+        kotak.setAttribute("aria-live", "polite");
         kotak.onclick = function () {
             this.style.display = "none";
         };
@@ -316,6 +326,8 @@ function keluar() {
     sessionStorage.removeItem("atlofMasuk");
     sessionStorage.removeItem("atlofAkun");
     sessionStorage.removeItem("atlofSesiServer");
+    sessionStorage.removeItem("atlofCacheLaporan");
+    sessionStorage.removeItem("atlofCacheSerah");
     if (window.fetch && modeServer) {
         fetch("logout.php", {
             method: "POST",
@@ -346,9 +358,12 @@ function cekAksesHalaman() {
     return true;
 }
 
+var headerAkunSiap = false;
+
 // Atur tombol Masuk/Daftar pada header.
 function pasangHeaderAkun() {
-    if (!ambil("menu-akun") || !sudahMasuk()) return;
+    if (!ambil("menu-akun") || !sudahMasuk() || headerAkunSiap) return;
+    headerAkunSiap = true;
     ambil("menu-akun").innerHTML =
         '<a href="profil.xhtml" class="tombol tombol-outline tombol-kecil">Profil</a>' +
         '<button id="keluar-header" type="button" class="tombol tombol-kecil tombol-keluar">Keluar</button>';
@@ -592,7 +607,7 @@ if (ambil("form-login")) {
             } else {
                 simpanSesi("atlofAkun", { nama: akun.nama, email: akun.email, teams: akun.teams, role: "user" });
                 sessionStorage.setItem("atlofMasuk", "ya");
-                window.location.href = tujuan == "admin_cs.xhtml" ? "index.xhtml" : tujuan;
+                window.location.href = "index.xhtml";
             }
         }
 
@@ -763,7 +778,6 @@ function tampilkanDetail() {
         if (telepon) {
             var nomorWhatsapp = telepon.replace(/[^0-9]/g, "");
             if (nomorWhatsapp.charAt(0) == "0") nomorWhatsapp = "62" + nomorWhatsapp.slice(1);
-            teks("detail-nomor", telepon);
             ambil("detail-whatsapp-link").href = "https://wa.me/" + nomorWhatsapp;
             ambil("detail-whatsapp").style.display = "flex";
         } else if (titipCS) {
@@ -925,14 +939,14 @@ function pasangKalender() {
 
     function gambarKalender() {
         teks("nama-bulan", namaBulan[bulanSaatIni] + " " + tahunSaatIni);
-        var urutanHari = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
+        var urutanHari = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
         var isi = "";
         for (var i = 0; i < urutanHari.length; i++) {
             isi += '<span class="nama-hari">' + urutanHari[i] + '</span>';
         }
 
         var hariPertama = new Date(tahunSaatIni, bulanSaatIni, 1).getDay();
-        var kolomAwal = (hariPertama + 6) % 7;
+        var kolomAwal = hariPertama;
         var jumlahHari = new Date(tahunSaatIni, bulanSaatIni + 1, 0).getDate();
 
         for (var kosong = 0; kosong < kolomAwal; kosong++) {
@@ -1042,8 +1056,7 @@ function aturFormLaporan(idForm) {
     if (adalahAdmin()) {
         var akunCs = dataAkun();
         if (idForm == "form-laporan") ambil("telepon").value = akunCs.telepon || "";
-        ambil("telepon").readOnly = true;
-        teks("bantuan-telepon", "Kontak laporan CS mengikuti nomor WhatsApp layanan yang diatur di halaman profil admin.");
+        teks("bantuan-telepon", "Masukkan nomor WhatsApp layanan CS. Nomor akan ditampilkan di halaman detail laporan.");
     }
 
     form.onsubmit = function (event) {
@@ -1163,7 +1176,10 @@ if (ambil("form-profil")) {
         ambil("nama").value = akun.nama;
         ambil("email").value = akun.email;
         ambil("teams").value = akun.teams || "";
-        if (adalahAdmin()) ambil("nomor-cs").value = akun.telepon || "";
+        if (adalahAdmin()) {
+            ambil("form-nomor-cs").style.display = "block";
+            ambil("nomor-cs").value = akun.telepon || "";
+        }
         tampilkanForm("form-profil");
     };
     ambil("tombol-ganti-password").onclick = function () {
@@ -1181,7 +1197,7 @@ if (ambil("form-profil")) {
             pesan("Lengkapi nama dan kontak Teams.");
             return;
         }
-        if (adalahAdmin() && telepon && !/^(\+?\d[\d\s-]{7,17})$/.test(telepon)) {
+        if (adalahAdmin() && telepon && !/^\+?[\d\s-]{8,20}$/.test(telepon)) {
             pesan("Masukkan nomor WhatsApp layanan yang valid.");
             return;
         }
@@ -1363,7 +1379,7 @@ function tampilkanDashboardCS() {
         isi += '<div class="baris-admin">' +
             '<div class="info-admin"><img src="' + bersihkan(barangCS.gambar) + '" alt="Foto kategori barang" />' +
             '<div><h3><a href="detail.xhtml?id=' + Number(barangCS.id) + '">' + bersihkan(barangCS.nama) + '</a></h3>' +
-            '<p>ID #' + Number(barangCS.id) + ' · ' + bersihkan(namaKampus(barangCS.lokasi)) + '</p>' +
+            '<p>' + bersihkan(namaKampus(barangCS.lokasi)) + '</p>' +
             '<span class="lencana">' + namaStatusCS(status) + '</span></div></div>' +
             '<div class="kontrol-admin"><a class="tombol tombol-outline tombol-kecil" href="serah_terima.xhtml?id=' +
             Number(barangCS.id) + '">' + namaTombol + '</a></div></div>';
@@ -1440,6 +1456,14 @@ function adaCatatan(daftar, idLaporan, jenis, kecualiId) {
 
 function namaJenisSerah(jenis) {
     return jenis == "pengembalian" ? "Pengembalian barang" : "Penerimaan barang";
+}
+
+// Satu baris informasi dalam kartu riwayat: label kecil di atas nilai.
+function metaSerah(label, nilai, lebarPenuh) {
+    return '<div class="serah-meta-item' + (lebarPenuh ? ' lebar-penuh' : '') + '">' +
+        '<span class="serah-meta-label">' + label + '</span>' +
+        '<span class="serah-meta-nilai">' + bersihkan(nilai == null ? "" : nilai) + '</span>' +
+        '</div>';
 }
 
 function waktuCatatan() {
@@ -1538,8 +1562,23 @@ function tampilkanHalamanSerah() {
     var berikutnya = jenisBerikutnyaSerah(daftar);
     var statusTampil = berikutnya === "penerimaan" ? "Menunggu pencatatan penerimaan" :
         berikutnya === "pengembalian" ? "Diterima CS" : "Sudah dikembalikan";
+    var kelasStatus = berikutnya === "penerimaan" ? "menunggu" :
+        berikutnya === "pengembalian" ? "diterima" : "selesai";
     teks("serah-status", statusTampil);
+    ambil("serah-status").className = "serah-status " + kelasStatus;
+    ambil("serah-status-badge").className = "serah-status-badge " + kelasStatus;
+    ambil("serah-status-badge").textContent =
+        berikutnya === "penerimaan" ? "Menunggu penerimaan" :
+        berikutnya === "pengembalian" ? "Sudah diterima CS" : "Sudah dikembalikan";
     ambil("kotak-form-serah").style.display = berikutnya === "selesai" ? "none" : "block";
+
+    // Saat penerimaan dan pengembalian sudah lengkap, form disembunyikan.
+    // Panel riwayat lalu memakai lebar penuh agar dua kartu tetap lega.
+    var layoutSerah = document.querySelector(".layout-serah-baru");
+    if (layoutSerah) {
+        layoutSerah.className = berikutnya === "selesai" ?
+            "layout-serah-baru tanpa-form" : "layout-serah-baru";
+    }
 
     if (berikutnya !== "selesai") {
         ambil("form-serah-baru").reset();
@@ -1559,13 +1598,18 @@ function tampilkanHalamanSerah() {
     var isi = "";
     for (var i = 0; i < daftar.length; i++) {
         var c = daftar[i];
-        isi += '<div class="serah-item">' +
+        isi += '<div class="serah-item ' + c.jenis + '">' +
+            '<div class="serah-item-atas">' +
+            '<div class="serah-judul">' +
             '<h3>' + bersihkan(namaJenisSerah(c.jenis)) + '</h3>' +
-            '<p><strong>Waktu:</strong> ' + bersihkan(c.waktu) + '</p>' +
-            '<p><strong>' + (c.jenis === "penerimaan" ? "Penyerah" : "Penerima") +
-            ':</strong> ' + bersihkan(c.nama_pihak) + '</p>' +
-            '<p><strong>Petugas:</strong> ' + bersihkan(c.petugas) + '</p>' +
-            (c.catatan ? '<p><strong>Keterangan:</strong> ' + bersihkan(c.catatan) + '</p>' : '') +
+            '<span class="serah-waktu">Waktu: ' + bersihkan(c.waktu) + '</span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="serah-meta">' +
+            metaSerah(c.jenis === "penerimaan" ? "Penyerah" : "Penerima", c.nama_pihak) +
+            metaSerah("Petugas", c.petugas) +
+            (c.catatan ? metaSerah("Keterangan", c.catatan, true) : '') +
+            '</div>' +
             '<div class="aksi">' +
             '<button type="button" class="tombol tombol-outline tombol-kecil" onclick="mulaiEditSerah(' + Number(c.id) + ')">Edit</button>' +
             '<button type="button" class="tombol tombol-bahaya tombol-kecil" onclick="hapusCatatanSerah(' + Number(c.id) + ')">Hapus</button>' +
@@ -1785,14 +1829,19 @@ function tampilkanRiwayatCS() {
     for (var j = awal; j < akhir; j++) {
         var catatan = hasil[j];
         var barangCS = barangSerahSaya(catatan.id_laporan);
-        html += '<div class="serah-item">' +
-            '<h3>' + bersihkan(barangCS.nama) + ' <span class="teks-abu">#' + Number(barangCS.id) + '</span></h3>' +
-            '<p><strong>Jenis:</strong> ' + bersihkan(namaJenisSerah(catatan.jenis)) + '</p>' +
-            '<p><strong>Waktu:</strong> ' + bersihkan(catatan.waktu) + '</p>' +
-            '<p><strong>' + (catatan.jenis === "penerimaan" ? "Penyerah" : "Penerima") +
-            ':</strong> ' + bersihkan(catatan.nama_pihak) + '</p>' +
-            '<p><strong>Petugas:</strong> ' + bersihkan(catatan.petugas) + '</p>' +
-            (catatan.catatan ? '<p><strong>Keterangan:</strong> ' + bersihkan(catatan.catatan) + '</p>' : '') +
+        html += '<div class="serah-item ' + catatan.jenis + '">' +
+            '<div class="serah-item-atas">' +
+            '<div class="serah-judul">' +
+            '<h3>' + bersihkan(barangCS.nama) + ' <span class="serah-id">#' + Number(barangCS.id) + '</span></h3>' +
+            '<span class="serah-waktu">Waktu: ' + bersihkan(catatan.waktu) + '</span>' +
+            '</div>' +
+            '<span class="serah-jenis ' + catatan.jenis + '">' + bersihkan(namaJenisSerah(catatan.jenis)) + '</span>' +
+            '</div>' +
+            '<div class="serah-meta">' +
+            metaSerah(catatan.jenis === "penerimaan" ? "Penyerah" : "Penerima", catatan.nama_pihak) +
+            metaSerah("Petugas", catatan.petugas) +
+            (catatan.catatan ? metaSerah("Keterangan", catatan.catatan, true) : '') +
+            '</div>' +
             '<div class="aksi"><a class="tombol tombol-outline tombol-kecil" href="serah_terima.xhtml?id=' +
             Number(barangCS.id) + '">Lihat / kelola barang</a></div></div>';
     }
@@ -1849,6 +1898,16 @@ function renderHalaman() {
 }
 
 function mulai() {
+    // Render pertama langsung dari cache sesi agar tata letak (termasuk posisi
+    // footer) stabil pada first paint dan tidak bergeser saat data server
+    // selesai diunduh.
+    if (cekAksesHalaman()) {
+        pasangHeaderAkun();
+        pasangTautanAkses();
+        renderHalaman();
+    }
+
+    var dataAwal = JSON.stringify([cacheLaporan, cacheSerah]);
     var bolehLanjut = true;
     muatSesiServer().then(function () {
         bolehLanjut = cekAksesHalaman();
@@ -1860,7 +1919,12 @@ function mulai() {
     }).then(function () {
         return bolehLanjut ? muatSerahServer() : null;
     }).then(function () {
-        if (bolehLanjut) renderHalaman();
+        // Render ulang hanya bila data server berbeda dari cache, supaya isian
+        // form yang sedang diketik pengguna tidak ter-reset dan footer tidak
+        // bergerak tanpa alasan.
+        if (bolehLanjut && JSON.stringify([cacheLaporan, cacheSerah]) !== dataAwal) {
+            renderHalaman();
+        }
     });
 }
 

@@ -33,6 +33,7 @@ Cakupan dokumen:
 18. [Contoh kombinasi class](#18-contoh-kombinasi-class)
 19. [Catatan penting](#19-catatan-penting)
 20. [Perawatan CSS](#20-perawatan-css)
+21. [Riwayat revisi](#21-riwayat-revisi)
 
 ## 1. Ringkasan
 
@@ -107,7 +108,7 @@ ATLOF_Frontend_Revisi_5/
 
 Keterangan folder:
 
-- `images/` berisi aset gambar dan ikon, termasuk `logo-atlof-ikon.svg`.
+- `images/` berisi aset gambar dan ikon, termasuk `logo-atlof-ikon.svg`, `placeholder.png`, dan placeholder kategori `ph-tumbler.png`, `ph-pakaian_jaket.png`, `ph-elektronik.png`, `ph-dompet_kartu.png`, `ph-kunci.png`, serta `ph-lainnya.png`.
 - `fonts/` berisi font lokal; jangan dihapus agar tampilan tidak bergantung internet.
 - `uploads/laporan/` menyimpan foto laporan yang diunggah.
 - `uploads/profil/` menyimpan foto profil (endpoint tersedia, UI revisi ini belum memakainya).
@@ -116,32 +117,127 @@ Keterangan folder:
 
 ## 3. Cara menjalankan
 
-### 3.1 Persiapan XAMPP
+Bagian ini dimulai dari nol: menyiapkan XAMPP, membuat database `atlof_db`, mengimpor tabel dan data awal, menyesuaikan koneksi, lalu membuka aplikasi.
 
-1. Pastikan folder project berada di `D:\XAMPP\htdocs\ATLOF_Frontend_Revisi_5`.
-2. Buka **XAMPP Control Panel**.
-3. Klik **Start** pada modul **Apache** dan **MySQL**.
+### 3.1 Prasyarat
 
-### 3.2 Import database
+- **XAMPP** dengan Apache dan MySQL/MariaDB sudah terpasang.
+- Browser modern (Chrome, Edge, atau Firefox).
+- Folder project berada di `D:\XAMPP\htdocs\ATLOF_Frontend_Revisi_5`. Jika nama folder berbeda, sesuaikan URL dan perintah di bawah.
 
-1. Buka browser, kunjungi `http://localhost/phpmyadmin`.
-2. Pilih menu **Import**.
-3. Pilih file `database/atlof_db.sql` dari folder project.
-4. Klik tombol **Go / Impor**.
+### 3.2 Jalankan Apache dan MySQL
 
-Script tersebut akan membuat database `atlof_db`, tabel `users`, `laporan`, `serah_terima`, dan mengisi data awal. Script memakai `CREATE TABLE IF NOT EXISTS` dan `ON DUPLICATE KEY UPDATE`, sehingga **aman dijalankan ulang** pada database yang sudah ada; data laporan milik pengguna tidak akan ditimpa.
+1. Buka **XAMPP Control Panel**.
+2. Klik **Start** pada modul **Apache**.
+3. Klik **Start** pada modul **MySQL**.
+4. Pastikan keduanya berstatus hijau.
+5. Cek `http://localhost` dan `http://localhost/phpmyadmin` di browser.
 
-### 3.3 Buka aplikasi
+Jika salah satu modul gagal start, biasanya port bentrok. Apache memakai port 80 dan MySQL memakai port 3306. Hentikan aplikasi lain yang memakai port tersebut atau ubah port lewat tombol **Config**.
+
+### 3.3 Buat database `atlof_db`
+
+Ada dua cara. Pilih salah satu.
+
+#### Cara A — lewat phpMyAdmin (disarankan)
+
+1. Buka `http://localhost/phpmyadmin`.
+2. Klik **New** / **Baru** di sidebar kiri.
+3. Isi **Database name** dengan `atlof_db`.
+4. Pilih collation `utf8mb4_unicode_ci`.
+5. Klik **Create** / **Buat**.
+
+Database kosong `atlof_db` sekarang tersedia.
+
+#### Cara B — lewat terminal MySQL
+
+Buka terminal, lalu masuk ke client MySQL:
+
+```powershell
+C:\XAMPP\mysql\bin\mysql.exe -u root -p
+```
+
+Jika user `root` tidak memakai password, tekan **Enter** saat diminta password. Setelah masuk, jalankan:
+
+```sql
+CREATE DATABASE IF NOT EXISTS `atlof_db`
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+EXIT;
+```
+
+### 3.4 Impor tabel dan data awal
+
+1. Buka phpMyAdmin.
+2. Pilih database `atlof_db` di sidebar kiri.
+3. Buka tab **Import**.
+4. Klik **Choose File**, lalu pilih `D:\XAMPP\htdocs\ATLOF_Frontend_Revisi_5\database\atlof_db.sql`.
+5. Klik **Go** / **Impor** dan tunggu pesan sukses.
+
+Script tersebut membuat tabel `users`, `laporan`, dan `serah_terima` beserta index dan foreign key, lalu mengisi 7 akun awal. Script memakai `CREATE DATABASE IF NOT EXISTS`, `CREATE TABLE IF NOT EXISTS`, dan `ON DUPLICATE KEY UPDATE`, sehingga **aman dijalankan ulang**; data laporan milik pengguna tidak ditimpa.
+
+Alternatif lewat terminal MySQL, setelah masuk ke client MySQL seperti pada 3.3 Cara B:
+
+```sql
+USE `atlof_db`;
+SOURCE D:/XAMPP/htdocs/ATLOF_Frontend_Revisi_5/database/atlof_db.sql;
+```
+
+### 3.5 Verifikasi database
+
+Jalankan query berikut di phpMyAdmin atau terminal:
+
+```sql
+USE `atlof_db`;
+SHOW TABLES;
+SELECT id, nama, email, role, kampus_cs FROM users ORDER BY id;
+```
+
+Hasil yang diharapkan:
+
+- Tiga tabel: `users`, `laporan`, `serah_terima`.
+- Tujuh akun: empat Admin CS dan tiga pengguna.
+
+Database baru hanya berisi akun awal, belum ada laporan barang. Laporan dibuat lewat aplikasi.
+
+### 3.6 Sesuaikan koneksi database
+
+Buka `koneksi.php` dan periksa bagian berikut:
+
+```php
+$host = 'localhost';
+$user = 'root';
+$pass = '';
+$db   = 'atlof_db';
+```
+
+Nilai di atas adalah default XAMPP. Jika MySQL kamu memakai password, isi `$pass` sesuai password tersebut. Simpan file; tidak perlu restart Apache.
+
+### 3.7 Buka aplikasi
 
 ```text
 http://localhost/ATLOF_Frontend_Revisi_5/index.xhtml
 ```
 
-Gunakan alamat `localhost`, bukan `file://`, karena `fetch()` dan sesi PHP hanya bekerja lewat server web. Jangan lupa mengimpor database sebelum mencoba login.
+Gunakan alamat `localhost`, bukan `file://`, karena `fetch()` dan sesi PHP hanya bekerja lewat server web. Login memakai akun di bagian 4.
 
-### 3.4 Perilaku jika server tidak aktif
+### 3.8 Perilaku jika server tidak aktif
 
 Jika Apache/MySQL mati atau halaman dibuka langsung lewat browser, aplikasi masih menampilkan tampilan dengan data fallback di `localStorage`/`sessionStorage`. Mode ini hanya untuk simulasi UI dan **tidak aman** untuk menyimpan akun atau data sungguhan.
+
+### 3.9 Jika muncul masalah
+
+| Gejala | Penyebab umum | Solusi |
+| --- | --- | --- |
+| `Access denied for user 'root'@'localhost'` | Password MySQL tidak cocok | Sesuaikan `$pass` di `koneksi.php`. |
+| `Unknown database 'atlof_db'` | Database belum dibuat atau impor gagal | Ulangi 3.3 dan 3.4. |
+| `Table 'atlof_db.users' doesn't exist` | Impor belum selesai | Impor ulang `database/atlof_db.sql`. |
+| Apache tidak mau start | Port 80 dipakai aplikasi lain | Hentikan IIS/Skype atau ubah port Apache. |
+| MySQL tidak mau start | Port 3306 dipakai MySQL lain | Hentikan service MySQL lain atau ubah port. |
+| Halaman terbuka tetapi data kosong | Apache/MySQL mati atau database kosong | Nyalakan modul XAMPP dan ulangi 3.4. |
+| Perubahan CSS tidak terlihat | Browser memakai cache | Muat ulang dengan `Ctrl+F5`. |
+| Upload foto gagal | Folder `uploads/` tidak dapat ditulis | Pastikan `uploads/laporan/` dan `uploads/profil/` dapat ditulis Apache. |
+| Muncul 404 | Nama folder atau URL tidak sesuai | Sesuaikan URL dengan nama folder di `htdocs`. |
 
 ## 4. Akun uji dan peran
 
@@ -158,7 +254,7 @@ ORDER BY id;
 ### 4.1 Ringkasan akun bawaan
 
 | Peran | Email | Password | Keterangan |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Admin CS Kampus 1 | `cs1uajy@gmail.com` | `cs1uajyATLOF` | Masuk ke Dashboard CS Kampus 1 |
 | Admin CS Kampus 2 | `cs2uajy@gmail.com` | `cs2uajyATLOF` | Masuk ke Dashboard CS Kampus 2 |
 | Admin CS Kampus 3 | `cs3uajy@gmail.com` | `cs3uajyATLOF` | Masuk ke Dashboard CS Kampus 3 |
@@ -172,7 +268,7 @@ Semua akun di atas tersimpan di tabel `users` dan **hanya berlaku saat login lew
 ### 4.2 Admin CS
 
 | Email | Password | Kampus |
-|---|---|---|
+| --- | --- | --- |
 | `cs1uajy@gmail.com` | `cs1uajyATLOF` | Kampus 1 — Gedung Alfonsus Mrican |
 | `cs2uajy@gmail.com` | `cs2uajyATLOF` | Kampus 2 — Gedung Thomas Aquinas |
 | `cs3uajy@gmail.com` | `cs3uajyATLOF` | Kampus 3 — Gedung Bonaventura |
@@ -183,12 +279,12 @@ Setelah login, Admin CS otomatis diarahkan ke `admin_cs.xhtml` dan hanya melihat
 ### 4.3 Pengguna biasa
 
 | Email | Password | Nama |
-|---|---|---|
+| --- | --- | --- |
 | `kelvin@students.uajy.ac.id` | `Password123!` | Kelvin Utama |
 | `nadia@students.uajy.ac.id` | `Password123!` | Nadia Putri |
 | `petugas@uajy.ac.id` | `Password123!` | Petugas Kampus (pelapor contoh) |
 
-Pengguna biasa diarahkan ke halaman tujuan (`?tujuan=...`) atau `index.xhtml`.
+Pengguna biasa selalu diarahkan ke `index.xhtml` setelah login. Parameter `?tujuan=...` masih dikirim dan divalidasi server, tetapi tidak lagi menentukan halaman redirect login.
 
 ### 4.4 Akun tambahan dan fallback
 
@@ -201,7 +297,7 @@ Akun `cs1@atlof.test` sampai `cs4@atlof.test` dengan password `ATLOFcs2026!` yan
 ### 5.1 File backend
 
 | File | Fungsi |
-|---|---|
+| --- | --- |
 | `koneksi.php` | Koneksi `mysqli` ke `atlof_db` dengan charset `utf8mb4`; mengembalikan JSON error bila koneksi gagal. |
 | `proses_login.php` | Menerima email/password, verifikasi bcrypt, membuat sesi, mengembalikan data user tanpa password. |
 | `proses_daftar.php` | Membuat akun pengguna baru, cek duplikat email, hash password. |
@@ -216,7 +312,7 @@ Akun `cs1@atlof.test` sampai `cs4@atlof.test` dengan password `ATLOFcs2026!` yan
 ### 5.2 Tabel `users`
 
 | Kolom | Tipe | Keterangan |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `INT AUTO_INCREMENT` | Primary key, dipakai sebagai `user_id` di tabel lain. |
 | `nama` | `VARCHAR(100)` | Nama lengkap atau nama Admin CS. |
 | `email` | `VARCHAR(100) UNIQUE` | Email login, disimpan huruf kecil. |
@@ -231,7 +327,7 @@ Akun `cs1@atlof.test` sampai `cs4@atlof.test` dengan password `ATLOFcs2026!` yan
 ### 5.3 Tabel `laporan`
 
 | Kolom | Tipe | Keterangan |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `INT AUTO_INCREMENT` | ID laporan; dipakai di URL `detail.xhtml?id=...`. |
 | `user_id` | `INT` | Foreign key ke `users.id`; pelapor tidak disimpan duplikat. |
 | `nama_barang` | `VARCHAR(150)` | Nama barang. |
@@ -251,7 +347,7 @@ Akun `cs1@atlof.test` sampai `cs4@atlof.test` dengan password `ATLOFcs2026!` yan
 ### 5.4 Tabel `serah_terima`
 
 | Kolom | Tipe | Keterangan |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `INT AUTO_INCREMENT` | ID catatan. |
 | `laporan_id` | `INT` | Foreign key ke `laporan.id`. |
 | `user_id` | `INT` | Foreign key ke `users.id` (Admin CS yang mencatat). |
@@ -332,23 +428,24 @@ Urutan yang dijalankan `app.js` saat halaman dibuka:
 
 1. **Muat `app.js`** dari `<script src="js/app.js">` di akhir `<body>`.
 2. **`mulai()`** dijalankan.
-3. **`muatSesiServer()`** memanggil `cek_sesi.php`:
+3. **Render awal dari cache sesi**: jika `cekAksesHalaman()` lolos, `pasangHeaderAkun()`, `pasangTautanAkses()`, dan `renderHalaman()` langsung dijalankan memakai `atlofCacheLaporan` dan `atlofCacheSerah` dari `sessionStorage`. Tujuannya agar tinggi halaman dan posisi footer stabil sejak render pertama.
+4. **`muatSesiServer()`** memanggil `cek_sesi.php`:
    - Jika sesi PHP aktif, data user disalin ke `sessionStorage.atlofAkun`, lalu `atlofMasuk = ya` dan `atlofSesiServer = ya`.
-   - Jika sesi PHP tidak aktif dan `atlofSesiServer` pernah diset, sesi lokal dihapus.
-   - Jika server tidak merespons, sesi lokal dibiarkan (mode offline).
-4. **`cekAksesHalaman()`** memeriksa halaman:
+   - Jika sesi PHP tidak aktif dan `atlofSesiServer` pernah diset, sesi lokal beserta cache laporan/serah dihapus.
+   - Jika server tidak merespons, sesi lokal dan cache dibiarkan (mode offline).
+5. **`cekAksesHalaman()`** memeriksa halaman:
    - Halaman khusus pengguna (`katalog`, `detail`, `buat_laporan`, `edit_laporan`, `laporan_saya`, `profil`, `admin_cs`, `serah_terima`, `riwayat_serah_terima`) akan mengarahkan tamu ke `akses_akun.xhtml`.
    - Halaman khusus admin akan mengarahkan pengguna biasa ke `index.xhtml`.
-5. **`pasangHeaderAkun()`** mengganti tombol Masuk/Daftar menjadi Profil/Keluar dan menambah menu Dashboard CS untuk admin.
-6. **`pasangTautanAkses()`** mencegat tautan ke halaman khusus bila belum login.
-7. **`muatLaporanServer()`** memanggil `laporan.php?aksi=list` dan mengisi `cacheLaporan`.
-8. **`muatSerahServer()`** (khusus admin) memanggil `serah_terima.php?aksi=list` dan mengisi `cacheSerah`.
-9. **`renderHalaman()`** memanggil fungsi render sesuai elemen yang ada di halaman.
+6. **`pasangHeaderAkun()`** mengganti tombol Masuk/Daftar menjadi Profil/Keluar dan menambah menu Dashboard CS untuk admin. Fungsi ini hanya berjalan sekali per halaman melalui penanda `headerAkunSiap`.
+7. **`pasangTautanAkses()`** mencegat tautan ke halaman khusus bila belum login.
+8. **`muatLaporanServer()`** memanggil `laporan.php?aksi=list`, mengisi `cacheLaporan`, lalu menyimpannya ke `sessionStorage.atlofCacheLaporan`.
+9. **`muatSerahServer()`** (khusus admin) memanggil `serah_terima.php?aksi=list`, mengisi `cacheSerah`, lalu menyimpannya ke `sessionStorage.atlofCacheSerah`.
+10. **`renderHalaman()`** dipanggil ulang hanya jika isi `cacheLaporan`/`cacheSerah` berbeda dari data awal. Dengan begitu, isian form yang sedang diketik pengguna tidak ter-reset dan footer tidak bergeser tanpa alasan.
 
 Tabel render per halaman:
 
 | Halaman | Fungsi render | Sumber data |
-|---|---|---|
+| --- | --- | --- |
 | `index.xhtml` | `tampilkanBeranda()` | `cacheLaporan` |
 | `katalog.xhtml` | `filterBarang()` | `cacheLaporan` |
 | `detail.xhtml` | `tampilkanDetail()` | `cacheLaporan` |
@@ -379,7 +476,8 @@ proses_login.php
 js/app.js
   - simpan user ke sessionStorage.atlofAkun
   - set atlofMasuk = ya, atlofSesiServer = ya
-  - redirect ke admin_cs.xhtml atau halaman tujuan
+  - redirect ke admin_cs.xhtml untuk Admin CS
+  - redirect ke index.xhtml untuk pengguna biasa
 ```
 
 Detail penting:
@@ -388,6 +486,7 @@ Detail penting:
 - Password yang salah tidak pernah mengembalikan data user.
 - Jika password di database masih plaintext (misalnya diinput lewat phpMyAdmin), `proses_login.php` melakukan fallback verifikasi lalu otomatis me-rehash dengan `password_hash()`.
 - Respons sukses tidak menyertakan kolom `password`.
+- Pengguna biasa selalu diarahkan ke `index.xhtml`. Parameter `tujuan` masih dikirim dan divalidasi server, tetapi tidak lagi dipakai untuk menentukan redirect login.
 
 ### 6.4 Alur pendaftaran
 
@@ -434,7 +533,7 @@ tombol Keluar
 Pembacaan data dilakukan **sekali di awal halaman**, lalu dipakai ulang oleh beberapa fitur:
 
 | Fitur | Fungsi | Cara mengambil data |
-|---|---|---|
+| --- | --- | --- |
 | Beranda terbaru | `tampilkanBeranda()` | `semuaLaporan().slice(0, 6)` dari `cacheLaporan` |
 | Katalog | `filterBarang()` | `semuaLaporan()` lalu filter di browser |
 | Detail | `tampilkanDetail()` | `cariBarang(id)` dari `cacheLaporan` |
@@ -520,6 +619,16 @@ form-serah-baru submit
              tampilkanHalamanSerah()
 ```
 
+Setelah data dimuat, `tampilkanHalamanSerah()` memperbarui lencana status:
+
+| Kondisi | Teks lencana | Class modifier |
+| --- | --- | --- |
+| Belum ada catatan | Menunggu penerimaan | `menunggu` |
+| Penerimaan sudah dicatat | Sudah diterima CS | `diterima` |
+| Pengembalian sudah dicatat | Sudah dikembalikan | `selesai` |
+
+Class modifier tersebut dipasang pada `#serah-status` dan `#serah-status-badge`. Jika penerimaan dan pengembalian sudah lengkap, form disembunyikan dan `.layout-serah-baru` mendapat class tambahan `tanpa-form`, sehingga panel riwayat memakai lebar penuh. Di halaman Kelola Serah Terima, `#riwayat-barang-serah` menampilkan kartu penerimaan dan pengembalian berdampingan (dua kolom); di halaman Riwayat, `#daftar-riwayat-cs` memakai grid `auto-fit` dengan lebar kartu minimal 420px.
+
 Aturan yang dijaga server:
 
 - Penerimaan harus lebih dulu; pengembalian tidak bisa dicatat langsung.
@@ -561,7 +670,7 @@ Jika endpoint gagal, `app.js` memakai pengecekan password lokal sebagai fallback
 ### 6.10 Alur upload foto
 
 | Jenis | Endpoint | Field | Folder |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Foto laporan | `laporan.php?aksi=create/update` | `foto` | `uploads/laporan/` |
 | Foto profil | `ubah_foto_profil.php` | `foto` / `action=hapus` | `uploads/profil/` |
 
@@ -605,7 +714,7 @@ Contoh respons gagal:
 Kode HTTP yang dipakai:
 
 | Kode | Arti |
-|---|---|
+| --- | --- |
 | `200` | Berhasil. |
 | `400` | Input tidak valid. |
 | `401` | Belum login / sesi berakhir. |
@@ -624,13 +733,15 @@ Kode HTTP yang dipakai:
   - Operasi tulis menampilkan pesan “Gagal menghubungi server.”
   - Halaman baca menampilkan keadaan kosong atau laporan lokal yang dibuat pengguna saat offline.
 - Setelah operasi tulis berhasil, frontend biasanya memuat ulang data dari server (`muatLaporanServer`, `muatSerahServer`) atau memperbarui `cacheLaporan` secara langsung.
+- `cacheLaporan` dan `cacheSerah` disimpan ke `sessionStorage` setiap kali data server berhasil dimuat. Cache ini dipakai untuk render pertama di halaman berikutnya.
+- Setelah fetch selesai, `renderHalaman()` hanya dijalankan ulang bila isi cache berubah. Tujuannya agar isian form yang sedang diketik tidak hilang dan posisi footer tetap stabil.
 
 ### 6.13 Ringkasan komunikasi per file
 
 | File | Dipanggil oleh | Endpoint | Data yang dikirim | Hasil |
-|---|---|---|---|---|
-| `login.xhtml` | pengguna | `proses_login.php` | email, password, tujuan | sesi + redirect |
-| `pendaftaran.xhtml` | pengguna | `proses_daftar.php` | nama, email, teams, password, konfirmasi | akun + sesi |
+| --- | --- | --- | --- | --- |
+| `login.xhtml` | pengguna | `proses_login.php` | email, password, tujuan | sesi + redirect beranda/admin |
+| `pendaftaran.xhtml` | pengguna | `proses_daftar.php` | nama, email, teams, password, konfirmasi, tujuan | akun + sesi + redirect tujuan |
 | `js/app.js` (setiap halaman) | otomatis | `cek_sesi.php` | cookie sesi | data user / guest |
 | `js/app.js` (logout) | tombol Keluar | `logout.php` | cookie sesi | sesi dihapus |
 | `katalog.xhtml` | `filterBarang()` | `laporan.php?aksi=list` | cookie sesi | `cacheLaporan` |
@@ -650,7 +761,7 @@ Kode HTTP yang dipakai:
 ### 7.1 Data sesi PHP
 
 | Key `$_SESSION` | Isi |
-|---|---|
+| --- | --- |
 | `is_logged_in` | `true` setelah login berhasil. |
 | `user_id` | ID user di tabel `users`. |
 | `nama` | Nama lengkap. |
@@ -666,7 +777,7 @@ Sesi ini dibuat oleh `proses_login.php`/`proses_daftar.php`, dibaca oleh `cek_se
 ### 7.2 Matriks akses halaman
 
 | Halaman | Tamu | Pengguna | Admin CS |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `index.xhtml`, `katalog.xhtml`, `akses_akun.xhtml` | Boleh | Boleh | Boleh |
 | `detail.xhtml`, `laporan_saya.xhtml`, `buat_laporan.xhtml`, `edit_laporan.xhtml`, `profil.xhtml` | Diarahkan ke `akses_akun.xhtml` | Boleh | Boleh |
 | `admin_cs.xhtml`, `serah_terima.xhtml`, `riwayat_serah_terima.xhtml` | Diarahkan ke `akses_akun.xhtml` | Diarahkan ke `index.xhtml` | Boleh |
@@ -676,7 +787,8 @@ Pengecekan di browser dilakukan `cekAksesHalaman()`. Pengecekan sebenarnya tetap
 ### 7.3 Aturan redirect
 
 - Login Admin CS → `admin_cs.xhtml`.
-- Login pengguna → `?tujuan=...` bila valid, atau `index.xhtml`.
+- Login pengguna → `index.xhtml`. Parameter `?tujuan=...` masih dikirim, tetapi tidak lagi dipakai untuk redirect login.
+- Pendaftaran → nilai `?tujuan=...` yang dikirim form, atau `index.xhtml` bila kosong.
 - Tamu membuka halaman khusus → `akses_akun.xhtml?tujuan=<halaman>`.
 - Pengguna biasa membuka halaman admin → `index.xhtml`.
 - Logout → `index.xhtml`.
@@ -684,9 +796,9 @@ Pengecekan di browser dilakukan `cekAksesHalaman()`. Pengecekan sebenarnya tetap
 ### 7.4 Siklus sesi
 
 1. **Masuk**: `proses_login.php` membuat sesi dan `session_regenerate_id(true)`.
-2. **Pindah halaman**: `cek_sesi.php` memulihkan data sesi ke `sessionStorage`.
-3. **Sesi berakhir**: `cek_sesi.php` mengembalikan `guest`; jika `atlofSesiServer` pernah diset, sesi lokal dihapus.
-4. **Keluar**: `logout.php` menghancurkan sesi dan cookie; frontend menghapus `atlofMasuk`, `atlofAkun`, dan `atlofSesiServer`.
+2. **Pindah halaman**: `cek_sesi.php` memulihkan data sesi ke `sessionStorage`; cache laporan/serah dari halaman sebelumnya dipakai untuk render pertama.
+3. **Sesi berakhir**: `cek_sesi.php` mengembalikan `guest`; jika `atlofSesiServer` pernah diset, sesi lokal beserta `atlofCacheLaporan` dan `atlofCacheSerah` dihapus.
+4. **Keluar**: `logout.php` menghancurkan sesi dan cookie; frontend menghapus `atlofMasuk`, `atlofAkun`, `atlofSesiServer`, `atlofCacheLaporan`, dan `atlofCacheSerah`.
 
 ## 8. API laporan
 
@@ -703,7 +815,7 @@ Semua endpoint memerlukan sesi login. Format respons umum:
 ### 8.1 Endpoint
 
 | Method | URL | Keterangan |
-|---|---|---|
+| --- | --- | --- |
 | GET | `laporan.php?aksi=list` | Semua laporan, urut dari terbaru. |
 | GET | `laporan.php?aksi=list&q=kata` | Pencarian nama, deskripsi, atau lokasi. |
 | GET | `laporan.php?aksi=list&jenis=&kategori=&lokasi=&status=` | Filter field tertentu. |
@@ -722,7 +834,7 @@ Semua endpoint memerlukan sesi login. Format respons umum:
 Nama field mengikuti markup XHTML:
 
 | Field form | Keterangan |
-|---|---|
+| --- | --- |
 | `jenis` | `hilang` atau `ditemukan` (radio). |
 | `nama-barang` | Nama barang, wajib. |
 | `kategori` | Salah satu nilai enum kategori. |
@@ -731,7 +843,7 @@ Nama field mengikuti markup XHTML:
 | `detail-lokasi` | Wajib bila `lokasi = Lainnya`. |
 | `penyimpanan` | Wajib bila `jenis = ditemukan`; diabaikan untuk `hilang`. |
 | `deskripsi` | Ciri umum barang, wajib. |
-| `telepon` | Opsional. |
+| `telepon` | Opsional. Untuk Admin CS, diisi nomor WhatsApp layanan CS yang tampil sebagai tautan kontak. |
 | `foto` | Opsional, `multipart/form-data`. |
 | `id` | Dikirim pada `update`, `delete`, `status`, dan `status_cs`. |
 
@@ -744,6 +856,7 @@ Nama field mengikuti markup XHTML:
 - Saat jenis atau lokasi penyimpanan diubah, catatan serah terima lama dihapus dan `status_cs` dihitung ulang.
 - Field tanggal divalidasi dengan `checkdate()` sebelum disimpan.
 - Upload foto divalidasi berdasarkan ekstensi, MIME type, dan ukuran.
+- Nomor WhatsApp divalidasi dengan pola `^\+?[\d\s-]{8,20}$`: tanda `+` opsional, lalu 8–20 karakter angka, spasi, atau tanda hubung.
 
 ## 9. API serah terima
 
@@ -752,7 +865,7 @@ Khusus Admin CS. Semua endpoint memerlukan role `admin_cs`.
 ### 9.1 Endpoint
 
 | Method | URL | Keterangan |
-|---|---|---|
+| --- | --- | --- |
 | GET | `serah_terima.php?aksi=list` | Semua catatan kampus Admin CS. |
 | GET | `serah_terima.php?aksi=list&laporan_id=1` | Riwayat satu barang. |
 | POST | `serah_terima.php?aksi=create` | Catat penerimaan/pengembalian. |
@@ -776,7 +889,7 @@ Field delete: `id`.
 Setiap create/delete memanggil `sinkronStatusLaporan()`:
 
 | Catatan yang ada | `status_cs` | `status` |
-|---|---|---|
+| --- | --- | --- |
 | Belum ada | `menunggu` | `belum_dikembalikan` |
 | Penerimaan saja | `diterima` | `belum_dikembalikan` |
 | Penerimaan + pengembalian | `dikembalikan` | `sudah_dikembalikan` |
@@ -792,10 +905,10 @@ Menerima `nama`, `teams`, dan `telepon`.
 - Nama wajib diisi.
 - Pengguna biasa wajib mengisi `teams`; nomor `telepon` tidak diubah.
 - Admin CS boleh mengosongkan `teams` dan dapat mengubah `telepon` layanan kampusnya.
-- Nomor divalidasi dengan pola `+?` diikuti 8–18 karakter angka, spasi, atau tanda hubung.
+- Nomor divalidasi dengan pola `^\+?[\d\s-]{8,20}$`: tanda `+` opsional, lalu 8–20 karakter angka, spasi, atau tanda hubung.
 - Data yang berhasil disimpan juga diperbarui di `$_SESSION` dan `sessionStorage.atlofAkun`.
 
-Nomor WhatsApp Admin CS ditampilkan di `detail.xhtml` untuk barang yang dititipkan di kampusnya.
+Tautan WhatsApp Admin CS ditampilkan di `detail.xhtml` untuk barang yang dititipkan di kampusnya. Nomornya sendiri tidak dicetak di halaman; pengguna hanya melihat tombol **Hubungi via WhatsApp**.
 
 ### 10.2 `ubah_password.php`
 
@@ -825,10 +938,12 @@ Yang **belum** ada: token CSRF, pembatasan percobaan login, dan verifikasi email
 `js/app.js` menetapkan `modeServer = true` hanya ketika protokol halaman `http:` atau `https:`. Jika `false`, seluruh data diambil dari browser.
 
 | Penyimpanan | Isi |
-|---|---|
+| --- | --- |
 | `sessionStorage.atlofMasuk` | Penanda sudah masuk. |
 | `sessionStorage.atlofAkun` | Nama, email, role, kampus, Teams, telepon, foto. |
 | `sessionStorage.atlofSesiServer` | Penanda bahwa sesi berasal dari login PHP. |
+| `sessionStorage.atlofCacheLaporan` | Cache laporan terakhir dari server untuk render pertama. |
+| `sessionStorage.atlofCacheSerah` | Cache catatan serah terima terakhir untuk render pertama. |
 | `sessionStorage.atlofLaporan` | Laporan buatan pengguna saat offline. |
 | `sessionStorage.atlofSerahTerima` | Catatan serah terima saat offline. |
 | `sessionStorage.atlofKontakAdmin` | Nomor layanan CS saat offline. |
@@ -837,22 +952,26 @@ Yang **belum** ada: token CSRF, pembatasan percobaan login, dan verifikasi email
 
 Aturan fallback:
 
-- `muatSesiServer()` dipanggil lebih dulu; jika sesi PHP berakhir dan penanda `atlofSesiServer` ada, sesi lokal dihapus.
-- `muatLaporanServer()` mengisi `cacheLaporan`; bila gagal, `cacheLaporan` tetap `null` dan `semuaLaporan()` memakai data lokal pengguna.
-- `muatSerahServer()` melakukan hal yang sama untuk `cacheSerah`.
+- `muatSesiServer()` dipanggil lebih dulu; jika sesi PHP berakhir dan penanda `atlofSesiServer` ada, sesi lokal beserta cache laporan/serah dihapus.
+- `muatLaporanServer()` mengisi `cacheLaporan` dan `sessionStorage.atlofCacheLaporan`; bila gagal, `cacheLaporan` tetap `null` dan `semuaLaporan()` memakai data lokal pengguna.
+- `muatSerahServer()` melakukan hal yang sama untuk `cacheSerah` dan `sessionStorage.atlofCacheSerah`.
 - Katalog, beranda, detail, dan dashboard memakai `cacheLaporan` bila tersedia; filter katalog dilakukan di browser atas data yang sudah dimuat dari database.
+- Render pertama memakai cache sesi. Render ulang setelah fetch hanya terjadi bila isi cache berubah, sehingga isian form tidak ter-reset.
 
 ## 13. Panduan pengujian cepat
 
-1. Import `database/atlof_db.sql` lewat phpMyAdmin.
+1. Selesaikan langkah di bagian 3 sampai aplikasi terbuka di `http://localhost/ATLOF_Frontend_Revisi_5/`.
 2. Buka `http://localhost/ATLOF_Frontend_Revisi_5/login.xhtml`.
-3. Login sebagai `cs1uajy@gmail.com` / `cs1uajyATLOF`. Pastikan masuk ke Dashboard CS Kampus 1.
-4. Di Dashboard CS, cari/filter barang titipan, lalu buka **Kelola serah terima** pada laporan `#10`.
-5. Catat penerimaan, lalu pengembalian dengan mencentang verifikasi. Cek di `laporan.php?aksi=detail&id=10` bahwa status berubah menjadi `sudah_dikembalikan`.
-6. Buka `riwayat_serah_terima.xhtml` untuk melihat catatan kampus tersebut.
-7. Logout, lalu login sebagai `kelvin@students.uajy.ac.id` / `Password123!`.
-8. Buat laporan baru, ubah di `Laporan Saya`, coba status, lalu hapus. Cek di phpMyAdmin bahwa baris di `laporan` ikut berubah.
-9. Buka `profil.xhtml`, ubah nama/Teams/password, lalu cek kembali lewat `cek_sesi.php`.
+3. Login sebagai `kelvin@students.uajy.ac.id` / `Password123!`. Pastikan diarahkan ke beranda.
+4. Buat laporan **ditemukan** dengan penyimpanan `CS Kampus 1`. Buka laporan tersebut dan catat ID dari URL `detail.xhtml?id=...`.
+5. Logout, lalu login sebagai `cs1uajy@gmail.com` / `cs1uajyATLOF`. Pastikan masuk ke Dashboard CS Kampus 1 dan laporan tadi muncul.
+6. Buka **Kelola serah terima** pada barang tersebut. Catat penerimaan, lalu perhatikan lencana berubah dari **Menunggu penerimaan** menjadi **Sudah diterima CS**. Catat pengembalian dengan centang verifikasi; lencana berubah menjadi **Sudah dikembalikan**.
+7. Cek `laporan.php?aksi=detail&id=<ID_LAPORAN>` bahwa `status` menjadi `sudah_dikembalikan` dan `status_cs` menjadi `dikembalikan`.
+8. Buka `riwayat_serah_terima.xhtml` untuk melihat catatan kampus tersebut dalam kartu horizontal.
+9. Logout, lalu login kembali sebagai `kelvin@students.uajy.ac.id`. Pastikan status laporan di `Laporan Saya` sudah mengikuti hasil serah terima.
+10. Buat laporan baru, ubah di `Laporan Saya`, coba status, lalu hapus. Cek di phpMyAdmin bahwa baris di `laporan` ikut berubah.
+11. Buka `profil.xhtml`, ubah nama/Teams/password, lalu cek kembali lewat `cek_sesi.php`.
+12. Pindah antarhalaman setelah login. Pastikan footer tidak bergeser saat data server selesai dimuat dan isian form yang sedang diketik tidak ter-reset.
 
 Contoh pengecekan API dengan `curl`. Login dulu untuk menyimpan cookie sesi, lalu panggil endpoint:
 
@@ -863,11 +982,13 @@ curl -c cookie.txt -H "X-Requested-With: XMLHttpRequest" \
 
 curl -b cookie.txt "http://localhost/ATLOF_Frontend_Revisi_5/laporan.php?aksi=list&saya=1"
 
-curl -b cookie.txt "http://localhost/ATLOF_Frontend_Revisi_5/serah_terima.php?aksi=list&laporan_id=10"
+curl -b cookie.txt "http://localhost/ATLOF_Frontend_Revisi_5/serah_terima.php?aksi=list&laporan_id=1"
 
 curl -b cookie.txt -d "id=3&status=diterima" \
   "http://localhost/ATLOF_Frontend_Revisi_5/laporan.php?aksi=status_cs"
 ```
+
+Ganti angka `1` dan `3` dengan ID laporan yang benar-benar ada di database. Pada database baru, buat laporan lewat aplikasi terlebih dahulu.
 
 Endpoint `laporan.php?aksi=status_cs` dipakai untuk status penanganan CS; endpoint `serah_terima.php` dipakai untuk mencatat riwayat penerimaan/pengembalian.
 
@@ -929,7 +1050,7 @@ Endpoint `laporan.php?aksi=status_cs` dipakai untuk status penanganan CS; endpoi
 | `tombol` | Class dasar semua tombol | Semua halaman |
 | `tombol-kuning` | Tombol utama berwarna kuning | Semua halaman |
 | `tombol-outline` | Tombol sekunder bergaris | Semua halaman |
-| `tombol-putih` | Tombol putih untuk latar gelap | `index` |
+| `tombol-putih` | Tombol putih untuk latar gelap | `index`, `serah_terima` |
 | `tombol-kecil` | Tombol ukuran kecil | Semua halaman |
 | `tombol-bahaya` | Tombol untuk aksi berbahaya seperti hapus | `profil` dan tombol Hapus yang dibuat `app.js` |
 | `lebar-penuh` | Membuat tombol atau tautan selebar container | `katalog`, `login`, `pendaftaran` |
@@ -961,7 +1082,7 @@ Endpoint `laporan.php?aksi=status_cs` dipakai untuk status penanganan CS; endpoi
 | `pencarian` | Kotak form pencarian | `katalog` |
 | `baris-pencarian` | Baris input pencarian dan tombol cari | `katalog` |
 | `panel-filter` | Panel filter yang menempel saat scroll | `katalog` |
-| `daftar-barang` | Pembungkus daftar hasil pencarian; belum punya aturan CSS | `katalog` |
+| `daftar-barang` | Pembungkus daftar hasil pencarian; aturannya hanya `min-width: 0` pada media query responsif | `katalog` |
 | `field` | Grup label dan input pada filter | `katalog` |
 
 ### 15.6 Form dan input
@@ -990,6 +1111,8 @@ Endpoint `laporan.php?aksi=status_cs` dipakai untuk status penanganan CS; endpoi
 | `nama-hari` | Label nama hari di kalender | Dibuat `app.js` |
 | `pilih-hari` | Tombol satu tanggal di kalender | Dibuat `app.js` |
 | `tanggal-kosong` | Sel kosong sebelum tanggal pertama; belum punya aturan CSS | Dibuat `app.js` |
+
+Urutan hari dimulai dari **Minggu**: `Min`, `Sen`, `Sel`, `Rab`, `Kam`, `Jum`, `Sab`. Sel kosong di awal bulan dihitung dari posisi hari pertama pada urutan tersebut.
 
 ### 15.8 Kartu barang
 
@@ -1069,18 +1192,20 @@ Endpoint `laporan.php?aksi=status_cs` dipakai untuk status penanganan CS; endpoi
 | `kontrol-admin` | Tombol "Kelola serah terima" per barang | Dibuat `app.js` |
 | `halaman-dashboard` | Baris navigasi halaman daftar barang | `admin_cs` |
 
+Kartu barang titipan tidak lagi menampilkan ID laporan. ID tetap dipakai pada tautan `detail.xhtml?id=...` dan `serah_terima.xhtml?id=...`, serta masih dapat dicari lewat kolom pencarian.
+
 ### 15.13 Footer
 
 | Class | Fungsi | Dipakai di |
 | --- | --- | --- |
 | `footer-utama` | Footer biru tua | Semua halaman |
 | `footer-isi` | Grid isi footer | Semua halaman |
-| `footer-tentang` | Kolom tentang ATLOF; belum punya aturan CSS | Semua halaman |
+| `footer-tentang` | Kolom tentang ATLOF; aturannya hanya di media query responsif (`grid-column`) | Semua halaman |
 | `footer-merk` | Blok merek di footer | Semua halaman |
 | `footer-menu` | Kolom menu footer | Semua halaman |
 | `footer-kampus` | Kolom informasi kampus | Semua halaman |
 | `footer-bawah` | Baris copyright di dasar footer | Semua halaman |
-| `footer-pesan` | Slogan footer berwarna emas | `pendaftaran`, `profil` |
+| `footer-pesan` | Slogan footer berwarna emas; sekarang seluruh halaman memakai `teks-emas` | `pendaftaran`, `profil` |
 
 ### 15.14 Notifikasi dan status
 
@@ -1088,6 +1213,8 @@ Endpoint `laporan.php?aksi=status_cs` dipakai untuk status penanganan CS; endpoi
 | --- | --- | --- |
 | `pesan-form` | Kotak notifikasi global di kanan bawah | Dibuat `app.js` melalui `pesan()` |
 | `gagal` | Modifier merah untuk notifikasi gagal | Dibuat `app.js` melalui `pesan()` |
+
+Kotak notifikasi memakai `role="status"` dan `aria-live="polite"` agar perubahan pesan dibacakan pembaca layar.
 
 ### 15.15 Class yang dibuat JavaScript
 
@@ -1116,22 +1243,54 @@ Tabel ini merangkum class yang tidak selalu terlihat di file `.xhtml`.
 | `gagal` | `pesan()` | Modifier notifikasi gagal |
 | `tombol-keluar` | Header setelah login | Tombol keluar |
 | `aktif` | Header admin | Menandai link Dashboard CS |
+| `serah-item` | `tampilkanHalamanSerah()`, `tampilkanRiwayatCS()` | Kartu catatan serah terima |
+| `serah-item-atas` | `tampilkanHalamanSerah()`, `tampilkanRiwayatCS()` | Baris kepala kartu catatan dengan garis pemisah inset |
+| `serah-judul` | `tampilkanHalamanSerah()`, `tampilkanRiwayatCS()` | Judul dan waktu catatan |
+| `serah-waktu` | `tampilkanHalamanSerah()`, `tampilkanRiwayatCS()` | Teks waktu catatan |
+| `serah-id` | `tampilkanRiwayatCS()` | ID laporan pada kartu riwayat |
+| `serah-jenis` | `tampilkanRiwayatCS()` | Lencana jenis transaksi |
+| `serah-meta` | `tampilkanHalamanSerah()`, `tampilkanRiwayatCS()` | Grid metadata catatan |
+| `serah-meta-item` | `metaSerah()` | Satu baris metadata |
+| `serah-meta-label` | `metaSerah()` | Label metadata |
+| `serah-meta-nilai` | `metaSerah()` | Nilai metadata |
+| `penerimaan`, `pengembalian` | `tampilkanHalamanSerah()`, `tampilkanRiwayatCS()` | Modifier `serah-item` dan `serah-jenis` |
+| `menunggu`, `diterima`, `selesai` | `tampilkanHalamanSerah()` | Modifier `serah-status` dan `serah-status-badge` |
+| `tanpa-form` | `tampilkanHalamanSerah()` | Modifier `layout-serah-baru` saat form disembunyikan |
 
 ### 15.16 Serah terima barang
 
 | Class | Fungsi | Dipakai di |
 | --- | --- | --- |
 | `halaman-serah` | Scope halaman Kelola dan Riwayat Serah Terima | `serah_terima`, `riwayat_serah_terima` |
+| `serah-kepala` | Kepala halaman Kelola Serah Terima berlatar biru | `serah_terima` |
+| `serah-kepala-teks` | Blok judul dan deskripsi di kepala halaman | `serah_terima` |
 | `serah-info-barang` | Kartu ringkasan barang yang dipilih | `serah_terima` |
-| `serah-info-grid` | Grid dua kolom info barang | `serah_terima` |
+| `serah-info-kepala` | Baris nama barang dan lencana status | `serah_terima` |
+| `serah-info-grid` | Grid kartu info barang | `serah_terima` |
+| `serah-info-kotak` | Satu kotak info barang | `serah_terima` |
+| `serah-info-label` | Label kecil di dalam kotak info | `serah_terima` |
+| `serah-status` | Status serah terima dengan titik penanda | `serah_terima` |
+| `serah-status-badge` | Lencana status di samping nama barang | `serah_terima` |
 | `layout-serah-baru` | Grid form catatan dan riwayat barang | `serah_terima` |
+| `layout-serah-baru.tanpa-form` | Layout satu kolom saat form disembunyikan | Dibuat `app.js` |
 | `kotak-daftar-serah` | Kartu riwayat barang | `serah_terima` |
 | `serah-list` | Wadah daftar catatan serah terima | `serah_terima`, `riwayat_serah_terima` |
-| `serah-item` | Satu catatan serah terima | Dibuat `app.js` |
+| `serah-item` | Satu kartu catatan serah terima; modifier `penerimaan`/`pengembalian` menandai jenis transaksi | Dibuat `app.js` |
+| `serah-item-atas` | Baris kepala kartu catatan dengan garis pemisah inset | Dibuat `app.js` |
+| `serah-judul` | Blok judul dan waktu catatan | Dibuat `app.js` |
+| `serah-waktu` | Teks waktu catatan | Dibuat `app.js` |
+| `serah-id` | ID laporan pada kartu riwayat | Dibuat `app.js` |
+| `serah-jenis` | Lencana jenis transaksi; modifier `pengembalian` berwarna hijau | Dibuat `app.js` |
+| `serah-meta` | Grid dua kolom metadata catatan | Dibuat `app.js` |
+| `serah-meta-item` | Satu baris metadata; modifier `lebar-penuh` memakai seluruh lebar | Dibuat `app.js` |
+| `serah-meta-label` | Label metadata | Dibuat `app.js` |
+| `serah-meta-nilai` | Nilai metadata | Dibuat `app.js` |
 | `serah-kosong` | Keadaan kosong daftar catatan | `serah_terima`, `riwayat_serah_terima` |
 | `filter-riwayat-cs` | Baris pencarian dan filter riwayat | `riwayat_serah_terima` |
 | `serah-jumlah` | Teks jumlah catatan riwayat | `riwayat_serah_terima` |
 | `serah-pagination` | Navigasi halaman riwayat | `riwayat_serah_terima` |
+
+`#riwayat-barang-serah` memakai dua kolom agar penerimaan dan pengembalian berdampingan. `#daftar-riwayat-cs` memakai grid `auto-fit` dengan lebar kartu minimal 420px, sehingga riwayat tampil horizontal pada layar lebar dan menjadi satu kolom pada layar sempit.
 
 ## 16. Referensi ID per halaman
 
@@ -1248,8 +1407,9 @@ ID di halaman ini sama dengan `buat_laporan.xhtml`, kecuali form utama memakai `
 | `detail-info-kontak` | Keterangan cara menghubungi |
 | `detail-teams` | Tautan Microsoft Teams |
 | `detail-whatsapp` | Kotak kontak WhatsApp |
-| `detail-nomor` | Nomor WhatsApp yang ditampilkan |
 | `detail-whatsapp-link` | Tautan WhatsApp |
+
+Nomor WhatsApp tidak dicetak di halaman detail. Jika nomor tersedia, `#detail-whatsapp` ditampilkan dengan tombol **Hubungi via WhatsApp**; jika tidak, kontak CS menampilkan keterangan bahwa nomor layanan belum tersedia. ID `detail-nomor` sudah dihapus.
 
 ### 16.7 `login.xhtml`
 
@@ -1257,7 +1417,7 @@ ID di halaman ini sama dengan `buat_laporan.xhtml`, kecuali form utama memakai `
 | --- | --- |
 | `menu-akun` | Wadah tombol akun di header |
 | `form-login` | Form masuk |
-| `input-tujuan` | Halaman tujuan setelah login |
+| `input-tujuan` | Halaman tujuan yang dikirim form; tidak lagi dipakai untuk redirect login pengguna biasa |
 | `email` | Input email |
 | `password` | Input password |
 | `link-daftar` | Tautan ke halaman pendaftaran |
@@ -1345,10 +1505,11 @@ ID di halaman ini sama dengan `buat_laporan.xhtml`, kecuali form utama memakai `
 | `serah-tidak-ada` | Pesan saat barang tidak tersedia untuk CS ini |
 | `serah-konten` | Wadah seluruh konten serah terima |
 | `serah-nama-barang` | Nama barang yang dipilih |
-| `serah-id-laporan` | ID laporan barang |
+| `serah-status-badge` | Lencana status di samping nama barang |
+| `serah-id-laporan` | ID laporan barang; tetap ada di DOM tetapi disembunyikan dari tampilan |
 | `serah-kampus` | Nama kampus CS |
 | `serah-penyimpanan` | Lokasi penyimpanan barang |
-| `serah-status` | Status serah terima barang |
+| `serah-status` | Status serah terima barang dengan titik penanda |
 | `kotak-form-serah` | Kartu form catatan serah terima |
 | `judul-form-serah-baru` | Judul form penerimaan/pengembalian |
 | `keterangan-form-serah` | Keterangan pengantar form |
@@ -1364,6 +1525,8 @@ ID di halaman ini sama dengan `buat_laporan.xhtml`, kecuali form utama memakai `
 | `batal-edit-serah` | Tombol batal edit |
 | `riwayat-barang-serah` | Daftar riwayat barang ini |
 | `kosong-riwayat-barang` | Keadaan kosong riwayat barang |
+
+`#serah-id-laporan` tetap ada di DOM agar JavaScript tidak error, tetapi baris ID disembunyikan. `#riwayat-barang-serah` menampilkan kartu penerimaan dan pengembalian dalam dua kolom.
 
 ### 16.13 `riwayat_serah_terima.xhtml`
 
@@ -1444,6 +1607,49 @@ Kartu Laporan Saya juga menampilkan lencana jenis dan status, lalu panel status 
 </div>
 ```
 
+Kartu riwayat serah terima yang dibuat `app.js`:
+
+```html
+<div class="serah-item penerimaan">
+  <div class="serah-item-atas">
+    <div class="serah-judul">
+      <h3>Penerimaan</h3>
+      <span class="serah-waktu">Waktu: 26-11-2026 10:15</span>
+    </div>
+  </div>
+  <div class="serah-meta">
+    <div class="serah-meta-item">
+      <span class="serah-meta-label">Penyerah</span>
+      <span class="serah-meta-nilai">Nama Penyerah</span>
+    </div>
+    <div class="serah-meta-item">
+      <span class="serah-meta-label">Petugas</span>
+      <span class="serah-meta-nilai">Admin CS Kampus 1</span>
+    </div>
+    <div class="serah-meta-item lebar-penuh">
+      <span class="serah-meta-label">Keterangan</span>
+      <span class="serah-meta-nilai">Barang dititipkan di CS.</span>
+    </div>
+  </div>
+  <div class="aksi">...</div>
+</div>
+```
+
+Kartu riwayat penuh menambahkan lencana jenis transaksi:
+
+```html
+<div class="serah-item pengembalian">
+  <div class="serah-item-atas">
+    <div class="serah-judul">
+      <h3>Tumbler Hitam <span class="serah-id">#10</span></h3>
+      <span class="serah-waktu">Waktu: 26-11-2026 14:40</span>
+    </div>
+    <span class="serah-jenis pengembalian">Pengembalian</span>
+  </div>
+  <div class="serah-meta">...</div>
+</div>
+```
+
 Lencana jenis barang:
 
 ```html
@@ -1461,20 +1667,23 @@ Notifikasi gagal yang dibuat `app.js`:
 ## 19. Catatan penting
 
 - `hilang` dan `ditemukan` bukan class mandiri. Keduanya modifier untuk `lencana`, sehingga di HTML menjadi `class="lencana hilang"` atau `class="lencana ditemukan"`.
+- `penerimaan` dan `pengembalian` juga modifier: dipakai pada `serah-item` dan `serah-jenis`. `menunggu`, `diterima`, dan `selesai` adalah modifier untuk `serah-status` dan `serah-status-badge`.
 - `pesan-form` dan `gagal` juga dipakai bersama, sehingga notifikasi gagal menjadi `class="pesan-form gagal"`.
 - `#detail-lokasi` punya arti berbeda di halaman berbeda:
   - Di `buat_laporan.xhtml` dan `edit_laporan.xhtml`: input keterangan lokasi lainnya.
   - Di `detail.xhtml`: sel tabel lokasi kampus.
 - `#email`, `#password`, `#nama`, dan `#teams` muncul di beberapa halaman. Ini aman karena setiap halaman dimuat terpisah.
 - `#menu-akun` ada di semua halaman dan isinya diganti oleh `app.js` setelah login.
+- Kalender dimulai hari Minggu: `Min`, `Sen`, `Sel`, `Rab`, `Kam`, `Jum`, `Sab`.
+- Nomor WhatsApp tidak lagi dicetak di `detail.xhtml`; halaman hanya menampilkan tombol **Hubungi via WhatsApp**. ID `detail-nomor` sudah dihapus.
+- ID laporan tidak ditampilkan di kartu Dashboard CS dan info serah terima, tetapi tetap dipakai pada URL `detail.xhtml?id=...` dan `serah_terima.xhtml?id=...`.
+- Cache `atlofCacheLaporan` dan `atlofCacheSerah` dipakai untuk render pertama; keduanya dihapus saat logout atau sesi berakhir.
 - Class berikut dipakai di HTML atau dibuat JavaScript, tetapi belum punya aturan CSS:
   - `batal-profil`
-  - `daftar-barang`
-  - `footer-tentang`
   - `katalog-page`
   - `profil-tombol`
   - `tanggal-kosong`
-- `teks-emas` dan `footer-pesan` sama-sama memberi warna aksen pada slogan footer, tetapi warnanya berbeda. Saat ini `pendaftaran` dan `profil` memakai `footer-pesan`, halaman lain memakai `teks-emas`.
+- `teks-emas` dan `footer-pesan` sama-sama memberi warna aksen pada slogan footer. Keduanya sekarang memakai emas yang sama, dan seluruh halaman memakai `teks-emas` dengan bunyi slogan yang serupa.
 - ID `status-<id>` dan `kelola-<id>` harus unik dalam satu halaman. Jangan memakai ID laporan yang sama dua kali.
 - Jika nanti ada rename class atau ID, file yang perlu diperbarui adalah semua `.xhtml`, `css/style.css`, dan string HTML di `js/app.js`.
 
@@ -1484,7 +1693,7 @@ Notifikasi gagal yang dibuat `app.js`:
 
 ### 20.1 Yang sudah dihapus
 
-- Seluruh aturan responsif `@media` (480px, 700px, 760px, 900px, 1000px, 1170px) dan tag `meta viewport` di semua halaman. Layout desktop dipakai di semua lebar layar.
+- Aturan responsif lama yang sudah usang. Tag `meta viewport` dikembalikan di semua halaman dan aturan responsif baru ditaruh di bagian 23 `css/style.css`.
 - `.footer-kampus img`: tidak ada gambar di dalam footer kampus.
 - `.footer-isi h3`: semua `h3` footer ada di dalam `.footer-merk`, dan warnanya ditentukan `.footer-merk h3`.
 - `input[type="email"]`, `input[type="search"]`, `input[type="date"]`, `input[type="tel"]`: tidak ada input dengan tipe tersebut.
@@ -1498,7 +1707,7 @@ Notifikasi gagal yang dibuat `app.js`:
 - `display: flex` pada `.footer-kampus` tetap ada karena memengaruhi lebar konten; yang dihapus hanya `gap` dan `align-items`.
 - `.logo` memakai `align-items: center` dan `gap: 10px` karena memiliki dua anak: ikon SVG dan teks.
 - Logo SVG memakai `alt=""` karena teks “ATLOF” di sebelahnya sudah memberi nama yang dapat dibaca pembaca layar.
-- `.detail-identitas` tetap dua kolom (label 170px dan nilai fleksibel) di semua lebar layar.
+- `.detail-identitas` tetap dua kolom (label 170px dan nilai fleksibel) di desktop, lalu menjadi satu kolom pada lebar 520px atau kurang.
 - `input[type="text"]`, `input[type="password"]`, `input[type="file"]`, `select`, dan `textarea` tetap dipakai dan berbagi gaya kotak input yang sama.
 - `overflow: hidden` pada `.kartu-barang` tetap dipakai untuk memotong gambar dan sudut kartu.
 
@@ -1506,7 +1715,8 @@ Notifikasi gagal yang dibuat `app.js`:
 
 - IBM Plex Sans tetap dipakai untuk seluruh teks sans melalui `--font-display` dan `--font-body`.
 - Poppins weight 400, 500, 600, dan 700 (`Poppins-<weight>-latin.woff2`) hanya dipakai di navbar melalui `--font-navbar`: logo, menu navigasi, dan tombol Masuk/Daftar/Keluar di header.
-- IBM Plex Mono dipakai untuk label kecil, kalender, dan ID melalui `--font-mono`. Lencana jenis barang dan label pada daftar identitas profil memakai IBM Plex Sans, seperti dijelaskan di 19.4.
+- IBM Plex Mono dipakai untuk label kecil, kalender, dan ID melalui `--font-mono`. Lencana jenis barang dan label pada daftar identitas profil memakai IBM Plex Sans, seperti dijelaskan di 20.4.
+- Semua halaman memuat font utama dengan `<link rel="preload" ... as="font" type="font/woff2" crossorigin="anonymous">` agar teks tidak berkedip saat font selesai dimuat.
 
 ### 20.4 Tipografi daftar identitas profil
 
@@ -1517,3 +1727,38 @@ Notifikasi gagal yang dibuat `app.js`:
 | Nilai kosong (`-`, `Belum diisi`) | IBM Plex Sans (`--font-body`) | 15px | 400, miring, abu-abu |
 
 Kedua kolom memakai font yang sama. Label dibedakan hanya dari berat hurufnya, bukan dari jenis font atau huruf kapital. Class `.nilai-kosong` dipasang di markup sebagai kondisi awal, lalu dihapus oleh `perbaruiProfil()` di `app.js` saat nilainya terisi.
+
+### 20.5 Responsif
+
+Aturan responsif berada di bagian 23 `css/style.css` dengan breakpoint berikut:
+
+| Breakpoint | Perubahan utama |
+| --- | --- |
+| `max-width: 1100px` | Navbar lebih rapat, katalog memakai panel filter 210px, grid barang/katalog menjadi dua kolom, jarak footer dikurangi. |
+| `max-width: 980px` | Header tidak lagi menempel saat scroll, menu navigasi bisa digeser horizontal. |
+| `max-width: 900px` | Katalog, detail barang, grid akun, dan layout serah terima menjadi satu kolom; footer dua kolom; ringkasan admin dua kolom; panel filter tidak lagi sticky. |
+| `max-width: 700px` | Container lebih sempit, hero dan tiga langkah menyesuaikan, footer satu kolom, padding kartu dikurangi, riwayat barang satu kolom, kalender menyesuaikan lebar layar. |
+| `max-width: 520px` | Grid barang/katalog satu kolom, ringkasan admin dan statistik satu kolom, tombol aksi selebar baris, detail identitas satu kolom, metadata serah terima satu kolom. |
+
+### 20.6 Aset dan head
+
+- Semua halaman memakai `<meta name="viewport" content="width=device-width, initial-scale=1" />`.
+- Favicon memakai `images/logo-atlof-ikon.svg`.
+- Font Poppins, IBM Plex Sans, dan IBM Plex Mono di-preload dari folder `fonts/`.
+- Placeholder gambar barang tersedia di `images/placeholder.png` dan `images/ph-<kategori>.png`.
+
+## 21. Riwayat revisi
+
+Revisi terakhir menyelaraskan kode dan dokumentasi:
+
+1. Kalender dimulai hari Minggu (`Min`–`Sab`).
+2. Nomor WhatsApp disembunyikan di halaman detail; hanya tombol tautan yang tampil.
+3. Tombol dan tautan informasi laporan dirapikan agar tidak keluar dari kartu.
+4. Login pengguna biasa selalu diarahkan ke `index.xhtml`.
+5. ID laporan tidak lagi ditampilkan di Dashboard CS dan info serah terima.
+6. Riwayat serah terima memakai kartu horizontal dan layout tanpa form saat selesai.
+7. Cache sesi dan render bertahap ditambahkan agar footer tidak bergeser dan isian form tidak ter-reset.
+8. Halaman memakai `meta viewport`, favicon, dan preload font; CSS responsif ditambahkan di bagian 23.
+9. Nomor urut pada kartu penerimaan dan pengembalian dihapus.
+10. Border berwarna pada kartu serah terima dihapus; garis pemisah dirapikan di bawah tanggal dan dibuat inset.
+11. Panduan menjalankan aplikasi secara lokal diperluas dari pembuatan database sampai penanganan masalah umum.

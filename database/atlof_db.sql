@@ -88,29 +88,3 @@ INSERT INTO `users` (`id`, `nama`, `email`, `password`, `teams`, `telepon`, `rol
 (7, 'Petugas Kampus', 'petugas@uajy.ac.id', '$2y$12$F4tnAGCjBlsE631ARGK.VePFQK1Sw8icX5CotgA/fncbXXpM2HEUK', 'cs@uajy.ac.id', '', 'user', NULL)
 ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
 
--- --------------------------------------------------------
--- Data Awal Laporan (Seed Data)
--- --------------------------------------------------------
-INSERT INTO `laporan` (`id`, `user_id`, `nama_barang`, `jenis`, `kategori`, `tanggal`, `lokasi`, `detail_lokasi`, `penyimpanan`, `status`, `status_cs`, `deskripsi`, `foto`, `telepon`, `created_at`) VALUES
-(1, 5, 'Tumbler Hitam', 'hilang', 'tumbler', '2026-11-10', 'Kampus 1', NULL, '-', 'masih_dicari', NULL, 'Tumbler warna hitam, ukuran sedang.', NULL, NULL, '2026-11-10 10:00:00'),
-(2, 7, 'Jaket Hoodie Abu-abu', 'ditemukan', 'pakaian_jaket', '2026-11-09', 'Kampus 2', NULL, 'CS Kampus 2', 'belum_dikembalikan', 'diterima', 'Jaket hoodie warna abu-abu polos.', NULL, NULL, '2026-11-09 10:00:00'),
-(3, 7, 'Kotak Earphone Putih', 'ditemukan', 'elektronik', '2026-11-08', 'Kampus 3', NULL, 'CS Kampus 3', 'belum_dikembalikan', 'menunggu', 'Kotak earphone putih tanpa isi.', NULL, NULL, '2026-11-08 10:00:00'),
-(4, 6, 'Dompet Cokelat', 'hilang', 'dompet_kartu', '2026-11-07', 'Kampus 4', NULL, '-', 'masih_dicari', NULL, 'Dompet berwarna cokelat tua.', NULL, NULL, '2026-11-07 10:00:00'),
-(5, 6, 'Kunci Motor', 'ditemukan', 'kunci', '2026-11-06', 'Kampus 1', NULL, 'Dibawa penemu', 'belum_dikembalikan', NULL, 'Satu kunci motor dengan gantungan biru.', NULL, NULL, '2026-11-06 10:00:00'),
-(6, 6, 'Kalkulator Ilmiah', 'hilang', 'elektronik', '2026-11-05', 'Kampus 2', NULL, '-', 'sudah_ditemukan', NULL, 'Kalkulator ilmiah warna hitam.', NULL, NULL, '2026-11-05 10:00:00'),
-(7, 7, 'Botol Minum Stainless', 'ditemukan', 'tumbler', '2026-11-04', 'Kampus 3', NULL, 'CS Kampus 3', 'sudah_dikembalikan', 'dikembalikan', 'Botol stainless warna perak.', NULL, NULL, '2026-11-04 10:00:00'),
-(8, 7, 'Payung Lipat Biru', 'ditemukan', 'lainnya', '2026-11-03', 'Kampus 4', NULL, 'CS Kampus 4', 'belum_dikembalikan', 'menunggu', 'Payung lipat biru tua.', NULL, NULL, '2026-11-03 10:00:00'),
-(9, 5, 'Tote Bag Kanvas', 'hilang', 'lainnya', '2026-11-02', 'Lainnya', NULL, '-', 'masih_dicari', NULL, 'Tas kain warna krem.', NULL, NULL, '2026-11-02 10:00:00'),
-(10, 6, 'Flashdisk 32 GB', 'ditemukan', 'elektronik', '2026-11-01', 'Kampus 1', NULL, 'CS Kampus 1', 'sudah_dikembalikan', 'dikembalikan', 'Flashdisk hitam ukuran kecil.', NULL, NULL, '2026-11-01 10:00:00')
-ON DUPLICATE KEY UPDATE `id` = VALUES(`id`);
-
--- --------------------------------------------------------
--- Data Awal Serah Terima (Seed Data)
--- --------------------------------------------------------
-INSERT INTO `serah_terima` (`id`, `laporan_id`, `user_id`, `kampus_cs`, `jenis`, `nama_pihak`, `catatan`, `waktu`) VALUES
-(1, 2, 2, 'Kampus 2', 'penerimaan', 'Petugas Kampus', 'Barang diterima dalam kondisi baik.', '2026-11-09 11:00:00'),
-(2, 7, 3, 'Kampus 3', 'penerimaan', 'Petugas Kampus', 'Barang diterima dalam kondisi baik.', '2026-11-04 11:00:00'),
-(3, 7, 3, 'Kampus 3', 'pengembalian', 'Nadia Putri', 'Kepemilikan sudah diverifikasi.', '2026-11-05 09:00:00'),
-(4, 10, 1, 'Kampus 1', 'penerimaan', 'Petugas Kampus', 'Barang diterima dalam kondisi baik.', '2026-11-01 11:00:00'),
-(5, 10, 1, 'Kampus 1', 'pengembalian', 'Nadia Putri', 'Kepemilikan sudah diverifikasi.', '2026-11-02 09:00:00')
-ON DUPLICATE KEY UPDATE `id` = VALUES(`id`);

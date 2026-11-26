@@ -307,7 +307,7 @@ if ($aksi === 'create' || $aksi === 'update') {
     } elseif (!in_array($penyimpanan, $simpanValid, true)) {
         balas('error', 'Lokasi penyimpanan barang tidak valid.', null, 400);
     }
-    if ($telepon !== '' && !preg_match('/^\+?[0-9][0-9\s-]{7,17}$/', $telepon)) {
+    if ($telepon !== '' && !preg_match('/^\+?[\d\s-]{8,20}$/', $telepon)) {
         balas('error', 'Nomor WhatsApp tidak valid.', null, 400);
     }
 

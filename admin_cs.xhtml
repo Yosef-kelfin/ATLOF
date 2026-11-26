@@ -4,8 +4,17 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dashboard CS - ATLOF</title>
+    <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
     <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="preload" href="fonts/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/Poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/Poppins-500-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/Poppins-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/Poppins-700-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/IBMPlexMono-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/IBMPlexMono-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 </head>
 
 <body>
@@ -31,7 +40,9 @@
         <div class="judul-bagian judul-dashboard">
             <div>
                 <h1>Dashboard CS</h1>
-                <p class="subjudul" id="subjudul-admin">Kelola barang titipan di kampusmu.</p>
+                <p class="subjudul" id="subjudul-admin">
+                    Kelola barang titipan di kampusmu.
+                </p>
             </div>
             <div class="tombol-dashboard">
                 <a href="buat_laporan.xhtml" class="tombol tombol-kuning">+ Buat laporan</a>
@@ -39,18 +50,29 @@
             </div>
         </div>
         <div class="ringkasan-admin">
-            <div class="angka-admin"><strong id="admin-total">0</strong><span>Total barang titipan</span></div>
-            <div class="angka-admin"><strong id="admin-menunggu">0</strong><span>Menunggu diterima</span></div>
-            <div class="angka-admin"><strong id="admin-diterima">0</strong><span>Di CS</span></div>
-            <div class="angka-admin"><strong id="admin-selesai">0</strong><span>Sudah dikembalikan</span></div>
+            <div class="angka-admin">
+                <strong id="admin-total">0</strong><span>Total barang titipan</span>
+            </div>
+            <div class="angka-admin">
+                <strong id="admin-menunggu">0</strong><span>Menunggu diterima</span>
+            </div>
+            <div class="angka-admin">
+                <strong id="admin-diterima">0</strong><span>Di CS</span>
+            </div>
+            <div class="angka-admin">
+                <strong id="admin-selesai">0</strong><span>Sudah dikembalikan</span>
+            </div>
         </div>
         <div class="panel-admin">
             <div>
                 <h2>Barang yang ditangani CS</h2>
-                <p class="teks-abu">Cari dan kelola barang titipan pada kampusmu.</p>
+                <p class="teks-abu">
+                    Cari dan kelola barang titipan pada kampusmu.
+                </p>
             </div>
             <div class="baris-kontak-cs">
-                <span>WhatsApp layanan: <strong id="nomor-wa-admin">Belum diatur</strong></span>
+                <span>WhatsApp layanan:
+                    <strong id="nomor-wa-admin">Belum diatur</strong></span>
                 <a href="profil.xhtml" class="tombol tombol-outline tombol-kecil">Atur di profil</a>
             </div>
         </div>
@@ -69,26 +91,34 @@
                 </select>
             </div>
         </div>
-        <p class="jumlah-hasil-admin" id="jumlah-hasil-admin">0 barang ditemukan</p>
+        <p class="jumlah-hasil-admin" id="jumlah-hasil-admin">
+            0 barang ditemukan
+        </p>
         <div id="daftar-admin" class="daftar-admin"></div>
-        <div id="kosong-admin" class="kosong" style="display:none;">
+        <div id="kosong-admin" class="kosong" style="display: none">
             <h2>Tidak ada barang yang sesuai</h2>
             <p>Coba ubah kata kunci atau filter status.</p>
         </div>
-        <div class="halaman-dashboard" id="halaman-dashboard" style="display:none;">
-            <button type="button" id="admin-sebelumnya" class="tombol tombol-outline tombol-kecil">Sebelumnya</button>
+        <div class="halaman-dashboard" id="halaman-dashboard" style="display: none">
+            <button type="button" id="admin-sebelumnya" class="tombol tombol-outline tombol-kecil">
+                Sebelumnya
+            </button>
             <span id="info-halaman-admin">Halaman 1 dari 1</span>
-            <button type="button" id="admin-berikutnya" class="tombol tombol-outline tombol-kecil">Berikutnya</button>
+            <button type="button" id="admin-berikutnya" class="tombol tombol-outline tombol-kecil">
+                Berikutnya
+            </button>
         </div>
     </div>
     <div class="footer-utama">
         <div class="container footer-isi">
             <div class="footer-tentang">
                 <div class="footer-merk">
-                    <h3>About ATLOF</h3>
+                    <h3>ATLOF</h3>
                 </div>
-                <p>Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang barang hilang dan
-                    ditemukan.</p>
+                <p>
+                    Atma Lost &amp; Found membantu warga kampus saling
+                    berbagi informasi tentang barang hilang dan ditemukan.
+                </p>
                 <span class="teks-emas">Temukan kembali, bantu kembali.</span>
             </div>
             <div class="footer-menu">
@@ -99,13 +129,18 @@
                 <a href="laporan_saya.xhtml">Kelola laporan</a>
             </div>
             <div class="footer-kampus">
-                <div><strong>Untuk Lingkungan Kampus</strong>
-                    <p>Universitas Atma Jaya Yogyakarta</p><small>Kontak pelapor melalui Microsoft Teams. Pengembalian
-                        barang dilakukan dengan verifikasi kepemilikan.</small>
+                <div>
+                    <strong>Untuk Lingkungan Kampus</strong>
+                    <p>Universitas Atma Jaya Yogyakarta</p>
+                    <small>Kontak pelapor melalui Microsoft Teams.
+                        Pengembalian barang dilakukan dengan verifikasi
+                        kepemilikan.</small>
                 </div>
             </div>
         </div>
-        <div class="container footer-bawah"><span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span></div>
+        <div class="container footer-bawah">
+            <span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span>
+        </div>
     </div>
     <script type="text/javascript" src="js/app.js"></script>
 </body>

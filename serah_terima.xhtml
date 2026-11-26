@@ -4,8 +4,17 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Kelola Serah Terima - ATLOF</title>
+    <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
     <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="preload" href="fonts/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/Poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/Poppins-500-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/Poppins-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/Poppins-700-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/IBMPlexMono-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/IBMPlexMono-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 </head>
 
 <body>
@@ -29,12 +38,12 @@
     </div>
     <div class="container bagian halaman-serah">
         <a href="admin_cs.xhtml" class="link-kembali">&#8592; Kembali ke Dashboard CS</a>
-        <div class="judul-bagian">
-            <div>
+        <div class="serah-kepala">
+            <div class="serah-kepala-teks">
                 <h1>Kelola Serah Terima</h1>
-                <p class="subjudul">Catat penerimaan dan pengembalian barang yang ditangani CS.</p>
+                <p>Catat penerimaan dan pengembalian barang yang ditangani CS.</p>
             </div>
-            <a class="tombol tombol-outline" href="riwayat_serah_terima.xhtml">Semua riwayat</a>
+            <a class="tombol tombol-putih tombol-kecil" href="riwayat_serah_terima.xhtml">Semua riwayat</a>
         </div>
 
         <div id="serah-tidak-ada" class="kotak-form" style="display:none;">
@@ -45,12 +54,24 @@
 
         <div id="serah-konten" style="display:none;">
             <div class="kotak-form serah-info-barang">
-                <h2 id="serah-nama-barang">Nama barang</h2>
+                <div class="serah-info-kepala">
+                    <h2 id="serah-nama-barang">Nama barang</h2>
+                    <strong id="serah-status-badge" class="serah-status-badge">Menunggu</strong>
+                </div>
                 <div class="serah-info-grid">
-                    <p><strong>ID laporan:</strong> <span id="serah-id-laporan"></span></p>
-                    <p><strong>Kampus CS:</strong> <span id="serah-kampus"></span></p>
-                    <p><strong>Lokasi penyimpanan:</strong> <span id="serah-penyimpanan"></span></p>
-                    <p><strong>Status serah terima:</strong> <span id="serah-status"></span></p>
+                    <p style="display:none;"><strong>ID laporan:</strong> <span id="serah-id-laporan"></span></p>
+                    <div class="serah-info-kotak">
+                        <span class="serah-info-label">Kampus CS</span>
+                        <strong id="serah-kampus">-</strong>
+                    </div>
+                    <div class="serah-info-kotak">
+                        <span class="serah-info-label">Lokasi penyimpanan</span>
+                        <strong id="serah-penyimpanan">-</strong>
+                    </div>
+                    <div class="serah-info-kotak">
+                        <span class="serah-info-label">Status serah terima</span>
+                        <strong id="serah-status" class="serah-status">-</strong>
+                    </div>
                 </div>
             </div>
 

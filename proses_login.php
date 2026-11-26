@@ -142,7 +142,7 @@ $_SESSION['telepon']      = $user['telepon'];
 $_SESSION['foto']         = $user['foto'] ?? null;
 
 // Tentukan halaman pengalihan berdasarkan peran (Role)
-$redirectUrl = ($user['role'] === 'admin_cs') ? 'admin_cs.xhtml' : $tujuan;
+$redirectUrl = ($user['role'] === 'admin_cs') ? 'admin_cs.xhtml' : 'index.xhtml';
 
 // Format data user untuk dikirim balik (tanpa field password)
 $userData = [
