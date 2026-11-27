@@ -238,6 +238,32 @@ Jika Apache/MySQL mati atau halaman dibuka langsung lewat browser, aplikasi masi
 | Perubahan CSS tidak terlihat | Browser memakai cache | Muat ulang dengan `Ctrl+F5`. |
 | Upload foto gagal | Folder `uploads/` tidak dapat ditulis | Pastikan `uploads/laporan/` dan `uploads/profil/` dapat ditulis Apache. |
 | Muncul 404 | Nama folder atau URL tidak sesuai | Sesuaikan URL dengan nama folder di `htdocs`. |
+| Halaman `.xhtml` tampil sebagai source code / teks biasa | Shared hosting tidak mengenali MIME `.xhtml` | Pastikan `.htaccess` memuat `AddType text/html .xhtml` (lihat 3.10). |
+| Font navigasi berkedip saat pertama dibuka | Font belum masuk cache browser | Hard refresh (`Ctrl+F5`). Poppins 500/600/700 sudah inline di CSS dan preload dipindah sebelum stylesheet. |
+
+### 3.10 Deployment ke InfinityFree / shared hosting
+
+`.htaccess` di root project sudah memuat pengaturan berikut:
+
+```apache
+DirectoryIndex index.xhtml index.html index.php
+
+AddType text/html .xhtml
+AddType font/woff2 .woff2
+AddType image/svg+xml .svg
+```
+
+`AddType text/html .xhtml` mencegah server shared mengirim file XHTML sebagai `text/plain`. Tanpa baris ini, browser menampilkan kode sumber halaman, bukan tampilan aplikasi.
+
+Langkah singkat:
+
+1. Upload seluruh isi folder project ke `htdocs` hosting.
+2. Pastikan `.htaccess` ikut ter-upload dengan nama persis `.htaccess`.
+3. Sesuaikan `$host`, `$user`, `$pass`, dan `$db` di `koneksi.php` dengan database hosting.
+4. Impor `database/atlof_db.sql` lewat phpMyAdmin hosting.
+5. Buka `https://<nama-akun>.infinityfreeapp.com/index.xhtml`.
+6. Cek header dengan `curl -I` pastikan `Content-Type: text/html`, bukan `text/plain`.
+7. Jika font masih terasa berkedip, hard refresh sekali setelah CSS terbaru ter-upload.
 
 ## 4. Akun uji dan peran
 
@@ -303,7 +329,7 @@ Akun `cs1@atlof.test` sampai `cs4@atlof.test` dengan password `ATLOFcs2026!` yan
 | `proses_daftar.php` | Membuat akun pengguna baru, cek duplikat email, hash password. |
 | `cek_sesi.php` | Endpoint JSON untuk memeriksa status login dan data user pada sesi PHP. |
 | `logout.php` | Menghapus `$_SESSION`, cookie sesi, dan mengarahkan ke beranda. |
-| `laporan.php` | API laporan: list, detail, create, update, delete, status user, status CS. |
+| `laporan.php` | API laporan: list, detail, create, update, delete, status user, status CS. Saat create/update oleh Admin CS, nomor WhatsApp yang diisi di form juga disinkronkan ke `users.telepon` dan `$_SESSION['telepon']`. |
 | `serah_terima.php` | API catatan penerimaan/pengembalian barang titipan CS. |
 | `simpan_profil.php` | Memperbarui nama, kontak Teams, dan nomor WhatsApp layanan CS. |
 | `ubah_password.php` | Memverifikasi password lama dan menyimpan password baru yang di-hash. |
@@ -534,7 +560,7 @@ Pembacaan data dilakukan **sekali di awal halaman**, lalu dipakai ulang oleh beb
 
 | Fitur | Fungsi | Cara mengambil data |
 | --- | --- | --- |
-| Beranda terbaru | `tampilkanBeranda()` | `semuaLaporan().slice(0, 6)` dari `cacheLaporan` |
+| Beranda terbaru | `tampilkanBeranda()` | `semuaLaporan().slice(0, 6)` dari `cacheLaporan`; `#tidak-ada-terbaru` ditampilkan bila hasil kosong |
 | Katalog | `filterBarang()` | `semuaLaporan()` lalu filter di browser |
 | Detail | `tampilkanDetail()` | `cariBarang(id)` dari `cacheLaporan` |
 | Laporan Saya | `perbaruiLaporanSaya()` | `laporanMilikSaya()` memfilter `cacheLaporan` berdasarkan email |
@@ -558,6 +584,7 @@ buat_laporan.xhtml
           ├─ validasi enum, tanggal, lokasi, penyimpanan
           ├─ upload foto ke uploads/laporan/ (jika ada)
           ├─ INSERT INTO laporan
+          ├─ jika Admin CS: sinkronkan telepon form ke users.telepon + sesi
           └─ JSON data laporan baru
     └─ redirect ke laporan_saya.xhtml
 ```
@@ -568,6 +595,7 @@ buat_laporan.xhtml
 - Saat submit, `FormData` ditambah `id`, lalu dikirim ke `laporan.php?aksi=update`.
 - Server memeriksa `laporan.user_id == $_SESSION['user_id']`. Jika bukan pemilik, respons `403`.
 - Jika lokasi penyimpanan berubah, catatan serah terima lama dihapus dan `status_cs` dihitung ulang.
+- Sinkronisasi nomor WhatsApp ke profil Admin CS juga berlaku pada `update`, bukan hanya `create`.
 
 #### Hapus laporan
 
@@ -843,7 +871,7 @@ Nama field mengikuti markup XHTML:
 | `detail-lokasi` | Wajib bila `lokasi = Lainnya`. |
 | `penyimpanan` | Wajib bila `jenis = ditemukan`; diabaikan untuk `hilang`. |
 | `deskripsi` | Ciri umum barang, wajib. |
-| `telepon` | Opsional. Untuk Admin CS, diisi nomor WhatsApp layanan CS yang tampil sebagai tautan kontak. |
+| `telepon` | Opsional. Untuk Admin CS, diisi nomor WhatsApp layanan CS; nilainya ikut disinkronkan ke `users.telepon`. Untuk user biasa, dipakai sebagai fallback **“Hubungi penemu via WhatsApp”** saat WA layanan CS belum tersedia. |
 | `foto` | Opsional, `multipart/form-data`. |
 | `id` | Dikirim pada `update`, `delete`, `status`, dan `status_cs`. |
 
@@ -908,7 +936,14 @@ Menerima `nama`, `teams`, dan `telepon`.
 - Nomor divalidasi dengan pola `^\+?[\d\s-]{8,20}$`: tanda `+` opsional, lalu 8–20 karakter angka, spasi, atau tanda hubung.
 - Data yang berhasil disimpan juga diperbarui di `$_SESSION` dan `sessionStorage.atlofAkun`.
 
-Tautan WhatsApp Admin CS ditampilkan di `detail.xhtml` untuk barang yang dititipkan di kampusnya. Nomornya sendiri tidak dicetak di halaman; pengguna hanya melihat tombol **Hubungi via WhatsApp**.
+Nomor WhatsApp yang diisi Admin CS di form `buat_laporan.xhtml` / `edit_laporan.xhtml` juga diperbarui ke profil dan sesi, sehingga langsung dibaca sebagai `telepon_cs` di halaman detail.
+
+Tautan WhatsApp ditampilkan di `detail.xhtml` untuk barang yang dititipkan di kampus CS. Nomornya sendiri tidak dicetak di halaman; pengguna hanya melihat tombol:
+
+- **Hubungi via WhatsApp** — memakai nomor layanan CS.
+- **Hubungi penemu via WhatsApp** — fallback memakai nomor opsional pelapor bila nomor layanan CS belum tersedia.
+
+Pada mode offline, nomor yang diketik CS di form juga disimpan ke `sessionStorage.atlofKontakAdmin` agar perilakunya sama.
 
 ### 10.2 `ubah_password.php`
 
@@ -972,6 +1007,9 @@ Aturan fallback:
 10. Buat laporan baru, ubah di `Laporan Saya`, coba status, lalu hapus. Cek di phpMyAdmin bahwa baris di `laporan` ikut berubah.
 11. Buka `profil.xhtml`, ubah nama/Teams/password, lalu cek kembali lewat `cek_sesi.php`.
 12. Pindah antarhalaman setelah login. Pastikan footer tidak bergeser saat data server selesai dimuat dan isian form yang sedang diketik tidak ter-reset.
+13. Pastikan profil Admin CS Kampus 1 masih kosong bagian WhatsApp. Login sebagai `kelvin@students.uajy.ac.id`, buat laporan **ditemukan** dengan penyimpanan `CS Kampus 1` dan isi WA opsional, lalu buka detailnya. Tombol yang muncul harus **Hubungi penemu via WhatsApp** dengan tautan `wa.me/<nomor user>`.
+14. Login sebagai `cs1uajy@gmail.com` dan buka detail laporan tersebut. Akan muncul tombol **Atur nomor WA layanan**. Isi nomor lewat `profil.xhtml`, lalu buka kembali detail sebagai user: tombol berubah menjadi **Hubungi via WhatsApp** memakai nomor CS.
+15. Buat laporan sebagai Admin CS dengan mengisi nomor WA di form laporan tanpa mengubah profil lebih dulu. Cek `cek_sesi.php`: `telepon` otomatis terisi, dan detail laporan langsung menampilkan nomor CS.
 
 Contoh pengecekan API dengan `curl`. Login dulu untuk menyimpan cookie sesi, lalu panggil endpoint:
 
@@ -1040,7 +1078,7 @@ Endpoint `laporan.php?aksi=status_cs` dipakai untuk status penanganan CS; endpoi
 | `logo` | Blok merek ATLOF berisi ikon SVG dan teks | Semua halaman |
 | `menu-links` | Menu navigasi utama | Semua halaman |
 | `menu-akun` | Area tombol akun di kanan header | Semua halaman |
-| `aktif` | Menandai link navigasi yang sedang dibuka | `buat_laporan`, `detail`, `edit_laporan`, `index`, `katalog`, `laporan_saya`, dan link Dashboard CS yang dibuat JavaScript |
+| `aktif` | Menandai link navigasi yang sedang dibuka; garis kuning dianimasikan halus dengan `::after` dan `@keyframes garis-menu-masuk` | `buat_laporan`, `detail`, `edit_laporan`, `index`, `katalog`, `laporan_saya`, dan link Dashboard CS yang dibuat JavaScript |
 | `tombol-keluar` | Varian tombol keluar di header | Dibuat JavaScript setelah login |
 
 ### 15.3 Tombol dan baris aksi
@@ -1122,7 +1160,7 @@ Urutan hari dimulai dari **Minggu**: `Min`, `Sen`, `Sel`, `Rab`, `Kam`, `Jum`, `
 | `gambar-barang` | Tautan pembungkus gambar barang | Dibuat `app.js` |
 | `isi-kartu` | Bagian teks di dalam kartu barang | Dibuat `app.js` |
 | `lencana-baris` | Baris berisi lencana jenis barang | `detail` dan dibuat `app.js` |
-| `lencana` | Lencana kecil (IBM Plex Sans 11px) untuk jenis barang dan status | `detail` dan dibuat `app.js` |
+| `lencana` | Lencana kecil (Poppins 12px) untuk jenis barang dan status | `detail` dan dibuat `app.js` |
 | `hilang` | Modifier lencana untuk laporan hilang | Dibuat `app.js` melalui `class="lencana ' + b.jenis + '"` |
 | `ditemukan` | Modifier lencana untuk laporan ditemukan | Dibuat `app.js` melalui `class="lencana ' + b.jenis + '"` |
 | `kartu-kelola` | Satu kartu laporan di Laporan Saya: info barang, panel status, dan tombol aksi | Dibuat `app.js` |
@@ -1306,6 +1344,7 @@ Semua halaman memiliki `#menu-akun` di header. ID tersebut dipakai `app.js` untu
 | `bagian-cara` | Seksi cara kerja ATLOF |
 | `bagian-terbaru` | Seksi laporan terbaru |
 | `barang-terbaru` | Grid laporan terbaru |
+| `tidak-ada-terbaru` | Pesan saat belum ada laporan terbaru; diatur `tampilkanBeranda()` |
 
 ### 16.2 `katalog.xhtml`
 
@@ -1406,10 +1445,18 @@ ID di halaman ini sama dengan `buat_laporan.xhtml`, kecuali form utama memakai `
 | `detail-deskripsi` | Deskripsi barang |
 | `detail-info-kontak` | Keterangan cara menghubungi |
 | `detail-teams` | Tautan Microsoft Teams |
+| `detail-atur-wa` | Tombol **Atur nomor WA layanan** untuk Admin CS kampus terkait saat WA layanan kosong |
 | `detail-whatsapp` | Kotak kontak WhatsApp |
 | `detail-whatsapp-link` | Tautan WhatsApp |
 
-Nomor WhatsApp tidak dicetak di halaman detail. Jika nomor tersedia, `#detail-whatsapp` ditampilkan dengan tombol **Hubungi via WhatsApp**; jika tidak, kontak CS menampilkan keterangan bahwa nomor layanan belum tersedia. ID `detail-nomor` sudah dihapus.
+Nomor WhatsApp tidak dicetak di halaman detail. ID `detail-nomor` sudah dihapus. Perilaku `#detail-whatsapp`:
+
+- Barang `Dibawa penemu`: tombol **Hubungi via WhatsApp** memakai nomor opsional pelapor bila diisi.
+- Barang titipan CS dengan WA layanan tersedia: tombol **Hubungi via WhatsApp** memakai nomor CS, `#detail-teams` disembunyikan.
+- Barang titipan CS dengan WA layanan kosong tetapi pelapor mengisi WA opsional:
+  - Pengguna biasa melihat tombol **Hubungi penemu via WhatsApp** memakai nomor pelapor.
+  - Admin CS kampus terkait hanya melihat tombol **Atur nomor WA layanan**; tombol WA penemu disembunyikan agar tidak ada dua aksi bersaing.
+- Barang titipan CS dengan keduanya kosong: WhatsApp dan Teams tersembunyi; Admin CS kampus terkait mendapat tombol **Atur nomor WA layanan** ke `profil.xhtml` memakai `#detail-atur-wa`.
 
 ### 16.7 `login.xhtml`
 
@@ -1577,7 +1624,7 @@ Kartu barang yang dibuat `app.js`:
 ```html
 <div class="kartu-barang">
   <a class="gambar-barang" href="detail.xhtml?id=1">
-    <img src="images/ph-tumbler.png" alt="Gambar barang" />
+    <img src="images/ph-tumbler.png" alt="" />
   </a>
   <div class="isi-kartu">
     <div class="lencana-baris">
@@ -1675,7 +1722,9 @@ Notifikasi gagal yang dibuat `app.js`:
 - `#email`, `#password`, `#nama`, dan `#teams` muncul di beberapa halaman. Ini aman karena setiap halaman dimuat terpisah.
 - `#menu-akun` ada di semua halaman dan isinya diganti oleh `app.js` setelah login.
 - Kalender dimulai hari Minggu: `Min`, `Sen`, `Sel`, `Rab`, `Kam`, `Jum`, `Sab`.
-- Nomor WhatsApp tidak lagi dicetak di `detail.xhtml`; halaman hanya menampilkan tombol **Hubungi via WhatsApp**. ID `detail-nomor` sudah dihapus.
+- Nomor WhatsApp tidak lagi dicetak di `detail.xhtml`; halaman hanya menampilkan tombol **Hubungi via WhatsApp** atau **Hubungi penemu via WhatsApp**. ID `detail-nomor` sudah dihapus.
+- Gambar pada kartu barang memakai `alt=""` karena nama barang sudah tersedia pada tautan di dalam kartu yang sama.
+- Judul hero tidak memakai `<br />`; baris mengikuti lebar container agar tidak dipaksa putus di layar sempit.
 - ID laporan tidak ditampilkan di kartu Dashboard CS dan info serah terima, tetapi tetap dipakai pada URL `detail.xhtml?id=...` dan `serah_terima.xhtml?id=...`.
 - Cache `atlofCacheLaporan` dan `atlofCacheSerah` dipakai untuk render pertama; keduanya dihapus saat logout atau sesi berakhir.
 - Class berikut dipakai di HTML atau dibuat JavaScript, tetapi belum punya aturan CSS:
@@ -1713,10 +1762,15 @@ Notifikasi gagal yang dibuat `app.js`:
 
 ### 20.3 Font
 
-- IBM Plex Sans tetap dipakai untuk seluruh teks sans melalui `--font-display` dan `--font-body`.
-- Poppins weight 400, 500, 600, dan 700 (`Poppins-<weight>-latin.woff2`) hanya dipakai di navbar melalui `--font-navbar`: logo, menu navigasi, dan tombol Masuk/Daftar/Keluar di header.
-- IBM Plex Mono dipakai untuk label kecil, kalender, dan ID melalui `--font-mono`. Lencana jenis barang dan label pada daftar identitas profil memakai IBM Plex Sans, seperti dijelaskan di 20.4.
-- Semua halaman memuat font utama dengan `<link rel="preload" ... as="font" type="font/woff2" crossorigin="anonymous">` agar teks tidak berkedip saat font selesai dimuat.
+- **IBM Plex Sans** dipakai untuk teks UI/body melalui `--font-display` dan `--font-body`: judul, paragraf, label, dan nilai.
+- **Poppins** dipakai untuk navbar melalui `--font-navbar`: logo, menu navigasi, dan tombol Masuk/Daftar/Keluar di header.
+  - Weight **500, 600, dan 700** di-inline sebagai `data:font/woff2;base64,...` di `css/style.css`. Navbar tidak melakukan request font terpisah, sehingga tidak ada perubahan font yang terlihat saat halaman pertama dibuka.
+  - Weight **400** tetap memakai `fonts/Poppins-400-latin.woff2` dan di-preload.
+- `@font-face "Poppins Fallback"` memakai `local("Arial")` dengan penyesuaian metrik agar metriknya mirip Poppins. Fallback ini dipakai sebelum Poppins selesai dimuat.
+- **IBM Plex Mono** dipakai untuk kalender, ID, dan metadata teknis melalui `--font-mono`.
+- Percobaan memakai **Lora** untuk prosa panjang sudah dibatalkan karena perpaduannya terasa kurang nyaman di aplikasi ini; file Lora sudah dihapus.
+- Semua `@font-face` memakai `font-display: swap`, bukan `optional` atau `block`: teks tidak pernah kosong, tidak permanen memakai fallback, dan tidak mengalami FOIT.
+- Tag `<link rel="preload" ... as="font" type="font/woff2" crossorigin="anonymous">` diletakkan **sebelum** stylesheet dan hanya untuk 4 font yang masih dimuat lewat file: IBM Plex Sans, Poppins 400, IBM Plex Mono 400, dan IBM Plex Mono 600.
 
 ### 20.4 Tipografi daftar identitas profil
 
@@ -1744,8 +1798,37 @@ Aturan responsif berada di bagian 23 `css/style.css` dengan breakpoint berikut:
 
 - Semua halaman memakai `<meta name="viewport" content="width=device-width, initial-scale=1" />`.
 - Favicon memakai `images/logo-atlof-ikon.svg`.
-- Font Poppins, IBM Plex Sans, dan IBM Plex Mono di-preload dari folder `fonts/`.
+- IBM Plex Sans, Poppins 400, dan IBM Plex Mono 400/600 di-preload dari folder `fonts/` sebelum stylesheet. Poppins 500/600/700 tidak di-preload karena sudah inline di `css/style.css`.
+- `.htaccess` menetapkan `AddType text/html .xhtml`, `font/woff2`, dan `image/svg+xml` agar shared hosting tidak mengirim XHTML sebagai `text/plain`.
 - Placeholder gambar barang tersedia di `images/placeholder.png` dan `images/ph-<kategori>.png`.
+
+### 20.7 Palet warna
+
+Warna utama didefinisikan sebagai token di `:root` `css/style.css`:
+
+| Token | Nilai | Pemakaian |
+| --- | --- | --- |
+| `--warna-primer` | `#0B467A` | Header, footer, identitas utama |
+| `--warna-primer-terang` | `#0a5896` | Hero, tautan, focus ring |
+| `--warna-emas` | `#f3ad1b` | Logo, tombol kuning, garis menu aktif |
+| `--warna-emas-terang` | `#ffc94d` | Teks emas di atas hero (kontras 4.81:1) |
+| `--warna-teks` | `#1f2937` | Teks utama |
+| `--warna-teks-muda` | `#536379` | Teks sekunder (kontras 5.49:1 di atas latar, 6.12:1 di atas putih) |
+| `--warna-latar` | `#eef3f9` | Latar halaman |
+
+Footer kini memakai `--warna-primer` sehingga hanya ada dua nuansa biru: primary dan primary terang. Kartu terakhir yang ganjil pada grid dua kolom Dashboard CS dibuat full-width lewat `.baris-admin:last-child:nth-child(odd)`.
+
+Status memakai tiga pasangan warna yang sama di semua halaman (kartu barang, detail, katalog, Laporan Saya, Dashboard CS, dan serah terima):
+
+| Status | Warna teks | Warna latar | Makna |
+| --- | --- | --- | --- |
+| `menunggu` | `#9a6700` | `#fff7e6` | Masih dicari / belum dikembalikan / menunggu diterima |
+| `diterima` | `#07558c` | `#e7f1fb` | Sudah ditemukan / diterima CS |
+| `selesai` | `#1c6b45` | `#e8f7ee` | Sudah dikembalikan |
+
+Mapping dari nilai laporan dan `status_cs` ke tiga kelas tersebut ada di `kelasStatus()` pada `js/app.js`.
+
+Teks sekunder kecil juga diperkuat: `.lencana`, `.nama-hari`, `.serah-jenis`, `.serah-meta-label`, `.serah-info-label`, `.serah-status-badge`, dan `.footer-bawah` memakai minimal 12px; `.bantuan`, `.catatan-status`, dan `.isi-kartu` pada katalog memakai 13px. `.serah-waktu` dinaikkan ke berat 500.
 
 ## 21. Riwayat revisi
 
@@ -1762,3 +1845,18 @@ Revisi terakhir menyelaraskan kode dan dokumentasi:
 9. Nomor urut pada kartu penerimaan dan pengembalian dihapus.
 10. Border berwarna pada kartu serah terima dihapus; garis pemisah dirapikan di bawah tanggal dan dibuat inset.
 11. Panduan menjalankan aplikasi secara lokal diperluas dari pembuatan database sampai penanganan masalah umum.
+12. `.htaccess` ditambah `AddType text/html .xhtml`, `font/woff2`, dan `image/svg+xml` untuk deployment ke shared hosting seperti InfinityFree.
+13. Font navbar tidak lagi berkedip: Poppins 500/600/700 di-inline, fallback metrik ditambahkan, preload dipindah sebelum stylesheet dan dikurangi menjadi 4 font.
+14. WA yang diisi Admin CS di form laporan ikut disinkronkan ke profil dan sesi, baik saat create maupun update.
+15. Detail laporan menampilkan **Hubungi penemu via WhatsApp** sebagai fallback bila WA layanan CS kosong, serta tombol **Atur nomor WA layanan** untuk CS kampus terkait.
+16. Beranda memiliki empty state `#tidak-ada-terbaru`; judul hero tidak memakai `<br />`; gambar kartu memakai `alt=""`.
+17. Dokumentasi pengujian diperluas dengan alur WA CS kosong dan fallback penemu.
+18. Nomor CS dari `sessionStorage` tidak lagi dipakai saat mode server; data basi dibersihkan saat sesi PHP dimuat dan saat logout. Tombol **Atur nomor WA layanan** memakai elemen khusus `#detail-atur-wa`, bukan `#detail-teams`.
+19. Garis kuning indikator menu aktif dianimasikan halus saat hover dan saat pindah halaman, dengan fallback `prefers-reduced-motion`.
+20. Jumlah barang per halaman Dashboard CS diubah dari 5 menjadi 4 agar grid dua kolom tidak meninggalkan kartu tunggal di halaman pertama.
+21. Warna disatukan ke token CSS: footer memakai biru header, teks emas di hero lebih terang, teks sekunder naik ke `#5c6a7a`, dan kartu ganjil terakhir dibuat full-width.
+22. Status diberi warna konsisten: kuning untuk menunggu, biru untuk diterima, hijau untuk selesai, dipakai di katalog, detail, Laporan Saya, Dashboard CS, dan serah terima.
+23. Badge jenis di halaman detail ikut memperbarui class warnanya (`hilang`/`ditemukan`), sehingga tidak lagi tampil abu-abu.
+24. Teks sekunder disatukan ke `#536379` dan ukuran minimal teks kecil dinaikkan ke 12px/13px agar lebih mudah dibaca.
+25. Detail titipan CS tidak lagi menampilkan dua aksi sekaligus: CS melihat **Atur nomor WA layanan**, pengguna melihat **Hubungi penemu via WhatsApp**.
+26. Perpaduan Poppins + Lora untuk prosa panjang dicoba lalu dibatalkan karena terasa kurang nyaman; konfigurasi font dikembalikan ke Poppins (navbar), IBM Plex Sans (teks UI/body), dan IBM Plex Mono (kalender/ID). Perbaikan kontras teks sekunder tetap dipertahankan.

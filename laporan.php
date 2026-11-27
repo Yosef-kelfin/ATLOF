@@ -68,6 +68,28 @@ function tanggalKeSql($nilai)
     return sprintf('%04d-%02d-%02d', $tahun, $bulan, $hari);
 }
 
+/**
+ * Admin CS mengisi nomor WhatsApp layanan langsung di form laporan.
+ * Sinkronkan ke profil CS agar halaman detail membaca nomor yang sama
+ * melalui kolom users.telepon (telepon_cs pada query laporan).
+ */
+function sinkronkanTeleponCs($conn, $userId, $role, $telepon)
+{
+    if ($role !== 'admin_cs' || $telepon === '') {
+        return;
+    }
+
+    $stmt = mysqli_prepare($conn, 'UPDATE users SET telepon = ? WHERE id = ?');
+    if (!$stmt) {
+        return;
+    }
+    mysqli_stmt_bind_param($stmt, 'si', $telepon, $userId);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+
+    $_SESSION['telepon'] = $telepon;
+}
+
 function ubahBarisLaporan($baris)
 {
     $foto = $baris['foto'] ?? '';
@@ -352,6 +374,7 @@ if ($aksi === 'create' || $aksi === 'update') {
         }
         $idBaru = mysqli_insert_id($conn);
         mysqli_stmt_close($stmt);
+        sinkronkanTeleponCs($conn, $userId, $role, $telepon);
 
         $baris = ambilSatuLaporan($conn, $idBaru);
         balas('success', 'Laporan berhasil dibuat.', ubahBarisLaporan($baris));
@@ -425,6 +448,7 @@ if ($aksi === 'create' || $aksi === 'update') {
         balas('error', 'Gagal memperbarui laporan: ' . $pesanGagal, null, 500);
     }
     mysqli_stmt_close($stmt);
+    sinkronkanTeleponCs($conn, $userId, $role, $telepon);
 
     $baris = ambilSatuLaporan($conn, $id);
     balas('success', 'Laporan berhasil diperbarui.', ubahBarisLaporan($baris));

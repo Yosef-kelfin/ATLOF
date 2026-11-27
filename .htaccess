@@ -1,2 +1,7 @@
 # DirectoryIndex bawaan XAMPP tidak mencantumkan index.xhtml.
 DirectoryIndex index.xhtml index.html index.php
+
+# Pastikan shared hosting (mis. InfinityFree) tidak mengirim .xhtml sebagai text/plain.
+AddType text/html .xhtml
+AddType font/woff2 .woff2
+AddType image/svg+xml .svg

@@ -10,11 +10,11 @@
 // ========================================================
 // Lapisan data server (MySQL melalui PHP)
 // ========================================================
-var modeServer = window.location.protocol === "http:" || window.location.protocol === "https:";
+var modeServer = window.location.protocol === 'http:' || window.location.protocol === 'https:';
 // Cache sesi dipakai agar render pertama memakai data dari halaman sebelumnya,
 // sehingga tinggi halaman (termasuk footer) tidak bergeser setelah fetch selesai.
-var cacheLaporan = bacaSesi("atlofCacheLaporan", null); // null = belum dimuat dari server
-var cacheSerah = bacaSesi("atlofCacheSerah", null);     // null = belum dimuat dari server
+var cacheLaporan = bacaSesi('atlofCacheLaporan', null); // null = belum dimuat dari server
+var cacheSerah = bacaSesi('atlofCacheSerah', null); // null = belum dimuat dari server
 
 function mintaJson(url, opsi) {
     return fetch(url, opsi || {}).then(function (res) {
@@ -26,74 +26,93 @@ function mintaJson(url, opsi) {
 
 function kirimData(url, data) {
     return mintaJson(url, {
-        method: "POST",
+        method: 'POST',
         body: data,
-        headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" }
+        headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
     });
 }
 
 // Sesi PHP adalah sumber kebenaran saat aplikasi berjalan lewat Apache.
 function muatSesiServer() {
     if (!modeServer) return Promise.resolve();
-    return mintaJson("cek_sesi.php", {
-        headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" },
-        cache: "no-store"
-    }).then(function (hasil) {
-        var data = hasil.data;
-        if (hasil.ok && data && data.is_logged && data.user) {
-            sessionStorage.setItem("atlofMasuk", "ya");
-            sessionStorage.setItem("atlofSesiServer", "ya");
-            simpanSesi("atlofAkun", {
-                nama: data.user.nama,
-                email: data.user.email,
-                teams: data.user.teams || "",
-                telepon: data.user.telepon || "",
-                role: data.user.role || "user",
-                kampus_cs: data.user.kampus_cs || null,
-                foto: data.user.foto || ""
-            });
-        } else if (sessionStorage.getItem("atlofSesiServer") === "ya") {
-            sessionStorage.removeItem("atlofMasuk");
-            sessionStorage.removeItem("atlofAkun");
-            sessionStorage.removeItem("atlofSesiServer");
-            sessionStorage.removeItem("atlofCacheLaporan");
-            sessionStorage.removeItem("atlofCacheSerah");
-            cacheLaporan = null;
-            cacheSerah = null;
-        }
-    }).catch(function () {
-        // Server tidak dapat dihubungi: biarkan mode lokal tetap berjalan.
-    });
+    return mintaJson('cek_sesi.php', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+        cache: 'no-store',
+    })
+        .then(function (hasil) {
+            var data = hasil.data;
+            if (hasil.ok && data && data.is_logged && data.user) {
+                sessionStorage.setItem('atlofMasuk', 'ya');
+                sessionStorage.setItem('atlofSesiServer', 'ya');
+                simpanSesi('atlofAkun', {
+                    nama: data.user.nama,
+                    email: data.user.email,
+                    teams: data.user.teams || '',
+                    telepon: data.user.telepon || '',
+                    role: data.user.role || 'user',
+                    kampus_cs: data.user.kampus_cs || null,
+                    foto: data.user.foto || '',
+                });
+                // Sesi PHP adalah sumber kebenaran. Buang nomor CS lama yang mungkin
+                // tertinggal di sessionStorage dari simulasi offline sebelumnya.
+                sessionStorage.removeItem('atlofKontakAdmin');
+            } else if (sessionStorage.getItem('atlofSesiServer') === 'ya') {
+                sessionStorage.removeItem('atlofMasuk');
+                sessionStorage.removeItem('atlofAkun');
+                sessionStorage.removeItem('atlofSesiServer');
+                sessionStorage.removeItem('atlofCacheLaporan');
+                sessionStorage.removeItem('atlofCacheSerah');
+                cacheLaporan = null;
+                cacheSerah = null;
+            }
+        })
+        .catch(function () {
+            // Server tidak dapat dihubungi: biarkan mode lokal tetap berjalan.
+        });
 }
 
 function muatLaporanServer() {
     if (!modeServer || !sudahMasuk()) return Promise.resolve();
-    return mintaJson("laporan.php?aksi=list", {
-        headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" },
-        cache: "no-store"
-    }).then(function (hasil) {
-        if (hasil.ok && hasil.data && hasil.data.status === "success" && Array.isArray(hasil.data.data)) {
-            cacheLaporan = hasil.data.data;
-            simpanSesi("atlofCacheLaporan", cacheLaporan);
-        }
-    }).catch(function () {
-        // Tetap gunakan data lokal bila server gagal.
-    });
+    return mintaJson('laporan.php?aksi=list', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+        cache: 'no-store',
+    })
+        .then(function (hasil) {
+            if (
+                hasil.ok &&
+                hasil.data &&
+                hasil.data.status === 'success' &&
+                Array.isArray(hasil.data.data)
+            ) {
+                cacheLaporan = hasil.data.data;
+                simpanSesi('atlofCacheLaporan', cacheLaporan);
+            }
+        })
+        .catch(function () {
+            // Tetap gunakan data lokal bila server gagal.
+        });
 }
 
 function muatSerahServer() {
     if (!modeServer || !adalahAdmin()) return Promise.resolve();
-    return mintaJson("serah_terima.php?aksi=list", {
-        headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" },
-        cache: "no-store"
-    }).then(function (hasil) {
-        if (hasil.ok && hasil.data && hasil.data.status === "success" && Array.isArray(hasil.data.data)) {
-            cacheSerah = hasil.data.data;
-            simpanSesi("atlofCacheSerah", cacheSerah);
-        }
-    }).catch(function () {
-        // Tetap gunakan data lokal bila server gagal.
-    });
+    return mintaJson('serah_terima.php?aksi=list', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+        cache: 'no-store',
+    })
+        .then(function (hasil) {
+            if (
+                hasil.ok &&
+                hasil.data &&
+                hasil.data.status === 'success' &&
+                Array.isArray(hasil.data.data)
+            ) {
+                cacheSerah = hasil.data.data;
+                simpanSesi('atlofCacheSerah', cacheSerah);
+            }
+        })
+        .catch(function () {
+            // Tetap gunakan data lokal bila server gagal.
+        });
 }
 
 function ambil(id) {
@@ -110,28 +129,28 @@ var pesanTimer = null;
 
 // Tampilkan pesan di halaman, bukan alert(), agar tidak memutus alur visual.
 function pesan(isi) {
-    var kotak = ambil("pesan-global");
+    var kotak = ambil('pesan-global');
     if (!kotak) {
         kotak = document.createElementNS
-            ? document.createElementNS("http://www.w3.org/1999/xhtml", "div")
-            : document.createElement("div");
-        kotak.id = "pesan-global";
-        kotak.title = "Klik untuk menutup pesan";
-        kotak.setAttribute("role", "status");
-        kotak.setAttribute("aria-live", "polite");
+            ? document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
+            : document.createElement('div');
+        kotak.id = 'pesan-global';
+        kotak.title = 'Klik untuk menutup pesan';
+        kotak.setAttribute('role', 'status');
+        kotak.setAttribute('aria-live', 'polite');
         kotak.onclick = function () {
-            this.style.display = "none";
+            this.style.display = 'none';
         };
         document.body.appendChild(kotak);
     }
-    var gagal = String(isi).toLowerCase().indexOf("berhasil") == -1;
-    kotak.className = "pesan-form" + (gagal ? " gagal" : "");
+    var gagal = String(isi).toLowerCase().indexOf('berhasil') == -1;
+    kotak.className = 'pesan-form' + (gagal ? ' gagal' : '');
     kotak.textContent = isi;
-    kotak.style.display = "block";
-    if (typeof setTimeout == "function") {
+    kotak.style.display = 'block';
+    if (typeof setTimeout == 'function') {
         if (pesanTimer) clearTimeout(pesanTimer);
         pesanTimer = setTimeout(function () {
-            kotak.style.display = "none";
+            kotak.style.display = 'none';
         }, 6000);
     }
 }
@@ -154,7 +173,7 @@ function bacaSesi(nama, nilaiAwal) {
 }
 
 function sudahMasuk() {
-    return sessionStorage.getItem("atlofMasuk") == "ya";
+    return sessionStorage.getItem('atlofMasuk') == 'ya';
 }
 
 // Akun dan password disimpan di localStorage browser, bukan di database.
@@ -176,16 +195,16 @@ function bacaLokal(nama, nilaiAwal) {
 }
 
 function semuaAkunLokal() {
-    return bacaLokal("atlofAkunLokal", {});
+    return bacaLokal('atlofAkunLokal', {});
 }
 
 function kataSandiCS() {
-    return bacaLokal("atlofPasswordCS", {});
+    return bacaLokal('atlofPasswordCS', {});
 }
 
 // Cari akun berdasarkan email, baik akun pengguna maupun Admin CS.
 function cariAkunTerdaftar(email) {
-    var alamat = (email || "").toLowerCase();
+    var alamat = (email || '').toLowerCase();
     var daftar = semuaAkunLokal();
     if (daftar[alamat]) return daftar[alamat];
     var admin = cariAkunAdmin(alamat);
@@ -194,10 +213,10 @@ function cariAkunTerdaftar(email) {
     return {
         nama: admin.nama,
         email: admin.email,
-        teams: "",
-        password: kataSandi[admin.email] || "ATLOFcs2026!",
-        role: "admin_cs",
-        kampus_cs: admin.kampus
+        teams: '',
+        password: kataSandi[admin.email] || 'ATLOFcs2026!',
+        role: 'admin_cs',
+        kampus_cs: admin.kampus,
     };
 }
 
@@ -207,13 +226,13 @@ function simpanKataSandi(email, password) {
     if (cariAkunAdmin(alamat)) {
         var kataSandi = kataSandiCS();
         kataSandi[alamat] = password;
-        simpanLokal("atlofPasswordCS", kataSandi);
+        simpanLokal('atlofPasswordCS', kataSandi);
         return;
     }
     var daftar = semuaAkunLokal();
     if (daftar[alamat]) {
         daftar[alamat].password = password;
-        simpanLokal("atlofAkunLokal", daftar);
+        simpanLokal('atlofAkunLokal', daftar);
     }
 }
 
@@ -221,18 +240,18 @@ function simpanKataSandi(email, password) {
 // Untuk login lewat Apache, akun diambil dari tabel users di database.
 // Password uji offline: ATLOFcs2026! (jangan digunakan sebagai password sungguhan).
 var adminCS = [
-    { email: "cs1@atlof.test", nama: "Admin CS Kampus 1", kampus: "Kampus 1" },
-    { email: "cs2@atlof.test", nama: "Admin CS Kampus 2", kampus: "Kampus 2" },
-    { email: "cs3@atlof.test", nama: "Admin CS Kampus 3", kampus: "Kampus 3" },
-    { email: "cs4@atlof.test", nama: "Admin CS Kampus 4", kampus: "Kampus 4" }
+    { email: 'cs1@atlof.test', nama: 'Admin CS Kampus 1', kampus: 'Kampus 1' },
+    { email: 'cs2@atlof.test', nama: 'Admin CS Kampus 2', kampus: 'Kampus 2' },
+    { email: 'cs3@atlof.test', nama: 'Admin CS Kampus 3', kampus: 'Kampus 3' },
+    { email: 'cs4@atlof.test', nama: 'Admin CS Kampus 4', kampus: 'Kampus 4' },
 ];
 
 function dataAkun() {
-    return bacaSesi("atlofAkun", { nama: "Pengguna ATLOF", email: "", teams: "", role: "user" });
+    return bacaSesi('atlofAkun', { nama: 'Pengguna ATLOF', email: '', teams: '', role: 'user' });
 }
 
 function adalahAdmin() {
-    return sudahMasuk() && dataAkun().role == "admin_cs";
+    return sudahMasuk() && dataAkun().role == 'admin_cs';
 }
 
 function cariAkunAdmin(email) {
@@ -244,17 +263,17 @@ function cariAkunAdmin(email) {
 
 // Data kontak setiap akun CS disimpan terpisah menurut alamat email.
 function kontakAdmin() {
-    return bacaSesi("atlofKontakAdmin", {});
+    return bacaSesi('atlofKontakAdmin', {});
 }
 
 function nomorAdmin(kampus) {
     for (var i = 0; i < adminCS.length; i++) {
         if (adminCS[i].kampus == kampus) {
             var semua = kontakAdmin();
-            return semua[adminCS[i].email] ? semua[adminCS[i].email].telepon || "" : "";
+            return semua[adminCS[i].email] ? semua[adminCS[i].email].telepon || '' : '';
         }
     }
-    return "";
+    return '';
 }
 
 function akunAdmin(keterangan) {
@@ -263,15 +282,15 @@ function akunAdmin(keterangan) {
     return {
         nama: data.nama || keterangan.nama,
         email: keterangan.email,
-        teams: data.teams || "",
-        telepon: data.telepon || "",
-        role: "admin_cs",
-        kampus_cs: keterangan.kampus
+        teams: data.teams || '',
+        telepon: data.telepon || '',
+        role: 'admin_cs',
+        kampus_cs: keterangan.kampus,
     };
 }
 
 function laporanSaya() {
-    return bacaSesi("atlofLaporan", []);
+    return bacaSesi('atlofLaporan', []);
 }
 
 function laporanMilikSaya() {
@@ -286,64 +305,75 @@ function laporanMilikSaya() {
 
 function namaKampus(nama) {
     var gedung = {
-        "Kampus 1": "Gedung Alfonsus Mrican",
-        "Kampus 2": "Gedung Thomas Aquinas",
-        "Kampus 3": "Gedung Bonaventura",
-        "Kampus 4": "Gedung Theresa"
+        'Kampus 1': 'Gedung Alfonsus Mrican',
+        'Kampus 2': 'Gedung Thomas Aquinas',
+        'Kampus 3': 'Gedung Bonaventura',
+        'Kampus 4': 'Gedung Theresa',
     };
-    if (gedung[nama]) return nama + " - " + gedung[nama];
-    if (nama.indexOf("CS Kampus ") == 0) {
-        var kampus = nama.replace("CS ", "");
-        if (gedung[kampus]) return "CS " + namaKampus(kampus);
+    if (gedung[nama]) return nama + ' - ' + gedung[nama];
+    if (nama.indexOf('CS Kampus ') == 0) {
+        var kampus = nama.replace('CS ', '');
+        if (gedung[kampus]) return 'CS ' + namaKampus(kampus);
     }
     return nama;
 }
 
 function halamanIni() {
-    var url = window.location.pathname.split("/");
-    return url[url.length - 1] || "index.xhtml";
+    var url = window.location.pathname.split('/');
+    return url[url.length - 1] || 'index.xhtml';
 }
 
 function tujuanSebelumnya() {
     var parameter = new URLSearchParams(window.location.search);
-    var tujuan = parameter.get("tujuan") || "katalog.xhtml";
+    var tujuan = parameter.get('tujuan') || 'katalog.xhtml';
     // Hanya boleh pindah ke halaman dalam folder ini.
     if (!/^[a-z_]+\.xhtml(?:\?id=\d+)?$/.test(tujuan)) {
-        tujuan = "katalog.xhtml";
+        tujuan = 'katalog.xhtml';
     }
     return tujuan;
 }
 
 function halamanAkun() {
-    return halamanIni() == "login.xhtml" || halamanIni() == "pendaftaran.xhtml";
+    return halamanIni() == 'login.xhtml' || halamanIni() == 'pendaftaran.xhtml';
 }
 
 function pergiKeAkses(tujuan) {
-    window.location.href = "akses_akun.xhtml?tujuan=" + encodeURIComponent(tujuan);
+    window.location.href = 'akses_akun.xhtml?tujuan=' + encodeURIComponent(tujuan);
 }
 
 function keluar() {
-    sessionStorage.removeItem("atlofMasuk");
-    sessionStorage.removeItem("atlofAkun");
-    sessionStorage.removeItem("atlofSesiServer");
-    sessionStorage.removeItem("atlofCacheLaporan");
-    sessionStorage.removeItem("atlofCacheSerah");
+    sessionStorage.removeItem('atlofMasuk');
+    sessionStorage.removeItem('atlofAkun');
+    sessionStorage.removeItem('atlofSesiServer');
+    sessionStorage.removeItem('atlofCacheLaporan');
+    sessionStorage.removeItem('atlofCacheSerah');
+    sessionStorage.removeItem('atlofKontakAdmin');
     if (window.fetch && modeServer) {
-        fetch("logout.php", {
-            method: "POST",
-            headers: { "X-Requested-With": "XMLHttpRequest" }
+        fetch('logout.php', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
         }).finally(function () {
-            window.location.href = "index.xhtml";
+            window.location.href = 'index.xhtml';
         });
     } else {
-        window.location.href = "index.xhtml";
+        window.location.href = 'index.xhtml';
     }
 }
 
 // Cegah kunjungan langsung ke halaman khusus pengguna sebelum masuk.
 // Pemeriksaan dijalankan setelah sesi PHP selesai dimuat.
-var halamanKhusus = ["katalog.xhtml", "detail.xhtml", "buat_laporan.xhtml", "edit_laporan.xhtml", "laporan_saya.xhtml", "profil.xhtml", "admin_cs.xhtml", "serah_terima.xhtml", "riwayat_serah_terima.xhtml"];
-var halamanAdminSaja = ["admin_cs.xhtml", "serah_terima.xhtml", "riwayat_serah_terima.xhtml"];
+var halamanKhusus = [
+    'katalog.xhtml',
+    'detail.xhtml',
+    'buat_laporan.xhtml',
+    'edit_laporan.xhtml',
+    'laporan_saya.xhtml',
+    'profil.xhtml',
+    'admin_cs.xhtml',
+    'serah_terima.xhtml',
+    'riwayat_serah_terima.xhtml',
+];
+var halamanAdminSaja = ['admin_cs.xhtml', 'serah_terima.xhtml', 'riwayat_serah_terima.xhtml'];
 var sekarang = halamanIni();
 
 function cekAksesHalaman() {
@@ -352,7 +382,7 @@ function cekAksesHalaman() {
         return false;
     }
     if (sudahMasuk() && !adalahAdmin() && halamanAdminSaja.indexOf(sekarang) != -1) {
-        window.location.href = "index.xhtml";
+        window.location.href = 'index.xhtml';
         return false;
     }
     return true;
@@ -362,28 +392,35 @@ var headerAkunSiap = false;
 
 // Atur tombol Masuk/Daftar pada header.
 function pasangHeaderAkun() {
-    if (!ambil("menu-akun") || !sudahMasuk() || headerAkunSiap) return;
+    if (!ambil('menu-akun') || !sudahMasuk() || headerAkunSiap) return;
     headerAkunSiap = true;
-    ambil("menu-akun").innerHTML =
+    ambil('menu-akun').innerHTML =
         '<a href="profil.xhtml" class="tombol tombol-outline tombol-kecil">Profil</a>' +
         '<button id="keluar-header" type="button" class="tombol tombol-kecil tombol-keluar">Keluar</button>';
-    ambil("keluar-header").onclick = keluar;
+    ambil('keluar-header').onclick = keluar;
     if (adalahAdmin()) {
-        var daftarMenu = document.querySelector(".menu-links");
+        var daftarMenu = document.querySelector('.menu-links');
         if (daftarMenu) {
-            daftarMenu.innerHTML += '<a href="admin_cs.xhtml"' +
-                (sekarang == "admin_cs.xhtml" ? ' class="aktif"' : '') + '>Dashboard CS</a>';
+            daftarMenu.innerHTML +=
+                '<a href="admin_cs.xhtml"' +
+                (sekarang == 'admin_cs.xhtml' ? ' class="aktif"' : '') +
+                '>Dashboard CS</a>';
         }
     }
 }
 
 // Tautan katalog / laporan dari beranda harus melewati halaman akun.
 function pasangTautanAkses() {
-    var tautan = document.getElementsByTagName("a");
+    var tautan = document.getElementsByTagName('a');
     for (var t = 0; t < tautan.length; t++) {
         (function (link) {
-            var halaman = link.getAttribute("href") || "";
-            if (!sudahMasuk() && /^(katalog|detail|buat_laporan|edit_laporan|laporan_saya|profil|admin_cs|serah_terima|riwayat_serah_terima)\.xhtml/.test(halaman)) {
+            var halaman = link.getAttribute('href') || '';
+            if (
+                !sudahMasuk() &&
+                /^(katalog|detail|buat_laporan|edit_laporan|laporan_saya|profil|admin_cs|serah_terima|riwayat_serah_terima)\.xhtml/.test(
+                    halaman,
+                )
+            ) {
                 link.onclick = function (event) {
                     event.preventDefault();
                     pergiKeAkses(halaman);
@@ -395,22 +432,33 @@ function pasangTautanAkses() {
 
 // Ubah teks pengguna menjadi teks aman sebelum dimasukkan ke innerHTML.
 function bersihkan(nilai) {
-    return String(nilai).replace(/&/g, "&amp;").replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    return String(nilai)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 }
 
 function namaKategori(kategori) {
-    if (kategori == "pakaian_jaket") return "Pakaian / Jaket";
-    if (kategori == "dompet_kartu") return "Dompet / Kartu";
-    if (kategori == "lainnya") return "Lainnya";
+    if (kategori == 'pakaian_jaket') return 'Pakaian / Jaket';
+    if (kategori == 'dompet_kartu') return 'Dompet / Kartu';
+    if (kategori == 'lainnya') return 'Lainnya';
     return kategori.charAt(0).toUpperCase() + kategori.slice(1);
 }
 
 function namaStatus(status) {
-    if (status == "masih_dicari") return "Masih dicari";
-    if (status == "belum_dikembalikan") return "Belum dikembalikan";
-    if (status == "sudah_ditemukan") return "Sudah ditemukan";
-    return "Sudah dikembalikan";
+    if (status == 'masih_dicari') return 'Masih dicari';
+    if (status == 'belum_dikembalikan') return 'Belum dikembalikan';
+    if (status == 'sudah_ditemukan') return 'Sudah ditemukan';
+    return 'Sudah dikembalikan';
+}
+
+// Satu kelas warna untuk semua status, dipakai kartu, detail, katalog, dan dashboard.
+function kelasStatus(status) {
+    if (status == 'sudah_dikembalikan' || status == 'dikembalikan' || status == 'selesai')
+        return 'selesai';
+    if (status == 'sudah_ditemukan' || status == 'diterima') return 'diterima';
+    return 'menunggu';
 }
 
 function semuaLaporan() {
@@ -423,24 +471,48 @@ function semuaLaporan() {
 }
 
 function gambarKategori(kategori) {
-    return "images/ph-" + kategori + ".png";
+    return 'images/ph-' + kategori + '.png';
 }
 
 function buatKartu(b) {
-    return '<div class="kartu-barang">' +
-        '<a class="gambar-barang" href="detail.xhtml?id=' + b.id + '"><img src="' + bersihkan(b.gambar) + '" alt="Gambar barang" /></a>' +
+    return (
+        '<div class="kartu-barang">' +
+        '<a class="gambar-barang" href="detail.xhtml?id=' +
+        b.id +
+        '"><img src="' +
+        bersihkan(b.gambar) +
+        '" alt="" /></a>' +
         '<div class="isi-kartu">' +
-        '<div class="lencana-baris"><span class="lencana ' + b.jenis + '">' + (b.jenis == "hilang" ? "Hilang" : "Ditemukan") + '</span>' +
-        '<span class="lencana">' + namaStatus(b.status) + '</span></div>' +
-        '<h3><a href="detail.xhtml?id=' + b.id + '">' + bersihkan(b.nama) + '</a></h3>' +
-        '<p>' + namaKategori(b.kategori) + '</p>' +
-        '<p>Lokasi: ' + bersihkan(namaKampus(b.lokasi)) + '</p><p>' + bersihkan(b.tanggal) + '</p></div></div>';
+        '<div class="lencana-baris"><span class="lencana ' +
+        b.jenis +
+        '">' +
+        (b.jenis == 'hilang' ? 'Hilang' : 'Ditemukan') +
+        '</span>' +
+        '<span class="lencana ' +
+        kelasStatus(b.status) +
+        '">' +
+        namaStatus(b.status) +
+        '</span></div>' +
+        '<h3><a href="detail.xhtml?id=' +
+        b.id +
+        '">' +
+        bersihkan(b.nama) +
+        '</a></h3>' +
+        '<p>' +
+        namaKategori(b.kategori) +
+        '</p>' +
+        '<p>Lokasi: ' +
+        bersihkan(namaKampus(b.lokasi)) +
+        '</p><p>' +
+        bersihkan(b.tanggal) +
+        '</p></div></div>'
+    );
 }
 
 function tampilkanBarang(id, daftar) {
     var bagian = ambil(id);
     if (!bagian) return;
-    var hasil = "";
+    var hasil = '';
     for (var i = 0; i < daftar.length; i++) {
         hasil += buatKartu(daftar[i]);
     }
@@ -449,27 +521,30 @@ function tampilkanBarang(id, daftar) {
 
 // Beranda: pengunjung melihat petunjuk, pengguna masuk melihat laporan terbaru.
 function tampilkanBeranda() {
-    if (!ambil("bagian-cara") || !sudahMasuk()) return;
-    ambil("bagian-cara").style.display = "none";
-    ambil("bagian-terbaru").style.display = "block";
-    ambil("aksi-beranda-tamu").style.display = "none";
-    ambil("aksi-beranda-masuk").style.display = "flex";
-    tampilkanBarang("barang-terbaru", semuaLaporan().slice(0, 6));
+    if (!ambil('bagian-cara') || !sudahMasuk()) return;
+    ambil('bagian-cara').style.display = 'none';
+    ambil('bagian-terbaru').style.display = 'block';
+    ambil('aksi-beranda-tamu').style.display = 'none';
+    ambil('aksi-beranda-masuk').style.display = 'flex';
+    var terbaru = semuaLaporan().slice(0, 6);
+    tampilkanBarang('barang-terbaru', terbaru);
+    var kosong = ambil('tidak-ada-terbaru');
+    if (kosong) kosong.style.display = terbaru.length ? 'none' : 'block';
 }
 
 // Halaman pilihan masuk / daftar.
-if (ambil("akses-masuk")) {
+if (ambil('akses-masuk')) {
     var lokasiTujuan = encodeURIComponent(tujuanSebelumnya());
-    ambil("akses-masuk").href = "login.xhtml?tujuan=" + lokasiTujuan;
-    ambil("akses-daftar").href = "pendaftaran.xhtml?tujuan=" + lokasiTujuan;
+    ambil('akses-masuk').href = 'login.xhtml?tujuan=' + lokasiTujuan;
+    ambil('akses-daftar').href = 'pendaftaran.xhtml?tujuan=' + lokasiTujuan;
     if (sudahMasuk()) window.location.href = tujuanSebelumnya();
 }
 
 // Pindah antara form login dan daftar dengan tujuan tetap sama.
 if (halamanAkun()) {
     var tujuanLogin = encodeURIComponent(tujuanSebelumnya());
-    if (ambil("link-daftar")) ambil("link-daftar").href = "pendaftaran.xhtml?tujuan=" + tujuanLogin;
-    if (ambil("link-login")) ambil("link-login").href = "login.xhtml?tujuan=" + tujuanLogin;
+    if (ambil('link-daftar')) ambil('link-daftar').href = 'pendaftaran.xhtml?tujuan=' + tujuanLogin;
+    if (ambil('link-login')) ambil('link-login').href = 'login.xhtml?tujuan=' + tujuanLogin;
 }
 
 function cekEmail(email) {
@@ -477,60 +552,66 @@ function cekEmail(email) {
 }
 
 // Pendaftaran akun pengguna baru (mendukung backend PHP & fallback offline).
-if (ambil("form-daftar")) {
-    if (ambil("input-tujuan-daftar")) {
-        ambil("input-tujuan-daftar").value = tujuanSebelumnya();
+if (ambil('form-daftar')) {
+    if (ambil('input-tujuan-daftar')) {
+        ambil('input-tujuan-daftar').value = tujuanSebelumnya();
     }
     var paramDaftar = new URLSearchParams(window.location.search);
-    if (paramDaftar.has("error")) {
-        pesan(paramDaftar.get("error"));
+    if (paramDaftar.has('error')) {
+        pesan(paramDaftar.get('error'));
     }
 
-    ambil("form-daftar").onsubmit = function (event) {
+    ambil('form-daftar').onsubmit = function (event) {
         event.preventDefault();
-        var nama = ambil("nama").value.trim();
-        var email = ambil("email").value.trim().toLowerCase();
-        var teams = ambil("teams").value.trim();
-        var password = ambil("password").value;
-        var konfirmasi = ambil("konfirmasi") ? ambil("konfirmasi").value : "";
+        var nama = ambil('nama').value.trim();
+        var email = ambil('email').value.trim().toLowerCase();
+        var teams = ambil('teams').value.trim();
+        var password = ambil('password').value;
+        var konfirmasi = ambil('konfirmasi') ? ambil('konfirmasi').value : '';
         var tujuan = tujuanSebelumnya();
 
         if (!nama || !cekEmail(email) || !teams || password.length < 8) {
-            pesan("Lengkapi data dengan benar. Password minimal 8 karakter.");
+            pesan('Lengkapi data dengan benar. Password minimal 8 karakter.');
             return;
         }
         if (password !== konfirmasi) {
-            pesan("Konfirmasi password tidak sama.");
+            pesan('Konfirmasi password tidak sama.');
             return;
         }
 
         function fallbackDaftarOffline() {
             if (cariAkunAdmin(email) || semuaAkunLokal()[email]) {
-                pesan("Email ini sudah terdaftar. Silakan masuk.");
+                pesan('Email ini sudah terdaftar. Silakan masuk.');
                 return;
             }
-            var akunBaru = { nama: nama, email: email, teams: teams, password: password, role: "user" };
+            var akunBaru = {
+                nama: nama,
+                email: email,
+                teams: teams,
+                password: password,
+                role: 'user',
+            };
             var daftar = semuaAkunLokal();
             daftar[email] = akunBaru;
-            simpanLokal("atlofAkunLokal", daftar);
-            simpanSesi("atlofAkun", { nama: nama, email: email, teams: teams, role: "user" });
-            sessionStorage.setItem("atlofMasuk", "ya");
+            simpanLokal('atlofAkunLokal', daftar);
+            simpanSesi('atlofAkun', { nama: nama, email: email, teams: teams, role: 'user' });
+            sessionStorage.setItem('atlofMasuk', 'ya');
             window.location.href = tujuan;
         }
 
         if (modeServer) {
             var dataKirim = new FormData();
-            dataKirim.append("nama", nama);
-            dataKirim.append("email", email);
-            dataKirim.append("teams", teams);
-            dataKirim.append("password", password);
-            dataKirim.append("konfirmasi", konfirmasi);
-            dataKirim.append("tujuan", tujuan);
+            dataKirim.append('nama', nama);
+            dataKirim.append('email', email);
+            dataKirim.append('teams', teams);
+            dataKirim.append('password', password);
+            dataKirim.append('konfirmasi', konfirmasi);
+            dataKirim.append('tujuan', tujuan);
 
-            fetch("proses_daftar.php", {
-                method: "POST",
+            fetch('proses_daftar.php', {
+                method: 'POST',
                 body: dataKirim,
-                headers: { "X-Requested-With": "XMLHttpRequest" }
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
             })
                 .then(function (res) {
                     return res.json().then(function (data) {
@@ -539,20 +620,20 @@ if (ambil("form-daftar")) {
                 })
                 .then(function (hasil) {
                     var data = hasil.data;
-                    if (!hasil.ok || data.status !== "success") {
-                        pesan(data.message || "Pendaftaran gagal.");
+                    if (!hasil.ok || data.status !== 'success') {
+                        pesan(data.message || 'Pendaftaran gagal.');
                         return;
                     }
                     var user = data.user;
-                    simpanSesi("atlofAkun", {
+                    simpanSesi('atlofAkun', {
                         nama: user.nama,
                         email: user.email,
-                        teams: user.teams || "",
-                        telepon: user.telepon || "",
-                        role: user.role || "user"
+                        teams: user.teams || '',
+                        telepon: user.telepon || '',
+                        role: user.role || 'user',
                     });
-                    sessionStorage.setItem("atlofMasuk", "ya");
-                    sessionStorage.setItem("atlofSesiServer", "ya");
+                    sessionStorage.setItem('atlofMasuk', 'ya');
+                    sessionStorage.setItem('atlofSesiServer', 'ya');
                     window.location.href = data.redirect || tujuan;
                 })
                 .catch(function () {
@@ -565,62 +646,69 @@ if (ambil("form-daftar")) {
 }
 
 // Login pengguna dan Admin CS (mendukung backend PHP & fallback offline).
-if (ambil("form-login")) {
-    if (ambil("input-tujuan")) {
-        ambil("input-tujuan").value = tujuanSebelumnya();
+if (ambil('form-login')) {
+    if (ambil('input-tujuan')) {
+        ambil('input-tujuan').value = tujuanSebelumnya();
     }
     var paramUrl = new URLSearchParams(window.location.search);
-    if (paramUrl.has("error")) {
-        pesan(paramUrl.get("error"));
+    if (paramUrl.has('error')) {
+        pesan(paramUrl.get('error'));
     }
-    if (paramUrl.has("pesan")) {
-        pesan(paramUrl.get("pesan"));
+    if (paramUrl.has('pesan')) {
+        pesan(paramUrl.get('pesan'));
     }
 
-    ambil("form-login").onsubmit = function (event) {
+    ambil('form-login').onsubmit = function (event) {
         event.preventDefault();
-        var email = ambil("email").value.trim().toLowerCase();
-        var password = ambil("password").value;
+        var email = ambil('email').value.trim().toLowerCase();
+        var password = ambil('password').value;
         var tujuan = tujuanSebelumnya();
 
         if (!cekEmail(email) || !password) {
-            pesan("Masukkan email dan password yang benar.");
+            pesan('Masukkan email dan password yang benar.');
             return;
         }
 
         function fallbackLoginOffline() {
             var akun = cariAkunTerdaftar(email);
             if (!akun) {
-                pesan("Email belum terdaftar. Silakan daftar terlebih dahulu.");
+                pesan('Email belum terdaftar. Silakan daftar terlebih dahulu.');
                 return;
             }
             if (akun.password != password) {
-                pesan(akun.role == "admin_cs"
-                    ? "Password akun CS tidak sesuai."
-                    : "Password tidak sesuai.");
+                pesan(
+                    akun.role == 'admin_cs'
+                        ? 'Password akun CS tidak sesuai.'
+                        : 'Password tidak sesuai.',
+                );
                 return;
             }
-            if (akun.role == "admin_cs") {
-                simpanSesi("atlofAkun", akunAdmin(cariAkunAdmin(email)));
-                sessionStorage.setItem("atlofMasuk", "ya");
-                window.location.href = "admin_cs.xhtml";
+            if (akun.role == 'admin_cs') {
+                simpanSesi('atlofAkun', akunAdmin(cariAkunAdmin(email)));
+                sessionStorage.setItem('atlofMasuk', 'ya');
+                window.location.href = 'admin_cs.xhtml';
             } else {
-                simpanSesi("atlofAkun", { nama: akun.nama, email: akun.email, teams: akun.teams, role: "user" });
-                sessionStorage.setItem("atlofMasuk", "ya");
-                window.location.href = "index.xhtml";
+                simpanSesi('atlofAkun', {
+                    nama: akun.nama,
+                    email: akun.email,
+                    teams: akun.teams,
+                    role: 'user',
+                });
+                sessionStorage.setItem('atlofMasuk', 'ya');
+                window.location.href = 'index.xhtml';
             }
         }
 
         if (modeServer) {
             var dataKirim = new FormData();
-            dataKirim.append("email", email);
-            dataKirim.append("password", password);
-            dataKirim.append("tujuan", tujuan);
+            dataKirim.append('email', email);
+            dataKirim.append('password', password);
+            dataKirim.append('tujuan', tujuan);
 
-            fetch("proses_login.php", {
-                method: "POST",
+            fetch('proses_login.php', {
+                method: 'POST',
                 body: dataKirim,
-                headers: { "X-Requested-With": "XMLHttpRequest" }
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
             })
                 .then(function (res) {
                     return res.json().then(function (data) {
@@ -629,34 +717,35 @@ if (ambil("form-login")) {
                 })
                 .then(function (hasil) {
                     var data = hasil.data;
-                    if (!hasil.ok || data.status !== "success") {
-                        pesan(data.message || "Email atau password salah.");
+                    if (!hasil.ok || data.status !== 'success') {
+                        pesan(data.message || 'Email atau password salah.');
                         return;
                     }
                     var user = data.user;
-                    if (user.role === "admin_cs") {
-                        simpanSesi("atlofAkun", {
+                    if (user.role === 'admin_cs') {
+                        simpanSesi('atlofAkun', {
                             nama: user.nama,
                             email: user.email,
-                            teams: user.teams || "",
-                            telepon: user.telepon || "",
-                            role: "admin_cs",
-                            kampus_cs: user.kampus_cs
+                            teams: user.teams || '',
+                            telepon: user.telepon || '',
+                            role: 'admin_cs',
+                            kampus_cs: user.kampus_cs,
                         });
-                        sessionStorage.setItem("atlofMasuk", "ya");
-                        sessionStorage.setItem("atlofSesiServer", "ya");
-                        window.location.href = data.redirect || "admin_cs.xhtml";
+                        sessionStorage.setItem('atlofMasuk', 'ya');
+                        sessionStorage.setItem('atlofSesiServer', 'ya');
+                        window.location.href = data.redirect || 'admin_cs.xhtml';
                     } else {
-                        simpanSesi("atlofAkun", {
+                        simpanSesi('atlofAkun', {
                             nama: user.nama,
                             email: user.email,
-                            teams: user.teams || "",
-                            telepon: user.telepon || "",
-                            role: "user"
+                            teams: user.teams || '',
+                            telepon: user.telepon || '',
+                            role: 'user',
                         });
-                        sessionStorage.setItem("atlofMasuk", "ya");
-                        sessionStorage.setItem("atlofSesiServer", "ya");
-                        window.location.href = data.redirect || (tujuan == "admin_cs.xhtml" ? "index.xhtml" : tujuan);
+                        sessionStorage.setItem('atlofMasuk', 'ya');
+                        sessionStorage.setItem('atlofSesiServer', 'ya');
+                        window.location.href =
+                            data.redirect || (tujuan == 'admin_cs.xhtml' ? 'index.xhtml' : tujuan);
                     }
                 })
                 .catch(function () {
@@ -669,28 +758,28 @@ if (ambil("form-login")) {
 }
 
 // Tombol mata untuk menampilkan/menyembunyikan semua input password.
-var tombolMataList = document.querySelectorAll(".tombol-mata");
+var tombolMataList = document.querySelectorAll('.tombol-mata');
 for (var i = 0; i < tombolMataList.length; i++) {
     (function (tombol) {
         tombol.onclick = function (event) {
             event.preventDefault();
-            var targetId = this.getAttribute("data-target");
+            var targetId = this.getAttribute('data-target');
             var inputTarget = ambil(targetId);
             if (!inputTarget) return;
 
-            var ikonBuka = this.querySelector(".ikon-mata-buka");
-            var ikonTutup = this.querySelector(".ikon-mata-tutup");
+            var ikonBuka = this.querySelector('.ikon-mata-buka');
+            var ikonTutup = this.querySelector('.ikon-mata-tutup');
 
-            if (inputTarget.type === "password") {
-                inputTarget.type = "text";
-                if (ikonBuka) ikonBuka.style.display = "block";
-                if (ikonTutup) ikonTutup.style.display = "none";
-                this.setAttribute("aria-label", "Sembunyikan password");
+            if (inputTarget.type === 'password') {
+                inputTarget.type = 'text';
+                if (ikonBuka) ikonBuka.style.display = 'block';
+                if (ikonTutup) ikonTutup.style.display = 'none';
+                this.setAttribute('aria-label', 'Sembunyikan password');
             } else {
-                inputTarget.type = "password";
-                if (ikonBuka) ikonBuka.style.display = "none";
-                if (ikonTutup) ikonTutup.style.display = "block";
-                this.setAttribute("aria-label", "Tampilkan password");
+                inputTarget.type = 'password';
+                if (ikonBuka) ikonBuka.style.display = 'none';
+                if (ikonTutup) ikonTutup.style.display = 'block';
+                this.setAttribute('aria-label', 'Tampilkan password');
             }
         };
     })(tombolMataList[i]);
@@ -698,40 +787,41 @@ for (var i = 0; i < tombolMataList.length; i++) {
 
 // Katalog: pencarian, kategori, jenis, lokasi dan status.
 function filterBarang() {
-    if (!ambil("semua-barang")) return;
-    var kata = ambil("cari").value.toLowerCase();
-    var jenis = ambil("filter-jenis").value;
-    var kategori = ambil("filter-kategori").value;
-    var lokasi = ambil("filter-lokasi").value;
-    var status = ambil("filter-status").value;
+    if (!ambil('semua-barang')) return;
+    var kata = ambil('cari').value.toLowerCase();
+    var jenis = ambil('filter-jenis').value;
+    var kategori = ambil('filter-kategori').value;
+    var lokasi = ambil('filter-lokasi').value;
+    var status = ambil('filter-status').value;
     var hasil = [];
     var daftar = semuaLaporan();
     for (var i = 0; i < daftar.length; i++) {
         var b = daftar[i];
-        if ((b.nama + " " + b.lokasi + " " + b.deskripsi).toLowerCase().indexOf(kata) == -1) continue;
+        if ((b.nama + ' ' + b.lokasi + ' ' + b.deskripsi).toLowerCase().indexOf(kata) == -1)
+            continue;
         if (jenis && b.jenis != jenis) continue;
         if (kategori && b.kategori != kategori) continue;
         if (lokasi && b.lokasi != lokasi) continue;
         if (status && b.status != status) continue;
         hasil.push(b);
     }
-    tampilkanBarang("semua-barang", hasil);
-    teks("jumlah-barang", hasil.length + " laporan ditemukan");
-    ambil("tidak-ada").style.display = hasil.length ? "none" : "block";
+    tampilkanBarang('semua-barang', hasil);
+    teks('jumlah-barang', hasil.length + ' laporan ditemukan');
+    ambil('tidak-ada').style.display = hasil.length ? 'none' : 'block';
 }
 
-if (ambil("semua-barang")) {
-    ambil("tombol-filter").onclick = filterBarang;
-    ambil("form-cari").onsubmit = function (event) {
+if (ambil('semua-barang')) {
+    ambil('tombol-filter').onclick = filterBarang;
+    ambil('form-cari').onsubmit = function (event) {
         event.preventDefault();
         filterBarang();
     };
-    ambil("tombol-reset").onclick = function () {
-        ambil("cari").value = "";
-        ambil("filter-jenis").value = "";
-        ambil("filter-kategori").value = "";
-        ambil("filter-lokasi").value = "";
-        ambil("filter-status").value = "";
+    ambil('tombol-reset').onclick = function () {
+        ambil('cari').value = '';
+        ambil('filter-jenis').value = '';
+        ambil('filter-kategori').value = '';
+        ambil('filter-lokasi').value = '';
+        ambil('filter-status').value = '';
         filterBarang();
     };
 }
@@ -746,123 +836,203 @@ function cariBarang(id) {
 
 // Detail barang.
 function tampilkanDetail() {
-    if (!ambil("detail-nama") || !sudahMasuk()) return;
-    var detailId = Number(new URLSearchParams(window.location.search).get("id"));
+    if (!ambil('detail-nama') || !sudahMasuk()) return;
+    var detailId = Number(new URLSearchParams(window.location.search).get('id'));
     var detail = cariBarang(detailId);
     if (detail) {
-        ambil("detail-foto").src = detail.gambar;
-        teks("detail-nama", detail.nama);
-        teks("detail-jenis", detail.jenis == "hilang" ? "Hilang" : "Ditemukan");
-        teks("detail-status", namaStatus(detail.status));
-        teks("detail-pelapor", "Dilaporkan oleh " + detail.pelapor);
-        teks("detail-kategori", namaKategori(detail.kategori));
-        teks("detail-lokasi", detail.detail_lokasi ? namaKampus(detail.lokasi) + " - " + detail.detail_lokasi : namaKampus(detail.lokasi));
-        teks("detail-tanggal", detail.tanggal);
-        teks("detail-simpan", namaKampus(detail.penyimpanan));
-        teks("detail-deskripsi", detail.deskripsi);
-        var titipCS = detail.penyimpanan && detail.penyimpanan.indexOf("CS Kampus ") == 0;
-        var telepon = detail.telepon || "";
-        var teams = detail.teams || "";
+        ambil('detail-foto').src = detail.gambar;
+        teks('detail-nama', detail.nama);
+        var jenisDetail = ambil('detail-jenis');
+        jenisDetail.className = 'lencana ' + detail.jenis;
+        teks('detail-jenis', detail.jenis == 'hilang' ? 'Hilang' : 'Ditemukan');
+        var statusDetail = ambil('detail-status');
+        statusDetail.className = 'lencana ' + kelasStatus(detail.status);
+        teks('detail-status', namaStatus(detail.status));
+        teks('detail-pelapor', 'Dilaporkan oleh ' + detail.pelapor);
+        teks('detail-kategori', namaKategori(detail.kategori));
+        teks(
+            'detail-lokasi',
+            detail.detail_lokasi
+                ? namaKampus(detail.lokasi) + ' - ' + detail.detail_lokasi
+                : namaKampus(detail.lokasi),
+        );
+        teks('detail-tanggal', detail.tanggal);
+        teks('detail-simpan', namaKampus(detail.penyimpanan));
+        teks('detail-deskripsi', detail.deskripsi);
+        var titipCS = detail.penyimpanan && detail.penyimpanan.indexOf('CS Kampus ') == 0;
+        var telepon = detail.telepon || '';
+        var teams = detail.teams || '';
+        var kontakPenemu = false;
+        var timTeams = ambil('detail-teams');
+        var aturWa = ambil('detail-atur-wa');
+        if (aturWa) aturWa.style.display = 'none';
         if (titipCS) {
-            var lokasiCS = detail.penyimpanan.replace("CS ", "");
-            telepon = detail.telepon_cs || nomorAdmin(lokasiCS);
-            teks("detail-info-kontak", "Barang ditangani oleh " + namaKampus(detail.penyimpanan) +
-                ". Hubungi CS kampus untuk proses pengambilan dan verifikasi kepemilikan.");
-            ambil("detail-teams").style.display = "none";
+            var lokasiCS = detail.penyimpanan.replace('CS ', '');
+            // Saat online, nomor CS bersumber dari database lewat telepon_cs.
+            // localStorage hanya dipakai sebagai fallback offline.
+            var teleponCs = detail.telepon_cs || (!modeServer ? nomorAdmin(lokasiCS) : '');
+            if (timTeams) timTeams.style.display = 'none';
+            if (teleponCs) {
+                telepon = teleponCs;
+                teks(
+                    'detail-info-kontak',
+                    'Barang ditangani oleh ' +
+                        namaKampus(detail.penyimpanan) +
+                        '. Hubungi CS kampus untuk proses pengambilan dan verifikasi kepemilikan.',
+                );
+            } else if (telepon) {
+                if (adalahAdmin() && dataAkun().kampus_cs == lokasiCS) {
+                    teks(
+                        'detail-info-kontak',
+                        'Barang ditangani oleh ' +
+                            namaKampus(detail.penyimpanan) +
+                            '. Nomor WhatsApp layanan belum tersedia. Atur nomor layanan agar pemilik dapat menghubungi CS.',
+                    );
+                    if (aturWa) aturWa.style.display = 'inline-flex';
+                    telepon = '';
+                } else {
+                    kontakPenemu = true;
+                    teks(
+                        'detail-info-kontak',
+                        'Nomor WhatsApp layanan CS belum tersedia. Hubungi penemu untuk menanyakan informasi barang dan lakukan verifikasi kepemilikan sebelum pengambilan.',
+                    );
+                }
+            } else {
+                teks(
+                    'detail-info-kontak',
+                    'Barang ditangani oleh ' +
+                        namaKampus(detail.penyimpanan) +
+                        '. Nomor WhatsApp layanan belum tersedia.',
+                );
+                if (aturWa && adalahAdmin() && dataAkun().kampus_cs == lokasiCS) {
+                    aturWa.style.display = 'inline-flex';
+                }
+            }
         } else {
-            teks("detail-info-kontak", "Hubungi pelapor untuk menanyakan informasi dan verifikasi barang.");
-            ambil("detail-teams").href = teams ?
-                "https://teams.microsoft.com/l/chat/0/0?users=" + encodeURIComponent(teams) :
-                "https://teams.microsoft.com/";
+            teks(
+                'detail-info-kontak',
+                'Hubungi pelapor untuk menanyakan informasi dan verifikasi barang.',
+            );
+            if (timTeams) {
+                timTeams.textContent = 'Hubungi via Microsoft Teams';
+                timTeams.href = teams
+                    ? 'https://teams.microsoft.com/l/chat/0/0?users=' + encodeURIComponent(teams)
+                    : 'https://teams.microsoft.com/';
+                timTeams.style.display = 'inline-flex';
+            }
         }
         if (telepon) {
-            var nomorWhatsapp = telepon.replace(/[^0-9]/g, "");
-            if (nomorWhatsapp.charAt(0) == "0") nomorWhatsapp = "62" + nomorWhatsapp.slice(1);
-            ambil("detail-whatsapp-link").href = "https://wa.me/" + nomorWhatsapp;
-            ambil("detail-whatsapp").style.display = "flex";
-        } else if (titipCS) {
-            teks("detail-info-kontak", "Barang ditangani oleh " + namaKampus(detail.penyimpanan) +
-                ". Nomor WhatsApp layanan belum tersedia.");
+            var nomorWhatsapp = telepon.replace(/[^0-9]/g, '');
+            if (nomorWhatsapp.charAt(0) == '0') nomorWhatsapp = '62' + nomorWhatsapp.slice(1);
+            var tautanWa = ambil('detail-whatsapp-link');
+            tautanWa.textContent = kontakPenemu
+                ? 'Hubungi penemu via WhatsApp'
+                : 'Hubungi via WhatsApp';
+            tautanWa.href = 'https://wa.me/' + nomorWhatsapp;
+            ambil('detail-whatsapp').style.display = 'flex';
+        } else {
+            ambil('detail-whatsapp').style.display = 'none';
         }
     } else {
-        teks("detail-nama", "Laporan tidak ditemukan");
+        teks('detail-nama', 'Laporan tidak ditemukan');
     }
 }
 
 // Pengguna memilih status lewat dropdown, lalu menekan Simpan status.
 function pilihanStatus(b, awalan) {
-    var pilihan = b.jenis == "hilang" ? [
-        ["masih_dicari", "Masih dicari"],
-        ["sudah_ditemukan", "Sudah ditemukan"]
-    ] : [
-        ["belum_dikembalikan", "Belum dikembalikan"],
-        ["sudah_dikembalikan", "Sudah dikembalikan"]
-    ];
+    var pilihan =
+        b.jenis == 'hilang'
+            ? [
+                  ['masih_dicari', 'Masih dicari'],
+                  ['sudah_ditemukan', 'Sudah ditemukan'],
+              ]
+            : [
+                  ['belum_dikembalikan', 'Belum dikembalikan'],
+                  ['sudah_dikembalikan', 'Sudah dikembalikan'],
+              ];
     var isi = '<select id="' + awalan + b.id + '" title="Pilih status laporan">';
     for (var i = 0; i < pilihan.length; i++) {
-        isi += '<option value="' + pilihan[i][0] + '"' +
+        isi +=
+            '<option value="' +
+            pilihan[i][0] +
+            '"' +
             (b.status == pilihan[i][0] ? ' selected="selected"' : '') +
-            '>' + pilihan[i][1] + '</option>';
+            '>' +
+            pilihan[i][1] +
+            '</option>';
     }
     return isi + '</select>';
 }
 
 function perbaruiLaporanSaya() {
-    if (!ambil("barang-saya")) return;
+    if (!ambil('barang-saya')) return;
     var daftar = laporanMilikSaya();
-    var isi = "";
+    var isi = '';
     var hilang = 0;
     var ditemukan = 0;
     for (var i = 0; i < daftar.length; i++) {
         var b = daftar[i];
-        if (b.jenis == "hilang") hilang++;
+        if (b.jenis == 'hilang') hilang++;
         else ditemukan++;
-        var dititipCS = b.jenis == "ditemukan" && b.penyimpanan.indexOf("CS Kampus ") == 0;
+        var dititipCS = b.jenis == 'ditemukan' && b.penyimpanan.indexOf('CS Kampus ') == 0;
         isi += '<div class="kartu-kelola" id="kelola-' + b.id + '">' + buatKartu(b);
         if (dititipCS) {
-            isi += '<p class="catatan-status">Status pengembalian dikelola oleh CS tempat barang dititipkan.</p>';
+            isi +=
+                '<p class="catatan-status">Status pengembalian dikelola oleh CS tempat barang dititipkan.</p>';
         } else {
-            isi += '<div class="pengaturan-status"><label for="status-' + b.id + '">Ubah status laporan</label>' +
-                pilihanStatus(b, "status-") +
-                '<button type="button" class="tombol tombol-kuning tombol-kecil" onclick="simpanStatus(' + b.id + ')">Simpan status</button></div>';
+            isi +=
+                '<div class="pengaturan-status"><label for="status-' +
+                b.id +
+                '">Ubah status laporan</label>' +
+                pilihanStatus(b, 'status-') +
+                '<button type="button" class="tombol tombol-kuning tombol-kecil" onclick="simpanStatus(' +
+                b.id +
+                ')">Simpan status</button></div>';
         }
-        isi += '<div class="aksi-kelola">' +
-            '<a href="edit_laporan.xhtml?id=' + b.id + '" class="tombol tombol-outline tombol-kecil">Edit</a>' +
-            '<button type="button" class="tombol tombol-bahaya tombol-kecil" onclick="hapusLaporan(' + b.id + ')">Hapus</button>' +
+        isi +=
+            '<div class="aksi-kelola">' +
+            '<a href="edit_laporan.xhtml?id=' +
+            b.id +
+            '" class="tombol tombol-outline tombol-kecil">Edit</a>' +
+            '<button type="button" class="tombol tombol-bahaya tombol-kecil" onclick="hapusLaporan(' +
+            b.id +
+            ')">Hapus</button>' +
             '</div></div>';
     }
-    ambil("barang-saya").innerHTML = isi;
-    teks("total-saya", daftar.length);
-    teks("jumlah-hilang", hilang);
-    teks("jumlah-ditemukan", ditemukan);
-    ambil("kosong-saya").style.display = daftar.length ? "none" : "block";
+    ambil('barang-saya').innerHTML = isi;
+    teks('total-saya', daftar.length);
+    teks('jumlah-hilang', hilang);
+    teks('jumlah-ditemukan', ditemukan);
+    ambil('kosong-saya').style.display = daftar.length ? 'none' : 'block';
 }
 
 function simpanStatus(id) {
-    var baru = ambil("status-" + id).value;
+    var baru = ambil('status-' + id).value;
     var laporan = cariBarang(id);
     if (!laporan || laporan.pelaporEmail != dataAkun().email) return;
     if (laporan.status == baru) {
-        pesan("Status laporan belum berubah.");
+        pesan('Status laporan belum berubah.');
         return;
     }
     if (!confirm("Ubah status laporan menjadi '" + namaStatus(baru) + "'?")) return;
 
     if (modeServer && cacheLaporan !== null) {
         var dataKirim = new FormData();
-        dataKirim.append("id", id);
-        dataKirim.append("status", baru);
-        kirimData("laporan.php?aksi=status", dataKirim).then(function (hasil) {
-            if (!hasil.ok || hasil.data.status !== "success") {
-                pesan(hasil.data.message || "Gagal memperbarui status laporan.");
-                return;
-            }
-            laporan.status = baru;
-            perbaruiLaporanSaya();
-            pesan("Status laporan berhasil diperbarui.");
-        }).catch(function () {
-            pesan("Gagal menghubungi server.");
-        });
+        dataKirim.append('id', id);
+        dataKirim.append('status', baru);
+        kirimData('laporan.php?aksi=status', dataKirim)
+            .then(function (hasil) {
+                if (!hasil.ok || hasil.data.status !== 'success') {
+                    pesan(hasil.data.message || 'Gagal memperbarui status laporan.');
+                    return;
+                }
+                laporan.status = baru;
+                perbaruiLaporanSaya();
+                pesan('Status laporan berhasil diperbarui.');
+            })
+            .catch(function () {
+                pesan('Gagal menghubungi server.');
+            });
         return;
     }
 
@@ -870,7 +1040,7 @@ function simpanStatus(id) {
     for (var i = 0; i < daftar.length; i++) {
         if (daftar[i].id == id && daftar[i].pelaporEmail == dataAkun().email) {
             daftar[i].status = baru;
-            simpanSesi("atlofLaporan", daftar);
+            simpanSesi('atlofLaporan', daftar);
             perbaruiLaporanSaya();
             return;
         }
@@ -878,26 +1048,28 @@ function simpanStatus(id) {
 }
 
 function hapusLaporan(id) {
-    if (!confirm("Yakin ingin menghapus laporan ini?")) return;
+    if (!confirm('Yakin ingin menghapus laporan ini?')) return;
 
     if (modeServer && cacheLaporan !== null) {
         var dataKirim = new FormData();
-        dataKirim.append("id", id);
-        kirimData("laporan.php?aksi=delete", dataKirim).then(function (hasil) {
-            if (!hasil.ok || hasil.data.status !== "success") {
-                pesan(hasil.data.message || "Gagal menghapus laporan.");
-                return;
-            }
-            var sisa = [];
-            for (var i = 0; i < cacheLaporan.length; i++) {
-                if (cacheLaporan[i].id != id) sisa.push(cacheLaporan[i]);
-            }
-            cacheLaporan = sisa;
-            perbaruiLaporanSaya();
-            pesan("Laporan berhasil dihapus.");
-        }).catch(function () {
-            pesan("Gagal menghubungi server.");
-        });
+        dataKirim.append('id', id);
+        kirimData('laporan.php?aksi=delete', dataKirim)
+            .then(function (hasil) {
+                if (!hasil.ok || hasil.data.status !== 'success') {
+                    pesan(hasil.data.message || 'Gagal menghapus laporan.');
+                    return;
+                }
+                var sisa = [];
+                for (var i = 0; i < cacheLaporan.length; i++) {
+                    if (cacheLaporan[i].id != id) sisa.push(cacheLaporan[i]);
+                }
+                cacheLaporan = sisa;
+                perbaruiLaporanSaya();
+                pesan('Laporan berhasil dihapus.');
+            })
+            .catch(function () {
+                pesan('Gagal menghubungi server.');
+            });
         return;
     }
 
@@ -906,41 +1078,55 @@ function hapusLaporan(id) {
     for (var i = 0; i < lama.length; i++) {
         if (lama[i].id != id || lama[i].pelaporEmail != dataAkun().email) baru.push(lama[i]);
     }
-    simpanSesi("atlofLaporan", baru);
+    simpanSesi('atlofLaporan', baru);
     perbaruiLaporanSaya();
 }
 
 function tanggalBenar(input) {
-    var bagian = input.split("-");
+    var bagian = input.split('-');
     if (bagian.length != 3) return false;
     var hari = Number(bagian[0]);
     var bulan = Number(bagian[1]);
     var tahun = Number(bagian[2]);
     var tanggal = new Date(tahun, bulan - 1, hari);
-    return tanggal.getFullYear() == tahun &&
+    return (
+        tanggal.getFullYear() == tahun &&
         tanggal.getMonth() == bulan - 1 &&
-        tanggal.getDate() == hari;
+        tanggal.getDate() == hari
+    );
 }
 
 // Kalender sederhana dibuat dengan JavaScript agar cocok untuk XHTML 1.0 Strict.
 function pasangKalender() {
-    if (!ambil("tanggal") || !ambil("kotak-kalender")) return;
+    if (!ambil('tanggal') || !ambil('kotak-kalender')) return;
 
     var bulanSaatIni = new Date().getMonth();
     var tahunSaatIni = new Date().getFullYear();
-    var namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    var kalender = ambil("kotak-kalender");
-    var input = ambil("tanggal");
+    var namaBulan = [
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    ];
+    var kalender = ambil('kotak-kalender');
+    var input = ambil('tanggal');
 
     function duaAngka(angka) {
-        return angka < 10 ? "0" + angka : String(angka);
+        return angka < 10 ? '0' + angka : String(angka);
     }
 
     function gambarKalender() {
-        teks("nama-bulan", namaBulan[bulanSaatIni] + " " + tahunSaatIni);
-        var urutanHari = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
-        var isi = "";
+        teks('nama-bulan', namaBulan[bulanSaatIni] + ' ' + tahunSaatIni);
+        var urutanHari = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        var isi = '';
         for (var i = 0; i < urutanHari.length; i++) {
             isi += '<span class="nama-hari">' + urutanHari[i] + '</span>';
         }
@@ -953,16 +1139,22 @@ function pasangKalender() {
             isi += '<span class="tanggal-kosong"></span>';
         }
         for (var hari = 1; hari <= jumlahHari; hari++) {
-            isi += '<button type="button" class="pilih-hari" value="' + hari + '">' + hari + '</button>';
+            isi +=
+                '<button type="button" class="pilih-hari" value="' +
+                hari +
+                '">' +
+                hari +
+                '</button>';
         }
-        ambil("hari-kalender").innerHTML = isi;
+        ambil('hari-kalender').innerHTML = isi;
 
-        var tombolHari = kalender.querySelectorAll(".pilih-hari");
+        var tombolHari = kalender.querySelectorAll('.pilih-hari');
         for (var j = 0; j < tombolHari.length; j++) {
             tombolHari[j].onclick = function () {
                 var hariDipilih = Number(this.value);
-                input.value = duaAngka(hariDipilih) + "-" + duaAngka(bulanSaatIni + 1) + "-" + tahunSaatIni;
-                kalender.style.display = "none";
+                input.value =
+                    duaAngka(hariDipilih) + '-' + duaAngka(bulanSaatIni + 1) + '-' + tahunSaatIni;
+                kalender.style.display = 'none';
             };
         }
     }
@@ -970,22 +1162,22 @@ function pasangKalender() {
     function bukaKalender() {
         // Bila tanggal sudah dipilih, buka pada bulan tanggal tersebut.
         if (tanggalBenar(input.value)) {
-            var bagian = input.value.split("-");
+            var bagian = input.value.split('-');
             bulanSaatIni = Number(bagian[1]) - 1;
             tahunSaatIni = Number(bagian[2]);
         }
         gambarKalender();
-        kalender.style.display = "block";
+        kalender.style.display = 'block';
     }
 
     input.onclick = bukaKalender;
     input.onkeydown = function (event) {
-        if (event.key == "Enter" || event.key == " ") {
+        if (event.key == 'Enter' || event.key == ' ') {
             event.preventDefault();
             bukaKalender();
         }
     };
-    ambil("bulan-sebelum").onclick = function () {
+    ambil('bulan-sebelum').onclick = function () {
         bulanSaatIni--;
         if (bulanSaatIni < 0) {
             bulanSaatIni = 11;
@@ -993,7 +1185,7 @@ function pasangKalender() {
         }
         gambarKalender();
     };
-    ambil("bulan-berikut").onclick = function () {
+    ambil('bulan-berikut').onclick = function () {
         bulanSaatIni++;
         if (bulanSaatIni > 11) {
             bulanSaatIni = 0;
@@ -1001,10 +1193,10 @@ function pasangKalender() {
         }
         gambarKalender();
     };
-    document.addEventListener("click", function (event) {
-        var areaTanggal = document.querySelector(".tanggal-pilih");
+    document.addEventListener('click', function (event) {
+        var areaTanggal = document.querySelector('.tanggal-pilih');
         if (areaTanggal && !areaTanggal.contains(event.target)) {
-            kalender.style.display = "none";
+            kalender.style.display = 'none';
         }
     });
 }
@@ -1015,93 +1207,117 @@ function aturFormLaporan(idForm) {
     var form = ambil(idForm);
     if (!form) return;
     var tombolJenis = form.querySelectorAll('input[name="jenis"]');
-    var editId = new URLSearchParams(window.location.search).get("id");
+    var editId = new URLSearchParams(window.location.search).get('id');
     var dataEdit = null;
 
     function aturPilihan() {
         var ditemukan = tombolJenis[1].checked;
-        ambil("wadah-penyimpanan").style.display = ditemukan ? "block" : "none";
-        teks("label-lokasi", ditemukan ? "Lokasi ditemukan *" : "Lokasi hilang *");
+        ambil('wadah-penyimpanan').style.display = ditemukan ? 'block' : 'none';
+        teks('label-lokasi', ditemukan ? 'Lokasi ditemukan *' : 'Lokasi hilang *');
         aturLokasiLainnya();
     }
 
     function aturLokasiLainnya() {
-        ambil("wadah-detail-lokasi").style.display = ambil("lokasi").value == "Lainnya" ? "block" : "none";
+        ambil('wadah-detail-lokasi').style.display =
+            ambil('lokasi').value == 'Lainnya' ? 'block' : 'none';
     }
 
     tombolJenis[0].onchange = aturPilihan;
     tombolJenis[1].onchange = aturPilihan;
-    ambil("lokasi").onchange = aturLokasiLainnya;
+    ambil('lokasi').onchange = aturLokasiLainnya;
 
-    if (idForm == "form-edit") {
+    if (idForm == 'form-edit') {
         dataEdit = cariBarang(editId);
         if (dataEdit && dataEdit.pelaporEmail != dataAkun().email) {
-            window.location.href = "laporan_saya.xhtml";
+            window.location.href = 'laporan_saya.xhtml';
             return;
         }
         if (dataEdit) {
-            ambil("nama-barang").value = dataEdit.nama;
-            ambil("kategori").value = dataEdit.kategori;
-            ambil("tanggal").value = dataEdit.tanggal;
-            ambil("lokasi").value = dataEdit.lokasi;
-            ambil("detail-lokasi").value = dataEdit.detail_lokasi || "";
-            ambil("deskripsi").value = dataEdit.deskripsi;
-            ambil("telepon").value = dataEdit.telepon || "";
-            ambil("penyimpanan").value = dataEdit.penyimpanan == "-" ? "" : dataEdit.penyimpanan;
-            if (dataEdit.jenis == "ditemukan") tombolJenis[1].checked = true;
+            ambil('nama-barang').value = dataEdit.nama;
+            ambil('kategori').value = dataEdit.kategori;
+            ambil('tanggal').value = dataEdit.tanggal;
+            ambil('lokasi').value = dataEdit.lokasi;
+            ambil('detail-lokasi').value = dataEdit.detail_lokasi || '';
+            ambil('deskripsi').value = dataEdit.deskripsi;
+            ambil('telepon').value = dataEdit.telepon || '';
+            ambil('penyimpanan').value = dataEdit.penyimpanan == '-' ? '' : dataEdit.penyimpanan;
+            if (dataEdit.jenis == 'ditemukan') tombolJenis[1].checked = true;
         }
     }
     aturPilihan();
 
     if (adalahAdmin()) {
         var akunCs = dataAkun();
-        if (idForm == "form-laporan") ambil("telepon").value = akunCs.telepon || "";
-        teks("bantuan-telepon", "Masukkan nomor WhatsApp layanan CS. Nomor akan ditampilkan di halaman detail laporan.");
+        if (idForm == 'form-laporan') ambil('telepon').value = akunCs.telepon || '';
+        teks(
+            'bantuan-telepon',
+            'Masukkan nomor WhatsApp layanan CS. Nomor akan ditampilkan di halaman detail laporan.',
+        );
     }
 
     form.onsubmit = function (event) {
         event.preventDefault();
-        var nama = ambil("nama-barang").value.trim();
-        var jenis = tombolJenis[1].checked ? "ditemukan" : "hilang";
-        var kategori = ambil("kategori").value;
-        var tanggal = ambil("tanggal").value.trim();
-        var lokasi = ambil("lokasi").value;
-        var deskripsi = ambil("deskripsi").value.trim();
-        var penyimpanan = jenis == "ditemukan" ? ambil("penyimpanan").value : "-";
-        var foto = ambil("foto").files[0];
-        if (!nama || !kategori || !tanggalBenar(tanggal) || !lokasi || !deskripsi || (jenis == "ditemukan" && !penyimpanan)) {
-            pesan("Lengkapi formulir dan pilih tanggal kejadian dari kalender.");
+        var nama = ambil('nama-barang').value.trim();
+        var jenis = tombolJenis[1].checked ? 'ditemukan' : 'hilang';
+        var kategori = ambil('kategori').value;
+        var tanggal = ambil('tanggal').value.trim();
+        var lokasi = ambil('lokasi').value;
+        var deskripsi = ambil('deskripsi').value.trim();
+        var penyimpanan = jenis == 'ditemukan' ? ambil('penyimpanan').value : '-';
+        var foto = ambil('foto').files[0];
+        if (
+            !nama ||
+            !kategori ||
+            !tanggalBenar(tanggal) ||
+            !lokasi ||
+            !deskripsi ||
+            (jenis == 'ditemukan' && !penyimpanan)
+        ) {
+            pesan('Lengkapi formulir dan pilih tanggal kejadian dari kalender.');
             return;
         }
-        if (lokasi == "Lainnya" && !ambil("detail-lokasi").value.trim()) {
-            pesan("Tuliskan keterangan lokasi lainnya.");
+        if (lokasi == 'Lainnya' && !ambil('detail-lokasi').value.trim()) {
+            pesan('Tuliskan keterangan lokasi lainnya.');
             return;
         }
         if (foto && !/^image\/(jpeg|png|webp)$/.test(foto.type)) {
-            pesan("Gunakan foto JPG, PNG, atau WEBP.");
+            pesan('Gunakan foto JPG, PNG, atau WEBP.');
             return;
         }
         if (foto && foto.size > 1000000) {
-            pesan("Ukuran foto maksimal 1 MB.");
+            pesan('Ukuran foto maksimal 1 MB.');
             return;
         }
 
         if (modeServer) {
             var dataKirim = new FormData(form);
-            if (dataEdit) dataKirim.append("id", dataEdit.id);
-            kirimData("laporan.php?aksi=" + (dataEdit ? "update" : "create"), dataKirim).then(function (hasil) {
-                if (!hasil.ok || hasil.data.status !== "success") {
-                    pesan(hasil.data.message || "Gagal menyimpan laporan.");
-                    return;
-                }
-                window.location.href = "laporan_saya.xhtml";
-            }).catch(function () {
-                pesan("Gagal menghubungi server.");
-            });
+            if (dataEdit) dataKirim.append('id', dataEdit.id);
+            kirimData('laporan.php?aksi=' + (dataEdit ? 'update' : 'create'), dataKirim)
+                .then(function (hasil) {
+                    if (!hasil.ok || hasil.data.status !== 'success') {
+                        pesan(hasil.data.message || 'Gagal menyimpan laporan.');
+                        return;
+                    }
+                    window.location.href = 'laporan_saya.xhtml';
+                })
+                .catch(function () {
+                    pesan('Gagal menghubungi server.');
+                });
             return;
         }
 
         var akun = dataAkun();
+        if (adalahAdmin()) {
+            var nomorForm = ambil('telepon').value.trim();
+            if (nomorForm) {
+                var kontakCs = kontakAdmin();
+                if (!kontakCs[akun.email]) kontakCs[akun.email] = {};
+                kontakCs[akun.email].telepon = nomorForm;
+                simpanSesi('atlofKontakAdmin', kontakCs);
+                akun.telepon = nomorForm;
+                simpanSesi('atlofAkun', akun);
+            }
+        }
         var daftar = laporanSaya();
         var laporan = {
             id: dataEdit ? dataEdit.id : Date.now(),
@@ -1110,17 +1326,27 @@ function aturFormLaporan(idForm) {
             kategori: kategori,
             tanggal: tanggal,
             lokasi: lokasi,
-            status: dataEdit ? dataEdit.status : (jenis == "hilang" ? "masih_dicari" : "belum_dikembalikan"),
+            status: dataEdit
+                ? dataEdit.status
+                : jenis == 'hilang'
+                  ? 'masih_dicari'
+                  : 'belum_dikembalikan',
             penyimpanan: penyimpanan,
-            detail_lokasi: ambil("detail-lokasi").value.trim(),
-            status_cs: jenis == "ditemukan" && penyimpanan.indexOf("CS Kampus ") == 0 ?
-                (dataEdit ? dataEdit.status_cs : (adalahAdmin() && penyimpanan == "CS " + akun.kampus_cs ? "diterima" : "menunggu")) : "",
+            detail_lokasi: ambil('detail-lokasi').value.trim(),
+            status_cs:
+                jenis == 'ditemukan' && penyimpanan.indexOf('CS Kampus ') == 0
+                    ? dataEdit
+                        ? dataEdit.status_cs
+                        : adalahAdmin() && penyimpanan == 'CS ' + akun.kampus_cs
+                          ? 'diterima'
+                          : 'menunggu'
+                    : '',
             deskripsi: deskripsi,
             pelapor: akun.nama,
             pelaporEmail: akun.email,
             teams: akun.teams,
-            telepon: ambil("telepon").value.trim(),
-            gambar: gambarKategori(kategori)
+            telepon: ambil('telepon').value.trim(),
+            gambar: gambarKategori(kategori),
         };
         if (dataEdit) {
             for (var i = 0; i < daftar.length; i++) {
@@ -1129,100 +1355,101 @@ function aturFormLaporan(idForm) {
         } else {
             daftar.unshift(laporan);
         }
-        simpanSesi("atlofLaporan", daftar);
-        window.location.href = "laporan_saya.xhtml";
+        simpanSesi('atlofLaporan', daftar);
+        window.location.href = 'laporan_saya.xhtml';
     };
 }
-
 
 // Profil: user melihat identitas; admin juga melihat kampus dan nomor layanan.
 function perbaruiProfil() {
     var akun = dataAkun();
-    teks("nama-profil", akun.nama);
-    teks("email-profil", akun.email);
-    teks("info-nama", akun.nama);
-    teks("info-email", akun.email);
-    teks("info-teams", akun.teams || "-");
-    ambil("info-teams").className = akun.teams ? "" : "nilai-kosong";
-    teks("avatar-profil", akun.nama.charAt(0).toUpperCase());
+    teks('nama-profil', akun.nama);
+    teks('email-profil', akun.email);
+    teks('info-nama', akun.nama);
+    teks('info-email', akun.email);
+    teks('info-teams', akun.teams || '-');
+    ambil('info-teams').className = akun.teams ? '' : 'nilai-kosong';
+    teks('avatar-profil', akun.nama.charAt(0).toUpperCase());
     if (adalahAdmin()) {
-        ambil("label-peran-profil").style.display = "inline-block";
-        ambil("identitas-admin").style.display = "grid";
-        ambil("identitas-wa").style.display = "grid";
-        ambil("form-nomor-cs").style.display = "block";
-        teks("info-kampus-cs", namaKampus(akun.kampus_cs));
-        teks("info-telepon", akun.telepon || "Belum diisi");
-        ambil("info-telepon").className = akun.telepon ? "" : "nilai-kosong";
+        ambil('label-peran-profil').style.display = 'inline-block';
+        ambil('identitas-admin').style.display = 'grid';
+        ambil('identitas-wa').style.display = 'grid';
+        ambil('form-nomor-cs').style.display = 'block';
+        teks('info-kampus-cs', namaKampus(akun.kampus_cs));
+        teks('info-telepon', akun.telepon || 'Belum diisi');
+        ambil('info-telepon').className = akun.telepon ? '' : 'nilai-kosong';
     }
 }
 
 function tampilkanForm(id) {
-    ambil("data-profil").style.display = "none";
-    ambil("profil-tombol").style.display = "none";
-    ambil("form-profil").style.display = id == "form-profil" ? "block" : "none";
-    ambil("form-password").style.display = id == "form-password" ? "block" : "none";
+    ambil('data-profil').style.display = 'none';
+    ambil('profil-tombol').style.display = 'none';
+    ambil('form-profil').style.display = id == 'form-profil' ? 'block' : 'none';
+    ambil('form-password').style.display = id == 'form-password' ? 'block' : 'none';
 }
 
 function tutupFormProfil() {
-    ambil("data-profil").style.display = "grid";
-    ambil("profil-tombol").style.display = "flex";
-    ambil("form-profil").style.display = "none";
-    ambil("form-password").style.display = "none";
+    ambil('data-profil').style.display = 'grid';
+    ambil('profil-tombol').style.display = 'flex';
+    ambil('form-profil').style.display = 'none';
+    ambil('form-password').style.display = 'none';
 }
 
-if (ambil("form-profil")) {
-    ambil("tombol-edit-profil").onclick = function () {
+if (ambil('form-profil')) {
+    ambil('tombol-edit-profil').onclick = function () {
         var akun = dataAkun();
-        ambil("nama").value = akun.nama;
-        ambil("email").value = akun.email;
-        ambil("teams").value = akun.teams || "";
+        ambil('nama').value = akun.nama;
+        ambil('email').value = akun.email;
+        ambil('teams').value = akun.teams || '';
         if (adalahAdmin()) {
-            ambil("form-nomor-cs").style.display = "block";
-            ambil("nomor-cs").value = akun.telepon || "";
+            ambil('form-nomor-cs').style.display = 'block';
+            ambil('nomor-cs').value = akun.telepon || '';
         }
-        tampilkanForm("form-profil");
+        tampilkanForm('form-profil');
     };
-    ambil("tombol-ganti-password").onclick = function () {
-        tampilkanForm("form-password");
+    ambil('tombol-ganti-password').onclick = function () {
+        tampilkanForm('form-password');
     };
-    ambil("tombol-logout").onclick = keluar;
-    var batal = document.querySelectorAll(".batal-profil");
+    ambil('tombol-logout').onclick = keluar;
+    var batal = document.querySelectorAll('.batal-profil');
     for (var i = 0; i < batal.length; i++) batal[i].onclick = tutupFormProfil;
-    ambil("form-profil").onsubmit = function (event) {
+    ambil('form-profil').onsubmit = function (event) {
         event.preventDefault();
-        var nama = ambil("nama").value.trim();
-        var teams = ambil("teams").value.trim();
-        var telepon = adalahAdmin() ? ambil("nomor-cs").value.trim() : "";
+        var nama = ambil('nama').value.trim();
+        var teams = ambil('teams').value.trim();
+        var telepon = adalahAdmin() ? ambil('nomor-cs').value.trim() : '';
         if (!nama || (!adalahAdmin() && !teams)) {
-            pesan("Lengkapi nama dan kontak Teams.");
+            pesan('Lengkapi nama dan kontak Teams.');
             return;
         }
         if (adalahAdmin() && telepon && !/^\+?[\d\s-]{8,20}$/.test(telepon)) {
-            pesan("Masukkan nomor WhatsApp layanan yang valid.");
+            pesan('Masukkan nomor WhatsApp layanan yang valid.');
             return;
         }
 
         if (modeServer) {
             var dataKirim = new FormData();
-            dataKirim.append("nama", nama);
-            dataKirim.append("teams", teams);
-            dataKirim.append("telepon", telepon);
-            kirimData("simpan_profil.php", dataKirim).then(function (hasil) {
-                if (!hasil.ok || hasil.data.status !== "success") {
-                    pesan(hasil.data.message || "Gagal memperbarui profil.");
-                    return;
-                }
-                var akun = dataAkun();
-                akun.nama = hasil.data.user.nama;
-                akun.teams = hasil.data.user.teams || "";
-                akun.telepon = hasil.data.user.telepon || "";
-                simpanSesi("atlofAkun", akun);
-                perbaruiProfil();
-                tutupFormProfil();
-                pesan("Profil berhasil diperbarui.");
-            }).catch(function () {
-                pesan("Gagal menghubungi server.");
-            });
+            dataKirim.append('nama', nama);
+            dataKirim.append('teams', teams);
+            dataKirim.append('telepon', telepon);
+            kirimData('simpan_profil.php', dataKirim)
+                .then(function (hasil) {
+                    if (!hasil.ok || hasil.data.status !== 'success') {
+                        pesan(hasil.data.message || 'Gagal memperbarui profil.');
+                        return;
+                    }
+                    var akun = dataAkun();
+                    akun.nama = hasil.data.user.nama;
+                    akun.teams = hasil.data.user.teams || '';
+                    akun.telepon = hasil.data.user.telepon || '';
+                    simpanSesi('atlofAkun', akun);
+                    perbaruiProfil();
+                    tutupFormProfil();
+                    pesan('Profil berhasil diperbarui.');
+                })
+                .catch(function () {
+                    pesan('Gagal menghubungi server.');
+                });
             return;
         }
 
@@ -1233,46 +1460,46 @@ if (ambil("form-profil")) {
             akun.telepon = telepon;
             var semua = kontakAdmin();
             semua[akun.email] = { nama: nama, teams: teams, telepon: telepon };
-            simpanSesi("atlofKontakAdmin", semua);
+            simpanSesi('atlofKontakAdmin', semua);
         }
-        simpanSesi("atlofAkun", akun);
+        simpanSesi('atlofAkun', akun);
         perbaruiProfil();
         tutupFormProfil();
-        pesan("Profil berhasil diperbarui.");
+        pesan('Profil berhasil diperbarui.');
     };
-    ambil("form-password").onsubmit = function (event) {
+    ambil('form-password').onsubmit = function (event) {
         event.preventDefault();
         var akun = dataAkun();
-        var passwordLama = ambil("password-lama").value;
-        var passwordBaru = ambil("password-baru").value;
-        var konfirmasi = ambil("konfirmasi-password").value;
+        var passwordLama = ambil('password-lama').value;
+        var passwordBaru = ambil('password-baru').value;
+        var konfirmasi = ambil('konfirmasi-password').value;
 
         if (passwordBaru.length < 8) {
-            pesan("Password baru minimal 8 karakter.");
+            pesan('Password baru minimal 8 karakter.');
             return;
         }
         if (passwordBaru != konfirmasi) {
-            pesan("Konfirmasi password baru tidak sama.");
+            pesan('Konfirmasi password baru tidak sama.');
             return;
         }
 
         function suksesUbah() {
             simpanKataSandi(akun.email, passwordBaru);
-            ambil("form-password").reset();
+            ambil('form-password').reset();
             tutupFormProfil();
-            pesan("Password berhasil diubah.");
+            pesan('Password berhasil diubah.');
         }
 
         if (modeServer) {
             var dataKirim = new FormData();
-            dataKirim.append("password_lama", passwordLama);
-            dataKirim.append("password_baru", passwordBaru);
-            dataKirim.append("konfirmasi", konfirmasi);
+            dataKirim.append('password_lama', passwordLama);
+            dataKirim.append('password_baru', passwordBaru);
+            dataKirim.append('konfirmasi', konfirmasi);
 
-            fetch("ubah_password.php", {
-                method: "POST",
+            fetch('ubah_password.php', {
+                method: 'POST',
                 body: dataKirim,
-                headers: { "X-Requested-With": "XMLHttpRequest" }
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
             })
                 .then(function (res) {
                     return res.json().then(function (data) {
@@ -1280,8 +1507,8 @@ if (ambil("form-profil")) {
                     });
                 })
                 .then(function (hasil) {
-                    if (!hasil.ok || hasil.data.status !== "success") {
-                        pesan(hasil.data.message || "Gagal mengubah password.");
+                    if (!hasil.ok || hasil.data.status !== 'success') {
+                        pesan(hasil.data.message || 'Gagal mengubah password.');
                         return;
                     }
                     suksesUbah();
@@ -1289,7 +1516,7 @@ if (ambil("form-profil")) {
                 .catch(function () {
                     var tersimpan = cariAkunTerdaftar(akun.email);
                     if (!tersimpan || tersimpan.password != passwordLama) {
-                        pesan("Password sekarang tidak sesuai.");
+                        pesan('Password sekarang tidak sesuai.');
                         return;
                     }
                     suksesUbah();
@@ -1299,7 +1526,7 @@ if (ambil("form-profil")) {
 
         var tersimpan = cariAkunTerdaftar(akun.email);
         if (!tersimpan || tersimpan.password != passwordLama) {
-            pesan("Password sekarang tidak sesuai.");
+            pesan('Password sekarang tidak sesuai.');
             return;
         }
         suksesUbah();
@@ -1309,35 +1536,36 @@ if (ambil("form-profil")) {
 // Dashboard Admin CS hanya menampilkan barang yang dititipkan di kampusnya.
 function statusCS(b) {
     if (b.status_cs) return b.status_cs;
-    if (b.status == "sudah_dikembalikan") return "dikembalikan";
-    return "menunggu";
+    if (b.status == 'sudah_dikembalikan') return 'dikembalikan';
+    return 'menunggu';
 }
 
 function namaStatusCS(status) {
-    if (status == "diterima") return "Diterima CS";
-    if (status == "dikembalikan") return "Sudah dikembalikan";
-    return "Menunggu diterima";
+    if (status == 'diterima') return 'Diterima CS';
+    if (status == 'dikembalikan') return 'Sudah dikembalikan';
+    return 'Menunggu diterima';
 }
 
 function daftarBarangCS() {
     var daftar = semuaLaporan();
     var hasil = [];
     if (!adalahAdmin()) return hasil;
-    var lokasi = "CS " + dataAkun().kampus_cs;
+    var lokasi = 'CS ' + dataAkun().kampus_cs;
     for (var i = 0; i < daftar.length; i++) {
-        if (daftar[i].jenis == "ditemukan" && daftar[i].penyimpanan == lokasi) hasil.push(daftar[i]);
+        if (daftar[i].jenis == 'ditemukan' && daftar[i].penyimpanan == lokasi)
+            hasil.push(daftar[i]);
     }
     return hasil;
 }
 
 var halamanAdmin = 1;
-var jumlahPerHalamanAdmin = 5;
+var jumlahPerHalamanAdmin = 4;
 
 function tampilkanDashboardCS() {
-    if (!ambil("daftar-admin") || !adalahAdmin()) return;
+    if (!ambil('daftar-admin') || !adalahAdmin()) return;
     var daftar = daftarBarangCS();
-    var cari = ambil("cari-admin").value.toLowerCase().trim();
-    var filter = ambil("filter-status-admin").value;
+    var cari = ambil('cari-admin').value.toLowerCase().trim();
+    var filter = ambil('filter-status-admin').value;
     var hasil = [];
     var menunggu = 0;
     var diterima = 0;
@@ -1346,68 +1574,86 @@ function tampilkanDashboardCS() {
     for (var i = 0; i < daftar.length; i++) {
         var b = daftar[i];
         var kondisi = statusCS(b);
-        if (kondisi == "menunggu") menunggu++;
-        if (kondisi == "diterima") diterima++;
-        if (kondisi == "dikembalikan") selesai++;
+        if (kondisi == 'menunggu') menunggu++;
+        if (kondisi == 'diterima') diterima++;
+        if (kondisi == 'dikembalikan') selesai++;
         var cocokNama = b.nama.toLowerCase().indexOf(cari) != -1;
         var cocokId = String(b.id).indexOf(cari) != -1;
-        var cocokStatus = filter == "semua" || kondisi == filter;
+        var cocokStatus = filter == 'semua' || kondisi == filter;
         if ((cocokNama || cocokId) && cocokStatus) hasil.push(b);
     }
 
     // Tampilkan laporan paling baru di atas.
-    hasil.sort(function (a, b) { return Number(b.id) - Number(a.id); });
+    hasil.sort(function (a, b) {
+        return Number(b.id) - Number(a.id);
+    });
 
-    teks("subjudul-admin", "Kelola barang titipan di " + namaKampus(dataAkun().kampus_cs) + ".");
-    teks("admin-total", daftar.length);
-    teks("admin-menunggu", menunggu);
-    teks("admin-diterima", diterima);
-    teks("admin-selesai", selesai);
-    teks("nomor-wa-admin", dataAkun().telepon || "Belum diatur");
-    teks("jumlah-hasil-admin", hasil.length + " dari " + daftar.length + " barang");
+    teks('subjudul-admin', 'Kelola barang titipan di ' + namaKampus(dataAkun().kampus_cs) + '.');
+    teks('admin-total', daftar.length);
+    teks('admin-menunggu', menunggu);
+    teks('admin-diterima', diterima);
+    teks('admin-selesai', selesai);
+    teks('nomor-wa-admin', dataAkun().telepon || 'Belum diatur');
+    teks('jumlah-hasil-admin', hasil.length + ' dari ' + daftar.length + ' barang');
 
     var totalHalaman = Math.max(1, Math.ceil(hasil.length / jumlahPerHalamanAdmin));
     if (halamanAdmin > totalHalaman) halamanAdmin = totalHalaman;
     var awal = (halamanAdmin - 1) * jumlahPerHalamanAdmin;
     var akhir = Math.min(awal + jumlahPerHalamanAdmin, hasil.length);
-    var isi = "";
+    var isi = '';
 
     for (var j = awal; j < akhir; j++) {
         var barangCS = hasil[j];
         var status = statusCS(barangCS);
-        var namaTombol = status == "dikembalikan" ? "Lihat serah terima" : "Kelola serah terima";
-        isi += '<div class="baris-admin">' +
-            '<div class="info-admin"><img src="' + bersihkan(barangCS.gambar) + '" alt="Foto kategori barang" />' +
-            '<div><h3><a href="detail.xhtml?id=' + Number(barangCS.id) + '">' + bersihkan(barangCS.nama) + '</a></h3>' +
-            '<p>' + bersihkan(namaKampus(barangCS.lokasi)) + '</p>' +
-            '<span class="lencana">' + namaStatusCS(status) + '</span></div></div>' +
+        var namaTombol = status == 'dikembalikan' ? 'Lihat serah terima' : 'Kelola serah terima';
+        isi +=
+            '<div class="baris-admin">' +
+            '<div class="info-admin"><img src="' +
+            bersihkan(barangCS.gambar) +
+            '" alt="Foto kategori barang" />' +
+            '<div><h3><a href="detail.xhtml?id=' +
+            Number(barangCS.id) +
+            '">' +
+            bersihkan(barangCS.nama) +
+            '</a></h3>' +
+            '<p>' +
+            bersihkan(namaKampus(barangCS.lokasi)) +
+            '</p>' +
+            '<span class="lencana ' +
+            kelasStatus(status) +
+            '">' +
+            namaStatusCS(status) +
+            '</span></div></div>' +
             '<div class="kontrol-admin"><a class="tombol tombol-outline tombol-kecil" href="serah_terima.xhtml?id=' +
-            Number(barangCS.id) + '">' + namaTombol + '</a></div></div>';
+            Number(barangCS.id) +
+            '">' +
+            namaTombol +
+            '</a></div></div>';
     }
 
-    ambil("daftar-admin").innerHTML = isi;
-    ambil("kosong-admin").style.display = hasil.length ? "none" : "block";
-    ambil("halaman-dashboard").style.display = hasil.length ? "flex" : "none";
-    teks("info-halaman-admin", "Halaman " + halamanAdmin + " dari " + totalHalaman);
-    ambil("admin-sebelumnya").disabled = halamanAdmin == 1;
-    ambil("admin-berikutnya").disabled = halamanAdmin == totalHalaman;
+    ambil('daftar-admin').innerHTML = isi;
+    ambil('kosong-admin').style.display = hasil.length ? 'none' : 'block';
+    ambil('halaman-dashboard').style.display = hasil.length ? 'flex' : 'none';
+    teks('info-halaman-admin', 'Halaman ' + halamanAdmin + ' dari ' + totalHalaman);
+    ambil('admin-sebelumnya').disabled = halamanAdmin == 1;
+    ambil('admin-berikutnya').disabled = halamanAdmin == totalHalaman;
 }
 
 function siapkanDashboardCS() {
-    if (!ambil("daftar-admin") || !adalahAdmin()) return;
-    ambil("cari-admin").oninput = function () {
+    if (!ambil('daftar-admin') || !adalahAdmin()) return;
+    ambil('cari-admin').oninput = function () {
         halamanAdmin = 1;
         tampilkanDashboardCS();
     };
-    ambil("filter-status-admin").onchange = function () {
+    ambil('filter-status-admin').onchange = function () {
         halamanAdmin = 1;
         tampilkanDashboardCS();
     };
-    ambil("admin-sebelumnya").onclick = function () {
+    ambil('admin-sebelumnya').onclick = function () {
         if (halamanAdmin > 1) halamanAdmin--;
         tampilkanDashboardCS();
     };
-    ambil("admin-berikutnya").onclick = function () {
+    ambil('admin-berikutnya').onclick = function () {
         halamanAdmin++;
         tampilkanDashboardCS();
     };
@@ -1420,11 +1666,11 @@ function siapkanDashboardCS() {
 // Pada versi frontend, data disimpan di sessionStorage.
 function semuaCatatan() {
     if (cacheSerah !== null) return cacheSerah;
-    return bacaSesi("atlofSerahTerima", []);
+    return bacaSesi('atlofSerahTerima', []);
 }
 
 function simpanCatatan(daftar) {
-    simpanSesi("atlofSerahTerima", daftar);
+    simpanSesi('atlofSerahTerima', daftar);
 }
 
 function catatanKampusSaya() {
@@ -1447,7 +1693,11 @@ function cariCatatan(id) {
 
 function adaCatatan(daftar, idLaporan, jenis, kecualiId) {
     for (var i = 0; i < daftar.length; i++) {
-        if (daftar[i].id_laporan == idLaporan && daftar[i].jenis == jenis && daftar[i].id != kecualiId) {
+        if (
+            daftar[i].id_laporan == idLaporan &&
+            daftar[i].jenis == jenis &&
+            daftar[i].id != kecualiId
+        ) {
             return true;
         }
     }
@@ -1455,31 +1705,50 @@ function adaCatatan(daftar, idLaporan, jenis, kecualiId) {
 }
 
 function namaJenisSerah(jenis) {
-    return jenis == "pengembalian" ? "Pengembalian barang" : "Penerimaan barang";
+    return jenis == 'pengembalian' ? 'Pengembalian barang' : 'Penerimaan barang';
 }
 
 // Satu baris informasi dalam kartu riwayat: label kecil di atas nilai.
 function metaSerah(label, nilai, lebarPenuh) {
-    return '<div class="serah-meta-item' + (lebarPenuh ? ' lebar-penuh' : '') + '">' +
-        '<span class="serah-meta-label">' + label + '</span>' +
-        '<span class="serah-meta-nilai">' + bersihkan(nilai == null ? "" : nilai) + '</span>' +
-        '</div>';
+    return (
+        '<div class="serah-meta-item' +
+        (lebarPenuh ? ' lebar-penuh' : '') +
+        '">' +
+        '<span class="serah-meta-label">' +
+        label +
+        '</span>' +
+        '<span class="serah-meta-nilai">' +
+        bersihkan(nilai == null ? '' : nilai) +
+        '</span>' +
+        '</div>'
+    );
 }
 
 function waktuCatatan() {
     var waktu = new Date();
-    function dua(angka) { return angka < 10 ? "0" + angka : String(angka); }
-    return dua(waktu.getDate()) + "-" + dua(waktu.getMonth() + 1) + "-" + waktu.getFullYear() +
-        " " + dua(waktu.getHours()) + ":" + dua(waktu.getMinutes());
+    function dua(angka) {
+        return angka < 10 ? '0' + angka : String(angka);
+    }
+    return (
+        dua(waktu.getDate()) +
+        '-' +
+        dua(waktu.getMonth() + 1) +
+        '-' +
+        waktu.getFullYear() +
+        ' ' +
+        dua(waktu.getHours()) +
+        ':' +
+        dua(waktu.getMinutes())
+    );
 }
 
 // Setelah CRUD serah terima, samakan status laporan dan status CS.
 function sesuaikanStatusLaporan(idLaporan) {
     var daftar = semuaCatatan();
-    var diterima = adaCatatan(daftar, idLaporan, "penerimaan", null);
-    var kembali = adaCatatan(daftar, idLaporan, "pengembalian", null);
-    var statusCSBaru = kembali ? "dikembalikan" : (diterima ? "diterima" : "menunggu");
-    var statusLaporan = kembali ? "sudah_dikembalikan" : "belum_dikembalikan";
+    var diterima = adaCatatan(daftar, idLaporan, 'penerimaan', null);
+    var kembali = adaCatatan(daftar, idLaporan, 'pengembalian', null);
+    var statusCSBaru = kembali ? 'dikembalikan' : diterima ? 'diterima' : 'menunggu';
+    var statusLaporan = kembali ? 'sudah_dikembalikan' : 'belum_dikembalikan';
 
     if (cacheLaporan !== null) {
         for (var k = 0; k < cacheLaporan.length; k++) {
@@ -1501,7 +1770,7 @@ function sesuaikanStatusLaporan(idLaporan) {
         }
     }
     if (ditemukan) {
-        simpanSesi("atlofLaporan", laporan);
+        simpanSesi('atlofLaporan', laporan);
     }
 }
 
@@ -1525,7 +1794,9 @@ function riwayatUntukBarang(idLaporan) {
     for (var i = 0; i < semua.length; i++) {
         if (Number(semua[i].id_laporan) === Number(idLaporan)) hasil.push(semua[i]);
     }
-    hasil.sort(function (a, b) { return Number(b.id) - Number(a.id); });
+    hasil.sort(function (a, b) {
+        return Number(b.id) - Number(a.id);
+    });
     return hasil;
 }
 
@@ -1533,90 +1804,122 @@ function jenisBerikutnyaSerah(daftar) {
     var adaPenerimaan = false;
     var adaPengembalian = false;
     for (var i = 0; i < daftar.length; i++) {
-        if (daftar[i].jenis === "penerimaan") adaPenerimaan = true;
-        if (daftar[i].jenis === "pengembalian") adaPengembalian = true;
+        if (daftar[i].jenis === 'penerimaan') adaPenerimaan = true;
+        if (daftar[i].jenis === 'pengembalian') adaPengembalian = true;
     }
-    if (!adaPenerimaan) return "penerimaan";
-    if (!adaPengembalian) return "pengembalian";
-    return "selesai";
+    if (!adaPenerimaan) return 'penerimaan';
+    if (!adaPengembalian) return 'pengembalian';
+    return 'selesai';
 }
 
 function tampilkanHalamanSerah() {
-    if (!ambil("serah-konten") || !adalahAdmin()) return;
+    if (!ambil('serah-konten') || !adalahAdmin()) return;
 
     var barangCS = barangSerahSaya(idSerahSekarang);
     if (!barangCS) {
-        ambil("serah-konten").style.display = "none";
-        ambil("serah-tidak-ada").style.display = "block";
+        ambil('serah-konten').style.display = 'none';
+        ambil('serah-tidak-ada').style.display = 'block';
         return;
     }
 
-    ambil("serah-tidak-ada").style.display = "none";
-    ambil("serah-konten").style.display = "block";
-    teks("serah-nama-barang", barangCS.nama);
-    teks("serah-id-laporan", "#" + barangCS.id);
-    teks("serah-kampus", namaKampus(dataAkun().kampus_cs));
-    teks("serah-penyimpanan", namaKampus(barangCS.penyimpanan));
+    ambil('serah-tidak-ada').style.display = 'none';
+    ambil('serah-konten').style.display = 'block';
+    teks('serah-nama-barang', barangCS.nama);
+    teks('serah-id-laporan', '#' + barangCS.id);
+    teks('serah-kampus', namaKampus(dataAkun().kampus_cs));
+    teks('serah-penyimpanan', namaKampus(barangCS.penyimpanan));
 
     var daftar = riwayatUntukBarang(idSerahSekarang);
     var berikutnya = jenisBerikutnyaSerah(daftar);
-    var statusTampil = berikutnya === "penerimaan" ? "Menunggu pencatatan penerimaan" :
-        berikutnya === "pengembalian" ? "Diterima CS" : "Sudah dikembalikan";
-    var kelasStatus = berikutnya === "penerimaan" ? "menunggu" :
-        berikutnya === "pengembalian" ? "diterima" : "selesai";
-    teks("serah-status", statusTampil);
-    ambil("serah-status").className = "serah-status " + kelasStatus;
-    ambil("serah-status-badge").className = "serah-status-badge " + kelasStatus;
-    ambil("serah-status-badge").textContent =
-        berikutnya === "penerimaan" ? "Menunggu penerimaan" :
-        berikutnya === "pengembalian" ? "Sudah diterima CS" : "Sudah dikembalikan";
-    ambil("kotak-form-serah").style.display = berikutnya === "selesai" ? "none" : "block";
+    var statusTampil =
+        berikutnya === 'penerimaan'
+            ? 'Menunggu pencatatan penerimaan'
+            : berikutnya === 'pengembalian'
+              ? 'Diterima CS'
+              : 'Sudah dikembalikan';
+    var kelasStatus =
+        berikutnya === 'penerimaan'
+            ? 'menunggu'
+            : berikutnya === 'pengembalian'
+              ? 'diterima'
+              : 'selesai';
+    teks('serah-status', statusTampil);
+    ambil('serah-status').className = 'serah-status ' + kelasStatus;
+    ambil('serah-status-badge').className = 'serah-status-badge ' + kelasStatus;
+    ambil('serah-status-badge').textContent =
+        berikutnya === 'penerimaan'
+            ? 'Menunggu penerimaan'
+            : berikutnya === 'pengembalian'
+              ? 'Sudah diterima CS'
+              : 'Sudah dikembalikan';
+    ambil('kotak-form-serah').style.display = berikutnya === 'selesai' ? 'none' : 'block';
 
     // Saat penerimaan dan pengembalian sudah lengkap, form disembunyikan.
     // Panel riwayat lalu memakai lebar penuh agar dua kartu tetap lega.
-    var layoutSerah = document.querySelector(".layout-serah-baru");
+    var layoutSerah = document.querySelector('.layout-serah-baru');
     if (layoutSerah) {
-        layoutSerah.className = berikutnya === "selesai" ?
-            "layout-serah-baru tanpa-form" : "layout-serah-baru";
+        layoutSerah.className =
+            berikutnya === 'selesai' ? 'layout-serah-baru tanpa-form' : 'layout-serah-baru';
     }
 
-    if (berikutnya !== "selesai") {
-        ambil("form-serah-baru").reset();
-        ambil("id-catatan-edit-baru").value = "";
-        teks("judul-form-serah-baru", berikutnya === "penerimaan" ? "Catat penerimaan barang" : "Catat pengembalian barang");
-        teks("keterangan-form-serah", berikutnya === "penerimaan" ?
-            "Isi data setelah barang benar-benar diterima CS." :
-            "Catat setelah barang diserahkan kepada pemilik yang sudah diverifikasi.");
-        ambil("jenis-serah-tampil").value = namaJenisSerah(berikutnya);
-        teks("label-pihak-serah", berikutnya === "penerimaan" ? "Nama penyerah" : "Nama penerima");
-        teks("tombol-simpan-serah", "Simpan " + (berikutnya === "penerimaan" ? "penerimaan" : "pengembalian"));
-        ambil("konfirmasi-kembali").style.display = berikutnya === "pengembalian" ? "block" : "none";
-        ambil("batal-edit-serah").style.display = "none";
+    if (berikutnya !== 'selesai') {
+        ambil('form-serah-baru').reset();
+        ambil('id-catatan-edit-baru').value = '';
+        teks(
+            'judul-form-serah-baru',
+            berikutnya === 'penerimaan' ? 'Catat penerimaan barang' : 'Catat pengembalian barang',
+        );
+        teks(
+            'keterangan-form-serah',
+            berikutnya === 'penerimaan'
+                ? 'Isi data setelah barang benar-benar diterima CS.'
+                : 'Catat setelah barang diserahkan kepada pemilik yang sudah diverifikasi.',
+        );
+        ambil('jenis-serah-tampil').value = namaJenisSerah(berikutnya);
+        teks('label-pihak-serah', berikutnya === 'penerimaan' ? 'Nama penyerah' : 'Nama penerima');
+        teks(
+            'tombol-simpan-serah',
+            'Simpan ' + (berikutnya === 'penerimaan' ? 'penerimaan' : 'pengembalian'),
+        );
+        ambil('konfirmasi-kembali').style.display =
+            berikutnya === 'pengembalian' ? 'block' : 'none';
+        ambil('batal-edit-serah').style.display = 'none';
         idCatatanEditSerah = 0;
     }
 
-    var isi = "";
+    var isi = '';
     for (var i = 0; i < daftar.length; i++) {
         var c = daftar[i];
-        isi += '<div class="serah-item ' + c.jenis + '">' +
+        isi +=
+            '<div class="serah-item ' +
+            c.jenis +
+            '">' +
             '<div class="serah-item-atas">' +
             '<div class="serah-judul">' +
-            '<h3>' + bersihkan(namaJenisSerah(c.jenis)) + '</h3>' +
-            '<span class="serah-waktu">Waktu: ' + bersihkan(c.waktu) + '</span>' +
+            '<h3>' +
+            bersihkan(namaJenisSerah(c.jenis)) +
+            '</h3>' +
+            '<span class="serah-waktu">Waktu: ' +
+            bersihkan(c.waktu) +
+            '</span>' +
             '</div>' +
             '</div>' +
             '<div class="serah-meta">' +
-            metaSerah(c.jenis === "penerimaan" ? "Penyerah" : "Penerima", c.nama_pihak) +
-            metaSerah("Petugas", c.petugas) +
-            (c.catatan ? metaSerah("Keterangan", c.catatan, true) : '') +
+            metaSerah(c.jenis === 'penerimaan' ? 'Penyerah' : 'Penerima', c.nama_pihak) +
+            metaSerah('Petugas', c.petugas) +
+            (c.catatan ? metaSerah('Keterangan', c.catatan, true) : '') +
             '</div>' +
             '<div class="aksi">' +
-            '<button type="button" class="tombol tombol-outline tombol-kecil" onclick="mulaiEditSerah(' + Number(c.id) + ')">Edit</button>' +
-            '<button type="button" class="tombol tombol-bahaya tombol-kecil" onclick="hapusCatatanSerah(' + Number(c.id) + ')">Hapus</button>' +
+            '<button type="button" class="tombol tombol-outline tombol-kecil" onclick="mulaiEditSerah(' +
+            Number(c.id) +
+            ')">Edit</button>' +
+            '<button type="button" class="tombol tombol-bahaya tombol-kecil" onclick="hapusCatatanSerah(' +
+            Number(c.id) +
+            ')">Hapus</button>' +
             '</div></div>';
     }
-    ambil("riwayat-barang-serah").innerHTML = isi;
-    ambil("kosong-riwayat-barang").style.display = daftar.length ? "none" : "block";
+    ambil('riwayat-barang-serah').innerHTML = isi;
+    ambil('kosong-riwayat-barang').style.display = daftar.length ? 'none' : 'block';
 }
 
 function mulaiEditSerah(idCatatan) {
@@ -1625,18 +1928,24 @@ function mulaiEditSerah(idCatatan) {
     if (!catatan || Number(catatan.id_laporan) !== idSerahSekarang) return;
 
     idCatatanEditSerah = Number(catatan.id);
-    ambil("kotak-form-serah").style.display = "block";
-    ambil("id-catatan-edit-baru").value = String(catatan.id);
-    ambil("jenis-serah-tampil").value = namaJenisSerah(catatan.jenis);
-    ambil("nama-pihak-serah").value = catatan.nama_pihak;
-    ambil("keterangan-serah-baru").value = catatan.catatan || "";
-    teks("judul-form-serah-baru", "Edit catatan " + (catatan.jenis === "penerimaan" ? "penerimaan" : "pengembalian"));
-    teks("label-pihak-serah", catatan.jenis === "penerimaan" ? "Nama penyerah" : "Nama penerima");
-    teks("keterangan-form-serah", "Perbaiki nama pihak atau keterangan. Jenis transaksi dan barang tidak bisa diubah.");
-    teks("tombol-simpan-serah", "Simpan perubahan");
-    ambil("konfirmasi-kembali").style.display = "none";
-    ambil("batal-edit-serah").style.display = "inline-block";
-    ambil("kotak-form-serah").scrollIntoView({ behavior: "smooth", block: "start" });
+    ambil('kotak-form-serah').style.display = 'block';
+    ambil('id-catatan-edit-baru').value = String(catatan.id);
+    ambil('jenis-serah-tampil').value = namaJenisSerah(catatan.jenis);
+    ambil('nama-pihak-serah').value = catatan.nama_pihak;
+    ambil('keterangan-serah-baru').value = catatan.catatan || '';
+    teks(
+        'judul-form-serah-baru',
+        'Edit catatan ' + (catatan.jenis === 'penerimaan' ? 'penerimaan' : 'pengembalian'),
+    );
+    teks('label-pihak-serah', catatan.jenis === 'penerimaan' ? 'Nama penyerah' : 'Nama penerima');
+    teks(
+        'keterangan-form-serah',
+        'Perbaiki nama pihak atau keterangan. Jenis transaksi dan barang tidak bisa diubah.',
+    );
+    teks('tombol-simpan-serah', 'Simpan perubahan');
+    ambil('konfirmasi-kembali').style.display = 'none';
+    ambil('batal-edit-serah').style.display = 'inline-block';
+    ambil('kotak-form-serah').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function batalEditSerah() {
@@ -1649,28 +1958,32 @@ function hapusCatatanSerah(idCatatan) {
     var c = cariCatatan(Number(idCatatan));
     if (!c || Number(c.id_laporan) !== idSerahSekarang) return;
     var daftar = semuaCatatan();
-    if (c.jenis === "penerimaan" && adaCatatan(daftar, idSerahSekarang, "pengembalian", null)) {
-        pesan("Hapus catatan pengembalian terlebih dahulu sebelum menghapus penerimaan.");
+    if (c.jenis === 'penerimaan' && adaCatatan(daftar, idSerahSekarang, 'pengembalian', null)) {
+        pesan('Hapus catatan pengembalian terlebih dahulu sebelum menghapus penerimaan.');
         return;
     }
-    if (!confirm("Hapus catatan " + namaJenisSerah(c.jenis).toLowerCase() + " ini?")) return;
+    if (!confirm('Hapus catatan ' + namaJenisSerah(c.jenis).toLowerCase() + ' ini?')) return;
 
     if (modeServer && cacheSerah !== null) {
         var dataKirim = new FormData();
-        dataKirim.append("id", idCatatan);
-        kirimData("serah_terima.php?aksi=delete", dataKirim).then(function (hasil) {
-            if (!hasil.ok || hasil.data.status !== "success") {
-                pesan(hasil.data.message || "Gagal menghapus catatan.");
-                return;
-            }
-            return muatLaporanServer().then(muatSerahServer).then(function () {
-                idCatatanEditSerah = 0;
-                tampilkanHalamanSerah();
-                pesan("Catatan berhasil dihapus.");
+        dataKirim.append('id', idCatatan);
+        kirimData('serah_terima.php?aksi=delete', dataKirim)
+            .then(function (hasil) {
+                if (!hasil.ok || hasil.data.status !== 'success') {
+                    pesan(hasil.data.message || 'Gagal menghapus catatan.');
+                    return;
+                }
+                return muatLaporanServer()
+                    .then(muatSerahServer)
+                    .then(function () {
+                        idCatatanEditSerah = 0;
+                        tampilkanHalamanSerah();
+                        pesan('Catatan berhasil dihapus.');
+                    });
+            })
+            .catch(function () {
+                pesan('Gagal menghubungi server.');
             });
-        }).catch(function () {
-            pesan("Gagal menghubungi server.");
-        });
         return;
     }
 
@@ -1682,73 +1995,80 @@ function hapusCatatanSerah(idCatatan) {
     sesuaikanStatusLaporan(idSerahSekarang);
     idCatatanEditSerah = 0;
     tampilkanHalamanSerah();
-    pesan("Catatan berhasil dihapus.");
+    pesan('Catatan berhasil dihapus.');
 }
 
 // Halaman Kelola Serah Terima dibuka dengan serah_terima.xhtml?id=ID_LAPORAN.
 function siapkanHalamanSerah() {
-    if (!ambil("serah-konten") || !adalahAdmin()) return;
+    if (!ambil('serah-konten') || !adalahAdmin()) return;
 
     var parameterSerah = new URLSearchParams(window.location.search);
-    var idDariAlamat = parameterSerah.get("id");
-    idSerahSekarang = /^\d+$/.test(idDariAlamat || "") ? Number(idDariAlamat) : 0;
+    var idDariAlamat = parameterSerah.get('id');
+    idSerahSekarang = /^\d+$/.test(idDariAlamat || '') ? Number(idDariAlamat) : 0;
 
     tampilkanHalamanSerah();
-    ambil("batal-edit-serah").onclick = batalEditSerah;
-    ambil("form-serah-baru").onsubmit = function (event) {
+    ambil('batal-edit-serah').onclick = batalEditSerah;
+    ambil('form-serah-baru').onsubmit = function (event) {
         event.preventDefault();
         var barangCS = barangSerahSaya(idSerahSekarang);
         if (!barangCS) return;
 
-        var nama = ambil("nama-pihak-serah").value.trim();
-        var keterangan = ambil("keterangan-serah-baru").value.trim();
+        var nama = ambil('nama-pihak-serah').value.trim();
+        var keterangan = ambil('keterangan-serah-baru').value.trim();
         if (!nama) {
-            pesan("Nama penyerah atau penerima harus diisi.");
+            pesan('Nama penyerah atau penerima harus diisi.');
             return;
         }
 
         if (modeServer && cacheSerah !== null) {
             var dataKirim = new FormData();
-            dataKirim.append("nama_pihak", nama);
-            dataKirim.append("catatan", keterangan);
-            var aksi = "create";
+            dataKirim.append('nama_pihak', nama);
+            dataKirim.append('catatan', keterangan);
+            var aksi = 'create';
 
             if (idCatatanEditSerah) {
                 var lamaCatatan = cariCatatan(idCatatanEditSerah);
                 if (!lamaCatatan || Number(lamaCatatan.id_laporan) !== idSerahSekarang) return;
-                if (!confirm("Simpan perubahan catatan ini?")) return;
-                aksi = "update";
-                dataKirim.append("id", idCatatanEditSerah);
+                if (!confirm('Simpan perubahan catatan ini?')) return;
+                aksi = 'update';
+                dataKirim.append('id', idCatatanEditSerah);
             } else {
                 var jenis = jenisBerikutnyaSerah(riwayatUntukBarang(idSerahSekarang));
-                if (jenis === "selesai") {
-                    pesan("Penerimaan dan pengembalian barang sudah dicatat.");
+                if (jenis === 'selesai') {
+                    pesan('Penerimaan dan pengembalian barang sudah dicatat.');
                     return;
                 }
-                if (jenis === "pengembalian" && !ambil("cek-verifikasi-serah").checked) {
-                    pesan("Centang konfirmasi verifikasi kepemilikan sebelum mencatat pengembalian.");
+                if (jenis === 'pengembalian' && !ambil('cek-verifikasi-serah').checked) {
+                    pesan(
+                        'Centang konfirmasi verifikasi kepemilikan sebelum mencatat pengembalian.',
+                    );
                     return;
                 }
-                if (!confirm("Simpan catatan " + namaJenisSerah(jenis).toLowerCase() + " ini?")) return;
-                dataKirim.append("laporan_id", idSerahSekarang);
-                if (ambil("cek-verifikasi-serah").checked) {
-                    dataKirim.append("cek_verifikasi", "1");
+                if (!confirm('Simpan catatan ' + namaJenisSerah(jenis).toLowerCase() + ' ini?'))
+                    return;
+                dataKirim.append('laporan_id', idSerahSekarang);
+                if (ambil('cek-verifikasi-serah').checked) {
+                    dataKirim.append('cek_verifikasi', '1');
                 }
             }
 
-            kirimData("serah_terima.php?aksi=" + aksi, dataKirim).then(function (hasil) {
-                if (!hasil.ok || hasil.data.status !== "success") {
-                    pesan(hasil.data.message || "Gagal menyimpan catatan.");
-                    return;
-                }
-                return muatLaporanServer().then(muatSerahServer).then(function () {
-                    idCatatanEditSerah = 0;
-                    tampilkanHalamanSerah();
-                    pesan("Catatan berhasil disimpan.");
+            kirimData('serah_terima.php?aksi=' + aksi, dataKirim)
+                .then(function (hasil) {
+                    if (!hasil.ok || hasil.data.status !== 'success') {
+                        pesan(hasil.data.message || 'Gagal menyimpan catatan.');
+                        return;
+                    }
+                    return muatLaporanServer()
+                        .then(muatSerahServer)
+                        .then(function () {
+                            idCatatanEditSerah = 0;
+                            tampilkanHalamanSerah();
+                            pesan('Catatan berhasil disimpan.');
+                        });
+                })
+                .catch(function () {
+                    pesan('Gagal menghubungi server.');
                 });
-            }).catch(function () {
-                pesan("Gagal menghubungi server.");
-            });
             return;
         }
 
@@ -1756,7 +2076,7 @@ function siapkanHalamanSerah() {
         if (idCatatanEditSerah) {
             var lama = cariCatatan(idCatatanEditSerah);
             if (!lama || Number(lama.id_laporan) !== idSerahSekarang) return;
-            if (!confirm("Simpan perubahan catatan ini?")) return;
+            if (!confirm('Simpan perubahan catatan ini?')) return;
             for (var i = 0; i < daftar.length; i++) {
                 if (Number(daftar[i].id) === idCatatanEditSerah) {
                     daftar[i].nama_pihak = nama;
@@ -1765,15 +2085,15 @@ function siapkanHalamanSerah() {
             }
         } else {
             var jenis = jenisBerikutnyaSerah(riwayatUntukBarang(idSerahSekarang));
-            if (jenis === "selesai") {
-                pesan("Penerimaan dan pengembalian barang sudah dicatat.");
+            if (jenis === 'selesai') {
+                pesan('Penerimaan dan pengembalian barang sudah dicatat.');
                 return;
             }
-            if (jenis === "pengembalian" && !ambil("cek-verifikasi-serah").checked) {
-                pesan("Centang konfirmasi verifikasi kepemilikan sebelum mencatat pengembalian.");
+            if (jenis === 'pengembalian' && !ambil('cek-verifikasi-serah').checked) {
+                pesan('Centang konfirmasi verifikasi kepemilikan sebelum mencatat pengembalian.');
                 return;
             }
-            if (!confirm("Simpan catatan " + namaJenisSerah(jenis).toLowerCase() + " ini?")) return;
+            if (!confirm('Simpan catatan ' + namaJenisSerah(jenis).toLowerCase() + ' ini?')) return;
             var idBaru = Date.now();
             for (var j = 0; j < daftar.length; j++) {
                 if (Number(daftar[j].id) >= idBaru) idBaru = Number(daftar[j].id) + 1;
@@ -1787,87 +2107,110 @@ function siapkanHalamanSerah() {
                 nama_pihak: nama,
                 catatan: keterangan,
                 petugas: dataAkun().nama,
-                waktu: waktuCatatan()
+                waktu: waktuCatatan(),
             });
         }
         simpanCatatan(daftar);
         sesuaikanStatusLaporan(idSerahSekarang);
         idCatatanEditSerah = 0;
         tampilkanHalamanSerah();
-        pesan("Catatan berhasil disimpan.");
+        pesan('Catatan berhasil disimpan.');
     };
 }
 
 // Halaman Riwayat Serah Terima: tampilkan semua transaksi kampus yang sedang login.
 function tampilkanRiwayatCS() {
-    if (!ambil("daftar-riwayat-cs") || !adalahAdmin()) return;
+    if (!ambil('daftar-riwayat-cs') || !adalahAdmin()) return;
     var seluruh = catatanKampusSaya();
-    var cari = ambil("cari-riwayat-cs").value.toLowerCase().trim();
-    var filter = ambil("jenis-riwayat-cs").value;
+    var cari = ambil('cari-riwayat-cs').value.toLowerCase().trim();
+    var filter = ambil('jenis-riwayat-cs').value;
     var hasil = [];
 
     for (var i = 0; i < seluruh.length; i++) {
         var c = seluruh[i];
         var b = barangSerahSaya(c.id_laporan);
         if (!b) continue;
-        var kata = (b.nama + " " + b.id + " " + c.nama_pihak).toLowerCase();
-        if ((filter === "semua" || filter === c.jenis) && kata.indexOf(cari) !== -1) {
+        var kata = (b.nama + ' ' + b.id + ' ' + c.nama_pihak).toLowerCase();
+        if ((filter === 'semua' || filter === c.jenis) && kata.indexOf(cari) !== -1) {
             hasil.push(c);
         }
     }
 
-    hasil.sort(function (a, b) { return Number(b.id) - Number(a.id); });
-    teks("jumlah-riwayat-cs", hasil.length + " dari " + seluruh.length + " catatan");
-    teks("keterangan-riwayat-cs", "Riwayat penerimaan dan pengembalian di " + namaKampus(dataAkun().kampus_cs) + ".");
+    hasil.sort(function (a, b) {
+        return Number(b.id) - Number(a.id);
+    });
+    teks('jumlah-riwayat-cs', hasil.length + ' dari ' + seluruh.length + ' catatan');
+    teks(
+        'keterangan-riwayat-cs',
+        'Riwayat penerimaan dan pengembalian di ' + namaKampus(dataAkun().kampus_cs) + '.',
+    );
 
     var jumlahHalaman = Math.max(1, Math.ceil(hasil.length / jumlahRiwayatPerHalaman));
     if (halamanRiwayatCS > jumlahHalaman) halamanRiwayatCS = jumlahHalaman;
     var awal = (halamanRiwayatCS - 1) * jumlahRiwayatPerHalaman;
     var akhir = Math.min(awal + jumlahRiwayatPerHalaman, hasil.length);
-    var html = "";
+    var html = '';
 
     for (var j = awal; j < akhir; j++) {
         var catatan = hasil[j];
         var barangCS = barangSerahSaya(catatan.id_laporan);
-        html += '<div class="serah-item ' + catatan.jenis + '">' +
+        html +=
+            '<div class="serah-item ' +
+            catatan.jenis +
+            '">' +
             '<div class="serah-item-atas">' +
             '<div class="serah-judul">' +
-            '<h3>' + bersihkan(barangCS.nama) + ' <span class="serah-id">#' + Number(barangCS.id) + '</span></h3>' +
-            '<span class="serah-waktu">Waktu: ' + bersihkan(catatan.waktu) + '</span>' +
+            '<h3>' +
+            bersihkan(barangCS.nama) +
+            ' <span class="serah-id">#' +
+            Number(barangCS.id) +
+            '</span></h3>' +
+            '<span class="serah-waktu">Waktu: ' +
+            bersihkan(catatan.waktu) +
+            '</span>' +
             '</div>' +
-            '<span class="serah-jenis ' + catatan.jenis + '">' + bersihkan(namaJenisSerah(catatan.jenis)) + '</span>' +
+            '<span class="serah-jenis ' +
+            catatan.jenis +
+            '">' +
+            bersihkan(namaJenisSerah(catatan.jenis)) +
+            '</span>' +
             '</div>' +
             '<div class="serah-meta">' +
-            metaSerah(catatan.jenis === "penerimaan" ? "Penyerah" : "Penerima", catatan.nama_pihak) +
-            metaSerah("Petugas", catatan.petugas) +
-            (catatan.catatan ? metaSerah("Keterangan", catatan.catatan, true) : '') +
+            metaSerah(
+                catatan.jenis === 'penerimaan' ? 'Penyerah' : 'Penerima',
+                catatan.nama_pihak,
+            ) +
+            metaSerah('Petugas', catatan.petugas) +
+            (catatan.catatan ? metaSerah('Keterangan', catatan.catatan, true) : '') +
             '</div>' +
             '<div class="aksi"><a class="tombol tombol-outline tombol-kecil" href="serah_terima.xhtml?id=' +
-            Number(barangCS.id) + '">Lihat / kelola barang</a></div></div>';
+            Number(barangCS.id) +
+            '">Lihat / kelola barang</a></div></div>';
     }
-    ambil("daftar-riwayat-cs").innerHTML = html;
-    ambil("riwayat-cs-kosong").style.display = hasil.length ? "none" : "block";
-    ambil("halaman-riwayat-cs").style.display = hasil.length > jumlahRiwayatPerHalaman ? "flex" : "none";
-    teks("info-halaman-riwayat", "Halaman " + halamanRiwayatCS + " dari " + jumlahHalaman);
-    ambil("riwayat-sebelumnya").disabled = halamanRiwayatCS === 1;
-    ambil("riwayat-berikutnya").disabled = halamanRiwayatCS === jumlahHalaman;
+    ambil('daftar-riwayat-cs').innerHTML = html;
+    ambil('riwayat-cs-kosong').style.display = hasil.length ? 'none' : 'block';
+    ambil('halaman-riwayat-cs').style.display =
+        hasil.length > jumlahRiwayatPerHalaman ? 'flex' : 'none';
+    teks('info-halaman-riwayat', 'Halaman ' + halamanRiwayatCS + ' dari ' + jumlahHalaman);
+    ambil('riwayat-sebelumnya').disabled = halamanRiwayatCS === 1;
+    ambil('riwayat-berikutnya').disabled = halamanRiwayatCS === jumlahHalaman;
 }
 
 function siapkanRiwayatCS() {
-    if (!ambil("daftar-riwayat-cs") || !adalahAdmin()) return;
-    ambil("cari-riwayat-cs").oninput = function () {
+    if (!ambil('daftar-riwayat-cs') || !adalahAdmin()) return;
+    ambil('cari-riwayat-cs').oninput = function () {
         halamanRiwayatCS = 1;
         tampilkanRiwayatCS();
     };
-    ambil("jenis-riwayat-cs").onchange = function () {
+    ambil('jenis-riwayat-cs').onchange = function () {
         halamanRiwayatCS = 1;
         tampilkanRiwayatCS();
     };
-    ambil("riwayat-sebelumnya").onclick = function () {
+    ambil('riwayat-sebelumnya').onclick = function () {
         if (halamanRiwayatCS > 1) halamanRiwayatCS--;
         tampilkanRiwayatCS();
     };
-    ambil("riwayat-berikutnya").onclick = function () {
+    ambil('riwayat-berikutnya').onclick = function () {
         halamanRiwayatCS++;
         tampilkanRiwayatCS();
     };
@@ -1878,19 +2221,19 @@ function siapkanRiwayatCS() {
 // Mulai aplikasi: sinkronkan sesi, muat data MySQL, lalu render halaman.
 // ========================================================
 function renderHalaman() {
-    if (ambil("akses-masuk") && sudahMasuk()) {
+    if (ambil('akses-masuk') && sudahMasuk()) {
         window.location.href = tujuanSebelumnya();
         return;
     }
 
     tampilkanBeranda();
 
-    if (ambil("semua-barang")) filterBarang();
-    if (ambil("detail-nama")) tampilkanDetail();
-    if (ambil("barang-saya")) perbaruiLaporanSaya();
-    if (ambil("form-laporan")) aturFormLaporan("form-laporan");
-    if (ambil("form-edit")) aturFormLaporan("form-edit");
-    if (ambil("form-profil")) perbaruiProfil();
+    if (ambil('semua-barang')) filterBarang();
+    if (ambil('detail-nama')) tampilkanDetail();
+    if (ambil('barang-saya')) perbaruiLaporanSaya();
+    if (ambil('form-laporan')) aturFormLaporan('form-laporan');
+    if (ambil('form-edit')) aturFormLaporan('form-edit');
+    if (ambil('form-profil')) perbaruiProfil();
 
     siapkanDashboardCS();
     siapkanHalamanSerah();
@@ -1909,23 +2252,26 @@ function mulai() {
 
     var dataAwal = JSON.stringify([cacheLaporan, cacheSerah]);
     var bolehLanjut = true;
-    muatSesiServer().then(function () {
-        bolehLanjut = cekAksesHalaman();
-        if (bolehLanjut) {
-            pasangHeaderAkun();
-            pasangTautanAkses();
-        }
-        return bolehLanjut ? muatLaporanServer() : null;
-    }).then(function () {
-        return bolehLanjut ? muatSerahServer() : null;
-    }).then(function () {
-        // Render ulang hanya bila data server berbeda dari cache, supaya isian
-        // form yang sedang diketik pengguna tidak ter-reset dan footer tidak
-        // bergerak tanpa alasan.
-        if (bolehLanjut && JSON.stringify([cacheLaporan, cacheSerah]) !== dataAwal) {
-            renderHalaman();
-        }
-    });
+    muatSesiServer()
+        .then(function () {
+            bolehLanjut = cekAksesHalaman();
+            if (bolehLanjut) {
+                pasangHeaderAkun();
+                pasangTautanAkses();
+            }
+            return bolehLanjut ? muatLaporanServer() : null;
+        })
+        .then(function () {
+            return bolehLanjut ? muatSerahServer() : null;
+        })
+        .then(function () {
+            // Render ulang hanya bila data server berbeda dari cache, supaya isian
+            // form yang sedang diketik pengguna tidak ter-reset dan footer tidak
+            // bergerak tanpa alasan.
+            if (bolehLanjut && JSON.stringify([cacheLaporan, cacheSerah]) !== dataAwal) {
+                renderHalaman();
+            }
+        });
 }
 
 mulai();
