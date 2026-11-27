@@ -1160,7 +1160,7 @@ Urutan hari dimulai dari **Minggu**: `Min`, `Sen`, `Sel`, `Rab`, `Kam`, `Jum`, `
 | `gambar-barang`     | Tautan pembungkus gambar barang                                                         | Dibuat `app.js`                                           |
 | `isi-kartu`         | Bagian teks di dalam kartu barang                                                       | Dibuat `app.js`                                           |
 | `lencana-baris`     | Baris berisi lencana jenis barang                                                       | `detail` dan dibuat `app.js`                              |
-| `lencana`           | Lencana kecil (Poppins 12px) untuk jenis barang dan status                              | `detail` dan dibuat `app.js`                              |
+| `lencana`           | Lencana kecil (IBM Plex Sans 12px) untuk jenis barang dan status                        | `detail` dan dibuat `app.js`                              |
 | `hilang`            | Modifier lencana untuk laporan hilang                                                   | Dibuat `app.js` melalui `class="lencana ' + b.jenis + '"` |
 | `ditemukan`         | Modifier lencana untuk laporan ditemukan                                                | Dibuat `app.js` melalui `class="lencana ' + b.jenis + '"` |
 | `kartu-kelola`      | Satu kartu laporan di Laporan Saya: info barang, panel status, dan tombol aksi          | Dibuat `app.js`                                           |
@@ -1763,6 +1763,8 @@ Notifikasi gagal yang dibuat `app.js`:
 - `overflow: hidden` pada `.kartu-barang` tetap dipakai untuk memotong gambar dan sudut kartu.
 
 ### 20.3 Font
+
+Konfigurasi final: **7 file font** di `fonts/` — IBM Plex Sans, Poppins 400/500/600/700, dan IBM Plex Mono 400/600. Empat di-preload (IBM Plex Sans, Poppins 400, IBM Plex Mono 400/600); tiga lainnya (Poppins 500/600/700) sudah inline di CSS sehingga tidak dimuat terpisah.
 
 - **IBM Plex Sans** dipakai untuk teks UI/body melalui `--font-display` dan `--font-body`: judul, paragraf, label, dan nilai.
 - **Poppins** dipakai untuk navbar melalui `--font-navbar`: logo, menu navigasi, dan tombol Masuk/Daftar/Keluar di header.
