@@ -1,159 +1,250 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Buat Laporan - ATLOF</title>
+        <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexSans-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/Poppins-400-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexMono-400-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexMono-600-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+    </head>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Buat Laporan - ATLOF</title>
-    <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
-    <link rel="preload" href="fonts/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/Poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/IBMPlexMono-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/IBMPlexMono-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
-</head>
-
-<body>
-    <div class="header-utama">
-        <div class="container navbar">
-            <div class="logo">
-                <img src="images/logo-atlof-ikon.svg" alt="" />
-                <span>ATLOF<small>Atma Lost &amp; Found</small></span>
-            </div>
-            <div class="menu-links">
-                <a href="index.xhtml">Beranda</a>
-                <a href="katalog.xhtml">Katalog</a>
-                <a href="buat_laporan.xhtml" class="aktif">Buat Laporan</a>
-                <a href="laporan_saya.xhtml">Laporan Saya</a>
-            </div>
-            <div class="menu-akun" id="menu-akun">
-                <a href="login.xhtml" class="tombol tombol-outline tombol-kecil">Masuk</a>
-                <a href="pendaftaran.xhtml" class="tombol tombol-kuning tombol-kecil">Daftar</a>
+    <body>
+        <div class="header-utama">
+            <div class="container navbar">
+                <div class="logo">
+                    <img src="images/logo-atlof-ikon.svg" alt="" />
+                    <span>ATLOF<small>Atma Lost &amp; Found</small></span>
+                </div>
+                <div class="menu-links">
+                    <a href="index.xhtml">Beranda</a>
+                    <a href="katalog.xhtml">Katalog</a>
+                    <a href="buat_laporan.xhtml" class="aktif">Buat Laporan</a>
+                    <a href="laporan_saya.xhtml">Laporan Saya</a>
+                </div>
+                <div class="menu-akun" id="menu-akun">
+                    <a href="login.xhtml" class="tombol tombol-outline tombol-kecil">Masuk</a>
+                    <a href="pendaftaran.xhtml" class="tombol tombol-kuning tombol-kecil">Daftar</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div>
-        <div class="container bagian halaman-form">
-            <div class="pengantar">
-                <h1>Buat laporan barang</h1>
-                <p class="subjudul">Laporkan barang hilang atau barang yang kamu temukan. Informasi yang jelas akan
-                    membantu proses pencarian dan pengembalian.</p>
-            </div>
-            <div class="form-besar">
-                <form id="form-laporan" action="#" method="post" enctype="multipart/form-data">
-                    <h2 class="judul-form">Informasi laporan</h2>
-                    <div class="pilih-jenis"><label><input type="radio" name="jenis" value="hilang" checked="checked" />
-                            Barang hilang</label><label><input type="radio" name="jenis" value="ditemukan" /> Barang
-                            ditemukan</label></div>
-                    <div class="field"><label for="nama-barang">Nama barang <em>*</em></label><input id="nama-barang"
-                            name="nama-barang" type="text" /></div>
-                    <div class="dua-kolom">
-                        <div class="field"><label for="kategori">Kategori <em>*</em></label><select id="kategori"
-                                name="kategori">
-                                <option value="">Pilih kategori</option>
-                                <option value="tumbler">Tumbler</option>
-                                <option value="pakaian_jaket">Pakaian / Jaket</option>
-                                <option value="elektronik">Elektronik</option>
-                                <option value="dompet_kartu">Dompet / Kartu</option>
-                                <option value="kunci">Kunci</option>
-                                <option value="lainnya">Lainnya</option>
-                            </select></div>
-                        <div class="field"><label for="tanggal">Tanggal kejadian <em>*</em></label>
-                            <div class="tanggal-pilih">
-                                <input id="tanggal" name="tanggal" type="text" readonly="readonly"
-                                    title="Pilih tanggal" />
-                                <div id="kotak-kalender" class="kalender" style="display:none;">
-                                    <div class="kalender-atas">
-                                        <button type="button" id="bulan-sebelum"
-                                            title="Bulan sebelumnya">&#8249;</button>
-                                        <strong id="nama-bulan"></strong>
-                                        <button type="button" id="bulan-berikut"
-                                            title="Bulan berikutnya">&#8250;</button>
-                                    </div>
-                                    <div id="hari-kalender" class="kalender-grid"></div>
-                                </div>
-                            </div>
-                            <p class="bantuan">Klik kolom tanggal untuk membuka kalender.</p>
+        <div>
+            <div class="container bagian halaman-form">
+                <div class="pengantar">
+                    <h1>Buat laporan barang</h1>
+                    <p class="subjudul">
+                        Laporkan barang hilang atau barang yang kamu temukan. Informasi yang jelas
+                        akan membantu proses pencarian dan pengembalian.
+                    </p>
+                </div>
+                <div class="form-besar">
+                    <form id="form-laporan" action="#" method="post" enctype="multipart/form-data">
+                        <h2 class="judul-form">Informasi laporan</h2>
+                        <div class="pilih-jenis">
+                            <label
+                                ><input
+                                    type="radio"
+                                    name="jenis"
+                                    value="hilang"
+                                    checked="checked"
+                                />
+                                Barang hilang</label
+                            ><label
+                                ><input type="radio" name="jenis" value="ditemukan" /> Barang
+                                ditemukan</label
+                            >
                         </div>
-                    </div>
-                    <div class="field"><label for="lokasi" id="label-lokasi">Lokasi hilang <em>*</em></label><select
-                            id="lokasi" name="lokasi">
-                            <option value="">Pilih kampus</option>
-                            <option value="Kampus 1">Kampus 1 - Gedung Alfonsus Mrican</option>
-                            <option value="Kampus 2">Kampus 2 - Gedung Thomas Aquinas</option>
-                            <option value="Kampus 3">Kampus 3 - Gedung Bonaventura</option>
-                            <option value="Kampus 4">Kampus 4 - Gedung Theresa</option>
-                            <option value="Lainnya">Lainnya</option>
-                        </select>
-                        <p class="bantuan">Pilih kampus tempat barang hilang atau ditemukan.</p>
-                    </div>
-                    <div class="field" id="wadah-detail-lokasi" style="display:none"><label
-                            for="detail-lokasi">Keterangan lokasi lainnya</label><input type="text" id="detail-lokasi"
-                            name="detail-lokasi" /></div>
-                    <div class="field" id="wadah-penyimpanan" style="display:none"><label for="penyimpanan">Lokasi
-                            penyimpanan barang <em>*</em></label><select id="penyimpanan" name="penyimpanan">
-                            <option value="">Pilih lokasi penyimpanan</option>
-                            <option value="CS Kampus 1">CS Kampus 1 - Gedung Alfonsus Mrican</option>
-                            <option value="CS Kampus 2">CS Kampus 2 - Gedung Thomas Aquinas</option>
-                            <option value="CS Kampus 3">CS Kampus 3 - Gedung Bonaventura</option>
-                            <option value="CS Kampus 4">CS Kampus 4 - Gedung Theresa</option>
-                            <option value="Dibawa penemu">Dibawa penemu</option>
-                        </select>
-                        <p class="bantuan">Pastikan barang tetap aman hingga diserahkan kepada pemilik yang
-                            terverifikasi.</p>
-                    </div>
-                    <div class="field"><label for="deskripsi">Deskripsi barang <em>*</em></label><textarea
-                            id="deskripsi" name="deskripsi" rows="4"></textarea>
-                        <p class="bantuan">Tuliskan ciri umum secukupnya. Jangan ungkap seluruh ciri
-                            khusus atau informasi rahasia agar kepemilikan dapat diverifikasi saat ada yang mengklaim.
-                        </p>
-                    </div>
-                    <div class="field"><label for="foto">Foto barang (opsional)</label><input type="file" id="foto"
-                            name="foto" accept="image/png,image/jpeg,image/webp" />
-                        <p class="bantuan">Jangan mengunggah foto KTP, KTM, SIM, atau dokumen identitas
-                            dengan data terbaca jelas. Blur atau tutupi nama, nomor identitas, alamat, dan informasi
-                            sensitif sebelum mengunggah.</p>
-                    </div>
-                    <div class="field"><label for="telepon">Nomor WhatsApp alternatif (opsional)</label><input
-                            type="text" id="telepon" name="telepon" />
-                        <p class="bantuan" id="bantuan-telepon">Jika diisi, nomor WhatsApp kamu akan ditampilkan di
-                            halaman detail laporan dan dapat dilihat pengguna ATLOF lainnya. Kosongkan jika tidak ingin
-                            membagikan nomor. Kontak melalui Microsoft Teams tetap tersedia.</p>
-                    </div>
-                    <div class="aksi aksi-form"><button type="submit" class="tombol tombol-kuning">Kirim
-                            laporan</button><a href="laporan_saya.xhtml" class="tombol tombol-outline">Batal</a></div>
-                </form>
+                        <div class="field">
+                            <label for="nama-barang">Nama barang <em>*</em></label
+                            ><input id="nama-barang" name="nama-barang" type="text" />
+                        </div>
+                        <div class="dua-kolom">
+                            <div class="field">
+                                <label for="kategori">Kategori <em>*</em></label
+                                ><select id="kategori" name="kategori">
+                                    <option value="">Pilih kategori</option>
+                                    <option value="tumbler">Tumbler</option>
+                                    <option value="pakaian_jaket">Pakaian / Jaket</option>
+                                    <option value="elektronik">Elektronik</option>
+                                    <option value="dompet_kartu">Dompet / Kartu</option>
+                                    <option value="kunci">Kunci</option>
+                                    <option value="lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="tanggal">Tanggal kejadian <em>*</em></label>
+                                <div class="tanggal-pilih">
+                                    <input
+                                        id="tanggal"
+                                        name="tanggal"
+                                        type="text"
+                                        readonly="readonly"
+                                        title="Pilih tanggal"
+                                    />
+                                    <div id="kotak-kalender" class="kalender" style="display: none">
+                                        <div class="kalender-atas">
+                                            <button
+                                                type="button"
+                                                id="bulan-sebelum"
+                                                title="Bulan sebelumnya"
+                                            >
+                                                &#8249;
+                                            </button>
+                                            <strong id="nama-bulan"></strong>
+                                            <button
+                                                type="button"
+                                                id="bulan-berikut"
+                                                title="Bulan berikutnya"
+                                            >
+                                                &#8250;
+                                            </button>
+                                        </div>
+                                        <div id="hari-kalender" class="kalender-grid"></div>
+                                    </div>
+                                </div>
+                                <p class="bantuan">Klik kolom tanggal untuk membuka kalender.</p>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="lokasi" id="label-lokasi">Lokasi hilang <em>*</em></label
+                            ><select id="lokasi" name="lokasi">
+                                <option value="">Pilih kampus</option>
+                                <option value="Kampus 1">Kampus 1 - Gedung Alfonsus Mrican</option>
+                                <option value="Kampus 2">Kampus 2 - Gedung Thomas Aquinas</option>
+                                <option value="Kampus 3">Kampus 3 - Gedung Bonaventura</option>
+                                <option value="Kampus 4">Kampus 4 - Gedung Theresa</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                            <p class="bantuan">Pilih kampus tempat barang hilang atau ditemukan.</p>
+                        </div>
+                        <div class="field" id="wadah-detail-lokasi" style="display: none">
+                            <label for="detail-lokasi">Keterangan lokasi lainnya</label
+                            ><input type="text" id="detail-lokasi" name="detail-lokasi" />
+                        </div>
+                        <div class="field" id="wadah-penyimpanan" style="display: none">
+                            <label for="penyimpanan">Lokasi penyimpanan barang <em>*</em></label
+                            ><select id="penyimpanan" name="penyimpanan">
+                                <option value="">Pilih lokasi penyimpanan</option>
+                                <option value="CS Kampus 1">
+                                    CS Kampus 1 - Gedung Alfonsus Mrican
+                                </option>
+                                <option value="CS Kampus 2">
+                                    CS Kampus 2 - Gedung Thomas Aquinas
+                                </option>
+                                <option value="CS Kampus 3">
+                                    CS Kampus 3 - Gedung Bonaventura
+                                </option>
+                                <option value="CS Kampus 4">CS Kampus 4 - Gedung Theresa</option>
+                                <option value="Dibawa penemu">Dibawa penemu</option>
+                            </select>
+                            <p class="bantuan">
+                                Pastikan barang tetap aman hingga diserahkan kepada pemilik yang
+                                terverifikasi.
+                            </p>
+                        </div>
+                        <div class="field">
+                            <label for="deskripsi">Deskripsi barang <em>*</em></label
+                            ><textarea id="deskripsi" name="deskripsi" rows="4"></textarea>
+                            <p class="bantuan">
+                                Tuliskan ciri umum secukupnya. Jangan ungkap seluruh ciri khusus
+                                atau informasi rahasia agar kepemilikan dapat diverifikasi saat ada
+                                yang mengklaim.
+                            </p>
+                        </div>
+                        <div class="field">
+                            <label for="foto">Foto barang (opsional)</label
+                            ><input
+                                type="file"
+                                id="foto"
+                                name="foto"
+                                accept="image/png,image/jpeg,image/webp"
+                            />
+                            <p class="bantuan">
+                                Jangan mengunggah foto KTP, KTM, SIM, atau dokumen identitas dengan
+                                data terbaca jelas. Blur atau tutupi nama, nomor identitas, alamat,
+                                dan informasi sensitif sebelum mengunggah.
+                            </p>
+                        </div>
+                        <div class="field">
+                            <label for="telepon">Nomor WhatsApp alternatif (opsional)</label
+                            ><input type="text" id="telepon" name="telepon" />
+                            <p class="bantuan" id="bantuan-telepon">
+                                Jika diisi, nomor WhatsApp kamu akan ditampilkan di halaman detail
+                                laporan dan dapat dilihat pengguna ATLOF lainnya. Kosongkan jika
+                                tidak ingin membagikan nomor. Kontak melalui Microsoft Teams tetap
+                                tersedia.
+                            </p>
+                        </div>
+                        <div class="aksi aksi-form">
+                            <button type="submit" class="tombol tombol-kuning">Kirim laporan</button
+                            ><a href="laporan_saya.xhtml" class="tombol tombol-outline">Batal</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="footer-utama">
-        <div class="container footer-isi">
-            <div class="footer-tentang">
-                <div class="footer-merk">
-                    <h3>ATLOF</h3>
+        <div class="footer-utama">
+            <div class="container footer-isi">
+                <div class="footer-tentang">
+                    <div class="footer-merk">
+                        <h3>ATLOF</h3>
+                    </div>
+                    <p>
+                        Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang
+                        barang hilang dan ditemukan.
+                    </p>
+                    <span class="teks-emas">Temukan kembali, bantu kembali.</span>
                 </div>
-                <p>Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang barang hilang dan
-                    ditemukan.</p>
-                <span class="teks-emas">Temukan kembali, bantu kembali.</span>
-            </div>
-            <div class="footer-menu">
-                <h4>Jelajahi ATLOF</h4>
-                <a href="index.xhtml">Beranda</a>
-                <a href="katalog.xhtml">Cari barang</a>
-                <a href="buat_laporan.xhtml">Buat laporan</a>
-                <a href="laporan_saya.xhtml">Kelola laporan</a>
-            </div>
-            <div class="footer-kampus">
-                <div><strong>Untuk Lingkungan Kampus</strong>
-                    <p>Universitas Atma Jaya Yogyakarta</p><small>Kontak pelapor melalui Microsoft Teams. Pengembalian
-                        barang dilakukan dengan verifikasi kepemilikan.</small>
+                <div class="footer-menu">
+                    <h4>Jelajahi ATLOF</h4>
+                    <a href="index.xhtml">Beranda</a>
+                    <a href="katalog.xhtml">Cari barang</a>
+                    <a href="buat_laporan.xhtml">Buat laporan</a>
+                    <a href="laporan_saya.xhtml">Kelola laporan</a>
                 </div>
+                <div class="footer-kampus">
+                    <div>
+                        <strong>Untuk Lingkungan Kampus</strong>
+                        <p>Universitas Atma Jaya Yogyakarta</p>
+                        <small
+                            >Kontak pelapor melalui Microsoft Teams. Pengembalian barang dilakukan
+                            dengan verifikasi kepemilikan.</small
+                        >
+                    </div>
+                </div>
+            </div>
+            <div class="container footer-bawah">
+                <span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span>
             </div>
         </div>
-        <div class="container footer-bawah"><span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span></div>
-    </div>
-    <script type="text/javascript" src="js/app.js"></script>
-</body>
-
+        <script type="text/javascript" src="js/app.js"></script>
+    </body>
 </html>

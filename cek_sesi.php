@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Backend Cek Sesi - ATLOF
  * Mengecek apakah pengguna sedang dalam keadaan login di server
@@ -33,4 +34,3 @@ if (!empty($_SESSION['is_logged_in']) && $_SESSION['is_logged_in'] === true) {
     ]);
 }
 exit;
-?>

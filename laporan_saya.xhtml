@@ -1,84 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Laporan Saya - ATLOF</title>
+        <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexSans-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/Poppins-400-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexMono-400-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexMono-600-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+    </head>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Laporan Saya - ATLOF</title>
-    <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
-    <link rel="preload" href="fonts/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/Poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/IBMPlexMono-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/IBMPlexMono-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
-</head>
-
-<body>
-    <div class="header-utama">
-        <div class="container navbar">
-            <div class="logo">
-                <img src="images/logo-atlof-ikon.svg" alt="" />
-                <span>ATLOF<small>Atma Lost &amp; Found</small></span>
-            </div>
-            <div class="menu-links">
-                <a href="index.xhtml">Beranda</a>
-                <a href="katalog.xhtml">Katalog</a>
-                <a href="buat_laporan.xhtml">Buat Laporan</a>
-                <a href="laporan_saya.xhtml" class="aktif">Laporan Saya</a>
-            </div>
-            <div class="menu-akun" id="menu-akun">
-                <a href="login.xhtml" class="tombol tombol-outline tombol-kecil">Masuk</a>
-                <a href="pendaftaran.xhtml" class="tombol tombol-kuning tombol-kecil">Daftar</a>
-            </div>
-        </div>
-    </div>
-    <div>
-        <div class="container bagian">
-            <div class="judul-bagian">
-                <div>
-                    <h1>Laporan saya</h1>
-                    <p class="subjudul">Pantau status, perbarui informasi, atau hapus laporan yang sudah dibuat.</p>
-                </div><a href="buat_laporan.xhtml" class="tombol tombol-kuning">+ Buat laporan</a>
-            </div>
-            <div class="statistik"><span><strong id="total-saya">0</strong> total laporan</span><span><strong
-                        id="jumlah-hilang">0</strong> barang hilang</span><span><strong id="jumlah-ditemukan">0</strong>
-                    barang ditemukan</span></div>
-            <div id="barang-saya" class="grid-barang"></div>
-            <div id="kosong-saya" class="kosong" style="display:none">
-                <h2>Belum ada laporan</h2>
-                <p>Barang hilang atau menemukan barang? Buat laporan pertamamu sekarang.</p><a href="buat_laporan.xhtml"
-                    class="tombol tombol-kuning">Buat laporan</a>
-            </div>
-        </div>
-    </div>
-    <div class="footer-utama">
-        <div class="container footer-isi">
-            <div class="footer-tentang">
-                <div class="footer-merk">
-                    <h3>ATLOF</h3>
+    <body>
+        <div class="header-utama">
+            <div class="container navbar">
+                <div class="logo">
+                    <img src="images/logo-atlof-ikon.svg" alt="" />
+                    <span>ATLOF<small>Atma Lost &amp; Found</small></span>
                 </div>
-                <p>Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang barang hilang dan
-                    ditemukan.</p>
-                <span class="teks-emas">Temukan kembali, bantu kembali.</span>
-            </div>
-            <div class="footer-menu">
-                <h4>Jelajahi ATLOF</h4>
-                <a href="index.xhtml">Beranda</a>
-                <a href="katalog.xhtml">Cari barang</a>
-                <a href="buat_laporan.xhtml">Buat laporan</a>
-                <a href="laporan_saya.xhtml">Kelola laporan</a>
-            </div>
-            <div class="footer-kampus">
-                <div><strong>Untuk Lingkungan Kampus</strong>
-                    <p>Universitas Atma Jaya Yogyakarta</p><small>Kontak pelapor melalui Microsoft Teams. Pengembalian
-                        barang dilakukan dengan verifikasi kepemilikan.</small>
+                <div class="menu-links">
+                    <a href="index.xhtml">Beranda</a>
+                    <a href="katalog.xhtml">Katalog</a>
+                    <a href="buat_laporan.xhtml">Buat Laporan</a>
+                    <a href="laporan_saya.xhtml" class="aktif">Laporan Saya</a>
+                </div>
+                <div class="menu-akun" id="menu-akun">
+                    <a href="login.xhtml" class="tombol tombol-outline tombol-kecil">Masuk</a>
+                    <a href="pendaftaran.xhtml" class="tombol tombol-kuning tombol-kecil">Daftar</a>
                 </div>
             </div>
         </div>
-        <div class="container footer-bawah"><span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span></div>
-    </div>
-    <script type="text/javascript" src="js/app.js"></script>
-</body>
-
+        <div>
+            <div class="container bagian">
+                <div class="judul-bagian">
+                    <div>
+                        <h1>Laporan saya</h1>
+                        <p class="subjudul">
+                            Pantau status, perbarui informasi, atau hapus laporan yang sudah dibuat.
+                        </p>
+                    </div>
+                    <a href="buat_laporan.xhtml" class="tombol tombol-kuning">+ Buat laporan</a>
+                </div>
+                <div class="statistik">
+                    <span><strong id="total-saya">0</strong> total laporan</span
+                    ><span><strong id="jumlah-hilang">0</strong> barang hilang</span
+                    ><span><strong id="jumlah-ditemukan">0</strong> barang ditemukan</span>
+                </div>
+                <div id="barang-saya" class="grid-barang"></div>
+                <div id="kosong-saya" class="kosong" style="display: none">
+                    <h2>Belum ada laporan</h2>
+                    <p>Barang hilang atau menemukan barang? Buat laporan pertamamu sekarang.</p>
+                    <a href="buat_laporan.xhtml" class="tombol tombol-kuning">Buat laporan</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-utama">
+            <div class="container footer-isi">
+                <div class="footer-tentang">
+                    <div class="footer-merk">
+                        <h3>ATLOF</h3>
+                    </div>
+                    <p>
+                        Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang
+                        barang hilang dan ditemukan.
+                    </p>
+                    <span class="teks-emas">Temukan kembali, bantu kembali.</span>
+                </div>
+                <div class="footer-menu">
+                    <h4>Jelajahi ATLOF</h4>
+                    <a href="index.xhtml">Beranda</a>
+                    <a href="katalog.xhtml">Cari barang</a>
+                    <a href="buat_laporan.xhtml">Buat laporan</a>
+                    <a href="laporan_saya.xhtml">Kelola laporan</a>
+                </div>
+                <div class="footer-kampus">
+                    <div>
+                        <strong>Untuk Lingkungan Kampus</strong>
+                        <p>Universitas Atma Jaya Yogyakarta</p>
+                        <small
+                            >Kontak pelapor melalui Microsoft Teams. Pengembalian barang dilakukan
+                            dengan verifikasi kepemilikan.</small
+                        >
+                    </div>
+                </div>
+            </div>
+            <div class="container footer-bawah">
+                <span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span>
+            </div>
+        </div>
+        <script type="text/javascript" src="js/app.js"></script>
+    </body>
 </html>

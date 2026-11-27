@@ -1,161 +1,298 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Profil - ATLOF</title>
+        <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexSans-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/Poppins-400-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexMono-400-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexMono-600-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+    </head>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Profil - ATLOF</title>
-    <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
-    <link rel="preload" href="fonts/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/Poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/IBMPlexMono-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/IBMPlexMono-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
-</head>
-
-<body>
-    <div class="header-utama">
-        <div class="container navbar">
-            <div class="logo">
-                <img src="images/logo-atlof-ikon.svg" alt="" />
-                <span>ATLOF<small>Atma Lost &amp; Found</small></span>
-            </div>
-            <div class="menu-links">
-                <a href="index.xhtml">Beranda</a>
-                <a href="katalog.xhtml">Katalog</a>
-                <a href="buat_laporan.xhtml">Buat Laporan</a>
-                <a href="laporan_saya.xhtml">Laporan Saya</a>
-            </div>
-            <div class="menu-akun" id="menu-akun">
-                <a href="login.xhtml" class="tombol tombol-outline tombol-kecil">Masuk</a>
-                <a href="pendaftaran.xhtml" class="tombol tombol-kuning tombol-kecil">Daftar</a>
+    <body>
+        <div class="header-utama">
+            <div class="container navbar">
+                <div class="logo">
+                    <img src="images/logo-atlof-ikon.svg" alt="" />
+                    <span>ATLOF<small>Atma Lost &amp; Found</small></span>
+                </div>
+                <div class="menu-links">
+                    <a href="index.xhtml">Beranda</a>
+                    <a href="katalog.xhtml">Katalog</a>
+                    <a href="buat_laporan.xhtml">Buat Laporan</a>
+                    <a href="laporan_saya.xhtml">Laporan Saya</a>
+                </div>
+                <div class="menu-akun" id="menu-akun">
+                    <a href="login.xhtml" class="tombol tombol-outline tombol-kecil">Masuk</a>
+                    <a href="pendaftaran.xhtml" class="tombol tombol-kuning tombol-kecil">Daftar</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div>
-        <div class="container bagian halaman-profil">
-            <div class="profil-container">
-                <div class="profil-atas-judul">
-                    <h1>Profil saya</h1>
-                </div>
-                <div class="form-besar profil-kartu">
-                    <div class="profil-atas">
-                        <div id="avatar-profil" class="avatar">A</div>
-                        <div>
-                            <h2 id="nama-profil">Pengguna ATLOF</h2>
-                            <p id="email-profil">Email akun</p>
-                            <span id="label-peran-profil" class="label-peran" style="display:none;">Admin CS</span>
-                        </div>
+        <div>
+            <div class="container bagian halaman-profil">
+                <div class="profil-container">
+                    <div class="profil-atas-judul">
+                        <h1>Profil saya</h1>
                     </div>
-                    <div id="data-profil" class="profil-identitas">
-                        <div class="detail-identitas"><span>Nama lengkap</span><strong id="info-nama">-</strong></div>
-                        <div class="detail-identitas"><span>Email akun</span><strong id="info-email">-</strong></div>
-                        <div class="detail-identitas"><span>Microsoft Teams</span><strong id="info-teams"
-                                class="nilai-kosong">-</strong></div>
-                        <div id="identitas-admin" class="detail-identitas" style="display:none;">
-                            <span>Lokasi pelayanan</span><strong id="info-kampus-cs">-</strong>
+                    <div class="form-besar profil-kartu">
+                        <div class="profil-atas">
+                            <div id="avatar-profil" class="avatar">A</div>
+                            <div>
+                                <h2 id="nama-profil">Pengguna ATLOF</h2>
+                                <p id="email-profil">Email akun</p>
+                                <span
+                                    id="label-peran-profil"
+                                    class="label-peran"
+                                    style="display: none"
+                                    >Admin CS</span
+                                >
+                            </div>
                         </div>
-                        <div id="identitas-wa" class="detail-identitas" style="display:none;">
-                            <span>WhatsApp layanan</span><strong id="info-telepon" class="nilai-kosong">Belum
-                                diisi</strong>
+                        <div id="data-profil" class="profil-identitas">
+                            <div class="detail-identitas">
+                                <span>Nama lengkap</span><strong id="info-nama">-</strong>
+                            </div>
+                            <div class="detail-identitas">
+                                <span>Email akun</span><strong id="info-email">-</strong>
+                            </div>
+                            <div class="detail-identitas">
+                                <span>Microsoft Teams</span
+                                ><strong id="info-teams" class="nilai-kosong">-</strong>
+                            </div>
+                            <div
+                                id="identitas-admin"
+                                class="detail-identitas"
+                                style="display: none"
+                            >
+                                <span>Lokasi pelayanan</span><strong id="info-kampus-cs">-</strong>
+                            </div>
+                            <div id="identitas-wa" class="detail-identitas" style="display: none">
+                                <span>WhatsApp layanan</span
+                                ><strong id="info-telepon" class="nilai-kosong">Belum diisi</strong>
+                            </div>
                         </div>
+                        <div class="aksi profil-tombol" id="profil-tombol">
+                            <button
+                                type="button"
+                                id="tombol-edit-profil"
+                                class="tombol tombol-kuning"
+                            >
+                                Ubah profil</button
+                            ><button
+                                type="button"
+                                id="tombol-ganti-password"
+                                class="tombol tombol-outline"
+                            >
+                                Ubah password</button
+                            ><button type="button" id="tombol-logout" class="tombol tombol-bahaya">
+                                Keluar
+                            </button>
+                        </div>
+                        <form
+                            id="form-profil"
+                            class="panel-form"
+                            action="#"
+                            method="post"
+                            style="display: none"
+                        >
+                            <h3>Edit informasi profil</h3>
+                            <div class="field">
+                                <label for="nama">Nama lengkap</label
+                                ><input type="text" id="nama" />
+                            </div>
+                            <div class="field">
+                                <label for="email">Email akun</label
+                                ><input type="text" id="email" readonly="readonly" />
+                            </div>
+                            <div class="field">
+                                <label for="teams">Kontak Microsoft Teams</label
+                                ><input type="text" id="teams" />
+                            </div>
+                            <div class="field" id="form-nomor-cs" style="display: none">
+                                <label for="nomor-cs">WhatsApp layanan CS</label>
+                                <input type="text" id="nomor-cs" name="nomor-cs" />
+                                <p class="bantuan">
+                                    Nomor ini ditampilkan sebagai kontak CS untuk barang yang
+                                    dititipkan pada kampusmu. Gunakan nomor layanan yang diizinkan.
+                                </p>
+                            </div>
+                            <div class="aksi">
+                                <button class="tombol tombol-kuning" type="submit">
+                                    Simpan profil</button
+                                ><button class="tombol tombol-outline batal-profil" type="button">
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
+                        <form
+                            id="form-password"
+                            class="panel-form"
+                            action="#"
+                            method="post"
+                            style="display: none"
+                        >
+                            <h3>Ubah password</h3>
+                            <div class="field">
+                                <label for="password-lama">Password sekarang</label>
+                                <div class="wadah-password">
+                                    <input id="password-lama" type="password" />
+                                    <button
+                                        type="button"
+                                        class="tombol-mata"
+                                        data-target="password-lama"
+                                        title="Lihat/Sembunyikan password"
+                                        aria-label="Tampilkan password sekarang"
+                                    >
+                                        <img
+                                            src="images/ikon-mata-tutup.svg"
+                                            class="ikon-mata-tutup"
+                                            alt="Tampilkan password"
+                                            width="16"
+                                            height="16"
+                                        />
+                                        <img
+                                            src="images/ikon-mata-buka.svg"
+                                            class="ikon-mata-buka"
+                                            alt="Sembunyikan password"
+                                            width="16"
+                                            height="16"
+                                            style="display: none"
+                                        />
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="password-baru">Password baru</label>
+                                <div class="wadah-password">
+                                    <input id="password-baru" type="password" />
+                                    <button
+                                        type="button"
+                                        class="tombol-mata"
+                                        data-target="password-baru"
+                                        title="Lihat/Sembunyikan password"
+                                        aria-label="Tampilkan password baru"
+                                    >
+                                        <img
+                                            src="images/ikon-mata-tutup.svg"
+                                            class="ikon-mata-tutup"
+                                            alt="Tampilkan password"
+                                            width="16"
+                                            height="16"
+                                        />
+                                        <img
+                                            src="images/ikon-mata-buka.svg"
+                                            class="ikon-mata-buka"
+                                            alt="Sembunyikan password"
+                                            width="16"
+                                            height="16"
+                                            style="display: none"
+                                        />
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="konfirmasi-password">Konfirmasi password baru</label>
+                                <div class="wadah-password">
+                                    <input id="konfirmasi-password" type="password" />
+                                    <button
+                                        type="button"
+                                        class="tombol-mata"
+                                        data-target="konfirmasi-password"
+                                        title="Lihat/Sembunyikan konfirmasi password"
+                                        aria-label="Tampilkan konfirmasi password baru"
+                                    >
+                                        <img
+                                            src="images/ikon-mata-tutup.svg"
+                                            class="ikon-mata-tutup"
+                                            alt="Tampilkan password"
+                                            width="16"
+                                            height="16"
+                                        />
+                                        <img
+                                            src="images/ikon-mata-buka.svg"
+                                            class="ikon-mata-buka"
+                                            alt="Sembunyikan password"
+                                            width="16"
+                                            height="16"
+                                            style="display: none"
+                                        />
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="aksi">
+                                <button class="tombol tombol-kuning" type="submit">
+                                    Perbarui password</button
+                                ><button class="tombol tombol-outline batal-profil" type="button">
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="aksi profil-tombol" id="profil-tombol"><button type="button" id="tombol-edit-profil"
-                            class="tombol tombol-kuning">Ubah profil</button><button type="button"
-                            id="tombol-ganti-password" class="tombol tombol-outline">Ubah password</button><button
-                            type="button" id="tombol-logout" class="tombol tombol-bahaya">Keluar</button></div>
-                    <form id="form-profil" class="panel-form" action="#" method="post" style="display:none">
-                        <h3>Edit informasi profil</h3>
-                        <div class="field"><label for="nama">Nama lengkap</label><input type="text" id="nama" /></div>
-                        <div class="field"><label for="email">Email akun</label><input type="text" id="email"
-                                readonly="readonly" /></div>
-                        <div class="field"><label for="teams">Kontak Microsoft Teams</label><input type="text"
-                                id="teams" /></div>
-                        <div class="field" id="form-nomor-cs" style="display:none;">
-                            <label for="nomor-cs">WhatsApp layanan CS</label>
-                            <input type="text" id="nomor-cs" name="nomor-cs" />
-                            <p class="bantuan">Nomor ini ditampilkan sebagai kontak CS untuk barang yang dititipkan pada
-                                kampusmu. Gunakan nomor layanan yang diizinkan.</p>
-                        </div>
-                        <div class="aksi"><button class="tombol tombol-kuning" type="submit">Simpan
-                                profil</button><button class="tombol tombol-outline batal-profil"
-                                type="button">Batal</button></div>
-                    </form>
-                    <form id="form-password" class="panel-form" action="#" method="post" style="display:none">
-                        <h3>Ubah password</h3>
-                        <div class="field"><label for="password-lama">Password sekarang</label>
-                            <div class="wadah-password">
-                                <input id="password-lama" type="password" />
-                                <button type="button" class="tombol-mata" data-target="password-lama"
-                                    title="Lihat/Sembunyikan password" aria-label="Tampilkan password sekarang">
-                                    <img src="images/ikon-mata-tutup.svg" class="ikon-mata-tutup"
-                                        alt="Tampilkan password" width="16" height="16" />
-                                    <img src="images/ikon-mata-buka.svg" class="ikon-mata-buka"
-                                        alt="Sembunyikan password" width="16" height="16" style="display:none;" />
-                                </button>
-                            </div>
-                        </div>
-                        <div class="field"><label for="password-baru">Password baru</label>
-                            <div class="wadah-password">
-                                <input id="password-baru" type="password" />
-                                <button type="button" class="tombol-mata" data-target="password-baru"
-                                    title="Lihat/Sembunyikan password" aria-label="Tampilkan password baru">
-                                    <img src="images/ikon-mata-tutup.svg" class="ikon-mata-tutup"
-                                        alt="Tampilkan password" width="16" height="16" />
-                                    <img src="images/ikon-mata-buka.svg" class="ikon-mata-buka"
-                                        alt="Sembunyikan password" width="16" height="16" style="display:none;" />
-                                </button>
-                            </div>
-                        </div>
-                        <div class="field"><label for="konfirmasi-password">Konfirmasi password baru</label>
-                            <div class="wadah-password">
-                                <input id="konfirmasi-password" type="password" />
-                                <button type="button" class="tombol-mata" data-target="konfirmasi-password"
-                                    title="Lihat/Sembunyikan konfirmasi password"
-                                    aria-label="Tampilkan konfirmasi password baru">
-                                    <img src="images/ikon-mata-tutup.svg" class="ikon-mata-tutup"
-                                        alt="Tampilkan password" width="16" height="16" />
-                                    <img src="images/ikon-mata-buka.svg" class="ikon-mata-buka"
-                                        alt="Sembunyikan password" width="16" height="16" style="display:none;" />
-                                </button>
-                            </div>
-                        </div>
-                        <div class="aksi"><button class="tombol tombol-kuning" type="submit">Perbarui
-                                password</button><button class="tombol tombol-outline batal-profil"
-                                type="button">Batal</button></div>
-                    </form>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="footer-utama">
-        <div class="container footer-isi">
-            <div class="footer-tentang">
-                <div class="footer-merk">
-                    <h3>ATLOF</h3>
+        <div class="footer-utama">
+            <div class="container footer-isi">
+                <div class="footer-tentang">
+                    <div class="footer-merk">
+                        <h3>ATLOF</h3>
+                    </div>
+                    <p>
+                        Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang
+                        barang hilang dan ditemukan.
+                    </p>
+                    <span class="teks-emas">Temukan kembali, bantu kembali.</span>
                 </div>
-                <p>Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang barang hilang dan
-                    ditemukan.</p>
-                <span class="teks-emas">Temukan kembali, bantu kembali.</span>
-            </div>
-            <div class="footer-menu">
-                <h4>Jelajahi ATLOF</h4>
-                <a href="index.xhtml">Beranda</a>
-                <a href="katalog.xhtml">Cari barang</a>
-                <a href="buat_laporan.xhtml">Buat laporan</a>
-                <a href="laporan_saya.xhtml">Kelola laporan</a>
-            </div>
-            <div class="footer-kampus">
-                <div><strong>Untuk Lingkungan Kampus</strong>
-                    <p>Universitas Atma Jaya Yogyakarta</p><small>Kontak pelapor melalui Microsoft Teams. Pengembalian
-                        barang dilakukan dengan verifikasi kepemilikan.</small>
+                <div class="footer-menu">
+                    <h4>Jelajahi ATLOF</h4>
+                    <a href="index.xhtml">Beranda</a>
+                    <a href="katalog.xhtml">Cari barang</a>
+                    <a href="buat_laporan.xhtml">Buat laporan</a>
+                    <a href="laporan_saya.xhtml">Kelola laporan</a>
                 </div>
+                <div class="footer-kampus">
+                    <div>
+                        <strong>Untuk Lingkungan Kampus</strong>
+                        <p>Universitas Atma Jaya Yogyakarta</p>
+                        <small
+                            >Kontak pelapor melalui Microsoft Teams. Pengembalian barang dilakukan
+                            dengan verifikasi kepemilikan.</small
+                        >
+                    </div>
+                </div>
+            </div>
+            <div class="container footer-bawah">
+                <span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span>
             </div>
         </div>
-        <div class="container footer-bawah"><span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span></div>
-    </div>
-    <script type="text/javascript" src="js/app.js"></script>
-</body>
-
+        <script type="text/javascript" src="js/app.js"></script>
+    </body>
 </html>

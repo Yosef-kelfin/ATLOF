@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Backend Pendaftaran Akun - ATLOF
  * Pemrograman Web Dasar
@@ -16,7 +17,8 @@ $isJsonRequest = (
     (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
 );
 
-function kirimResponDaftar($status, $pesan, $data = [], $redirect = 'login.xhtml') {
+function kirimResponDaftar($status, $pesan, $data = [], $redirect = 'login.xhtml')
+{
     global $isJsonRequest;
 
     if ($isJsonRequest) {
@@ -130,4 +132,3 @@ $userData = [
 ];
 
 kirimResponDaftar('success', 'Pendaftaran berhasil! Selamat datang di ATLOF.', ['user' => $userData], $tujuan);
-?>

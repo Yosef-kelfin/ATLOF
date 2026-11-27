@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Backend Ubah Password - ATLOF
  * Pemrograman Web Dasar
@@ -93,4 +94,3 @@ mysqli_stmt_close($updateStmt);
 
 echo json_encode(['status' => 'success', 'message' => 'Password berhasil diubah.']);
 exit;
-?>

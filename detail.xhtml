@@ -1,112 +1,163 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Detail Laporan - ATLOF</title>
+        <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexSans-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/Poppins-400-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexMono-400-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="fonts/IBMPlexMono-600-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+    </head>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Detail Laporan - ATLOF</title>
-    <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
-    <link rel="preload" href="fonts/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/Poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/IBMPlexMono-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="fonts/IBMPlexMono-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
-</head>
-
-<body>
-    <div class="header-utama">
-        <div class="container navbar">
-            <div class="logo">
-                <img src="images/logo-atlof-ikon.svg" alt="" />
-                <span>ATLOF<small>Atma Lost &amp; Found</small></span>
-            </div>
-            <div class="menu-links">
-                <a href="index.xhtml">Beranda</a>
-                <a href="katalog.xhtml" class="aktif">Katalog</a>
-                <a href="buat_laporan.xhtml">Buat Laporan</a>
-                <a href="laporan_saya.xhtml">Laporan Saya</a>
-            </div>
-            <div class="menu-akun" id="menu-akun">
-                <a href="login.xhtml" class="tombol tombol-outline tombol-kecil">Masuk</a>
-                <a href="pendaftaran.xhtml" class="tombol tombol-kuning tombol-kecil">Daftar</a>
+    <body>
+        <div class="header-utama">
+            <div class="container navbar">
+                <div class="logo">
+                    <img src="images/logo-atlof-ikon.svg" alt="" />
+                    <span>ATLOF<small>Atma Lost &amp; Found</small></span>
+                </div>
+                <div class="menu-links">
+                    <a href="index.xhtml">Beranda</a>
+                    <a href="katalog.xhtml" class="aktif">Katalog</a>
+                    <a href="buat_laporan.xhtml">Buat Laporan</a>
+                    <a href="laporan_saya.xhtml">Laporan Saya</a>
+                </div>
+                <div class="menu-akun" id="menu-akun">
+                    <a href="login.xhtml" class="tombol tombol-outline tombol-kecil">Masuk</a>
+                    <a href="pendaftaran.xhtml" class="tombol tombol-kuning tombol-kecil">Daftar</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div>
-        <div class="container bagian">
-            <a href="katalog.xhtml" class="link-kembali">&#8592; Kembali ke katalog</a>
-            <div class="detail-grid">
-                <div class="foto-detail"><img id="detail-foto" src="images/placeholder.png" alt="Foto barang" /></div>
-                <div class="kotak-detail">
-                    <div class="lencana-baris"><span id="detail-jenis" class="lencana hilang">Hilang</span><span
-                            id="detail-status" class="lencana menunggu">Masih dicari</span></div>
-                    <h1 id="detail-nama">Detail barang</h1>
-                    <p id="detail-pelapor" class="teks-abu"></p>
-                    <table class="tabel-detail">
-                        <tr>
-                            <th>Kategori</th>
-                            <td id="detail-kategori"></td>
-                        </tr>
-                        <tr>
-                            <th>Kampus</th>
-                            <td id="detail-lokasi"></td>
-                        </tr>
-                        <tr>
-                            <th>Tanggal</th>
-                            <td id="detail-tanggal"></td>
-                        </tr>
-                        <tr>
-                            <th>Penyimpanan</th>
-                            <td id="detail-simpan"></td>
-                        </tr>
-                    </table>
-                    <h3>Deskripsi umum</h3>
-                    <p id="detail-deskripsi"></p>
-                    <p class="catatan">Pastikan kepemilikan barang diverifikasi dengan ciri khusus sebelum barang
-                        diserahkan kepada pengklaim.</p>
-                    <div class="kontak-detail">
-                        <p id="detail-info-kontak" class="bantuan"></p>
-                        <a id="detail-teams" class="tombol tombol-kuning" href="https://teams.microsoft.com/"
-                            rel="noopener noreferrer">Hubungi via Microsoft Teams</a>
-                        <a id="detail-atur-wa" class="tombol tombol-outline tombol-kecil" href="profil.xhtml"
-                            rel="noopener noreferrer" style="display:none;">Atur nomor WA layanan</a>
-                        <div id="detail-whatsapp" class="kontak-whatsapp" style="display:none;">
-                            <a id="detail-whatsapp-link" class="tombol tombol-outline tombol-kecil"
-                                href="https://wa.me/">Hubungi via WhatsApp</a>
+        <div>
+            <div class="container bagian">
+                <a href="katalog.xhtml" class="link-kembali">&#8592; Kembali ke katalog</a>
+                <div class="detail-grid">
+                    <div class="foto-detail">
+                        <img id="detail-foto" src="images/placeholder.png" alt="Foto barang" />
+                    </div>
+                    <div class="kotak-detail">
+                        <div class="lencana-baris">
+                            <span id="detail-jenis" class="lencana hilang">Hilang</span
+                            ><span id="detail-status" class="lencana menunggu">Masih dicari</span>
+                        </div>
+                        <h1 id="detail-nama">Detail barang</h1>
+                        <p id="detail-pelapor" class="teks-abu"></p>
+                        <table class="tabel-detail">
+                            <tr>
+                                <th>Kategori</th>
+                                <td id="detail-kategori"></td>
+                            </tr>
+                            <tr>
+                                <th>Kampus</th>
+                                <td id="detail-lokasi"></td>
+                            </tr>
+                            <tr>
+                                <th>Tanggal</th>
+                                <td id="detail-tanggal"></td>
+                            </tr>
+                            <tr>
+                                <th>Penyimpanan</th>
+                                <td id="detail-simpan"></td>
+                            </tr>
+                        </table>
+                        <h3>Deskripsi umum</h3>
+                        <p id="detail-deskripsi"></p>
+                        <p class="catatan">
+                            Pastikan kepemilikan barang diverifikasi dengan ciri khusus sebelum
+                            barang diserahkan kepada pengklaim.
+                        </p>
+                        <div class="kontak-detail">
+                            <p id="detail-info-kontak" class="bantuan"></p>
+                            <a
+                                id="detail-teams"
+                                class="tombol tombol-kuning"
+                                href="https://teams.microsoft.com/"
+                                rel="noopener noreferrer"
+                                >Hubungi via Microsoft Teams</a
+                            >
+                            <a
+                                id="detail-atur-wa"
+                                class="tombol tombol-outline tombol-kecil"
+                                href="profil.xhtml"
+                                rel="noopener noreferrer"
+                                style="display: none"
+                                >Atur nomor WA layanan</a
+                            >
+                            <div id="detail-whatsapp" class="kontak-whatsapp" style="display: none">
+                                <a
+                                    id="detail-whatsapp-link"
+                                    class="tombol tombol-outline tombol-kecil"
+                                    href="https://wa.me/"
+                                    >Hubungi via WhatsApp</a
+                                >
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="footer-utama">
-        <div class="container footer-isi">
-            <div class="footer-tentang">
-                <div class="footer-merk">
-                    <h3>ATLOF</h3>
+        <div class="footer-utama">
+            <div class="container footer-isi">
+                <div class="footer-tentang">
+                    <div class="footer-merk">
+                        <h3>ATLOF</h3>
+                    </div>
+                    <p>
+                        Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang
+                        barang hilang dan ditemukan.
+                    </p>
+                    <span class="teks-emas">Temukan kembali, bantu kembali.</span>
                 </div>
-                <p>Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang barang hilang dan
-                    ditemukan.</p>
-                <span class="teks-emas">Temukan kembali, bantu kembali.</span>
-            </div>
-            <div class="footer-menu">
-                <h4>Jelajahi ATLOF</h4>
-                <a href="index.xhtml">Beranda</a>
-                <a href="katalog.xhtml">Cari barang</a>
-                <a href="buat_laporan.xhtml">Buat laporan</a>
-                <a href="laporan_saya.xhtml">Kelola laporan</a>
-            </div>
-            <div class="footer-kampus">
-                <div><strong>Untuk Lingkungan Kampus</strong>
-                    <p>Universitas Atma Jaya Yogyakarta</p><small>Kontak pelapor melalui Microsoft Teams. Pengembalian
-                        barang dilakukan dengan verifikasi kepemilikan.</small>
+                <div class="footer-menu">
+                    <h4>Jelajahi ATLOF</h4>
+                    <a href="index.xhtml">Beranda</a>
+                    <a href="katalog.xhtml">Cari barang</a>
+                    <a href="buat_laporan.xhtml">Buat laporan</a>
+                    <a href="laporan_saya.xhtml">Kelola laporan</a>
                 </div>
+                <div class="footer-kampus">
+                    <div>
+                        <strong>Untuk Lingkungan Kampus</strong>
+                        <p>Universitas Atma Jaya Yogyakarta</p>
+                        <small
+                            >Kontak pelapor melalui Microsoft Teams. Pengembalian barang dilakukan
+                            dengan verifikasi kepemilikan.</small
+                        >
+                    </div>
+                </div>
+            </div>
+            <div class="container footer-bawah">
+                <span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span>
             </div>
         </div>
-        <div class="container footer-bawah"><span>&#169; 2026 ATLOF &#183; Atma Lost &amp; Found</span></div>
-    </div>
-    <script type="text/javascript" src="js/app.js"></script>
-</body>
-
+        <script type="text/javascript" src="js/app.js"></script>
+    </body>
 </html>

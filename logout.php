@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Backend Logout - ATLOF
  * Menghapus seluruh sesi dan mengarahkan kembali ke index.xhtml
@@ -46,4 +47,3 @@ if ($isJsonRequest) {
 
 header('Location: index.xhtml');
 exit;
-?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Backend Ubah Foto Profil - ATLOF
  * Pemrograman Web Dasar
@@ -177,4 +178,3 @@ echo json_encode([
     'foto'    => $relativeUrl
 ]);
 exit;
-?>

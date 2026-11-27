@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Backend Proses Login - ATLOF
  * Pemrograman Web Dasar
@@ -19,7 +20,8 @@ $isJsonRequest = (
 );
 
 // Helper untuk mengirim respon (JSON atau Redirect)
-function kirimRespon($status, $pesan, $data = [], $redirect = 'login.xhtml') {
+function kirimRespon($status, $pesan, $data = [], $redirect = 'login.xhtml')
+{
     global $isJsonRequest;
 
     if ($isJsonRequest) {
@@ -157,4 +159,3 @@ $userData = [
 ];
 
 kirimRespon('success', 'Login berhasil! Selamat datang, ' . $user['nama'], ['user' => $userData], $redirectUrl);
-?>

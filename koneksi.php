@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Koneksi Database ATLOF (Atma Lost & Found)
  * Pemrograman Web Dasar
@@ -27,4 +28,3 @@ if (!$conn) {
 
 // Set karakter encoding ke utf8mb4
 mysqli_set_charset($conn, 'utf8mb4');
-?>
