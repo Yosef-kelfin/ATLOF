@@ -818,6 +818,7 @@ Pengecekan di browser dilakukan `cekAksesHalaman()`. Pengecekan sebenarnya tetap
 - Login pengguna → `index.xhtml`. Parameter `?tujuan=...` masih dikirim, tetapi tidak lagi dipakai untuk redirect login.
 - Pendaftaran → nilai `?tujuan=...` yang dikirim form, atau `index.xhtml` bila kosong.
 - Tamu membuka halaman khusus → `akses_akun.xhtml?tujuan=<halaman>`.
+- Tombol hero **Masuk atau daftar untuk mulai** di beranda → `login.xhtml?tujuan=katalog.xhtml`, langsung ke form login. Halaman `akses_akun.xhtml` hanya dipakai sebagai gerbang saat tamu membuka halaman khusus; tidak lagi dipakai sebagai tujuan CTA beranda.
 - Pengguna biasa membuka halaman admin → `index.xhtml`.
 - Logout → `index.xhtml`.
 
@@ -1864,3 +1865,4 @@ Revisi terakhir menyelaraskan kode dan dokumentasi:
 24. Teks sekunder disatukan ke `#536379` dan ukuran minimal teks kecil dinaikkan ke 12px/13px agar lebih mudah dibaca.
 25. Detail titipan CS tidak lagi menampilkan dua aksi sekaligus: CS melihat **Atur nomor WA layanan**, pengguna melihat **Hubungi penemu via WhatsApp**.
 26. Perpaduan Poppins + Lora untuk prosa panjang dicoba lalu dibatalkan karena terasa kurang nyaman; konfigurasi font dikembalikan ke Poppins (navbar), IBM Plex Sans (teks UI/body), dan IBM Plex Mono (kalender/ID). Perbaikan kontras teks sekunder tetap dipertahankan.
+27. Tombol **Masuk atau daftar untuk mulai** di beranda tidak lagi mengarah ke halaman gerbang `akses_akun.xhtml`, melainkan langsung ke form `login.xhtml?tujuan=katalog.xhtml`.
