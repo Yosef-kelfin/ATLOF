@@ -6,34 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Kelola Serah Terima - ATLOF</title>
         <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
-        <link
-            rel="preload"
-            href="fonts/IBMPlexSans-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="fonts/Poppins-400-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="fonts/IBMPlexMono-400-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="fonts/IBMPlexMono-600-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
+        <link rel="preload" href="fonts/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link rel="preload" href="fonts/Poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link rel="preload" href="fonts/IBMPlexMono-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link rel="preload" href="fonts/IBMPlexMono-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
         <link rel="stylesheet" type="text/css" href="css/style.css" />
     </head>
 
@@ -63,9 +39,7 @@
                     <h1>Kelola Serah Terima</h1>
                     <p>Catat penerimaan dan pengembalian barang yang ditangani CS.</p>
                 </div>
-                <a class="tombol tombol-putih tombol-kecil" href="riwayat_serah_terima.xhtml"
-                    >Semua riwayat</a
-                >
+                <a class="tombol tombol-putih tombol-kecil" href="riwayat_serah_terima.xhtml">Semua riwayat</a>
             </div>
 
             <div id="serah-tidak-ada" class="kotak-form" style="display: none">
@@ -81,9 +55,7 @@
                         <strong id="serah-status-badge" class="serah-status-badge">Menunggu</strong>
                     </div>
                     <div class="serah-info-grid">
-                        <p style="display: none">
-                            <strong>ID laporan:</strong> <span id="serah-id-laporan"></span>
-                        </p>
+                        <p style="display: none"><strong>ID laporan:</strong> <span id="serah-id-laporan"></span></p>
                         <div class="serah-info-kotak">
                             <span class="serah-info-label">Kampus CS</span>
                             <strong id="serah-kampus">-</strong>
@@ -102,88 +74,41 @@
                 <div class="layout-serah-baru">
                     <div class="kotak-form" id="kotak-form-serah">
                         <h2 id="judul-form-serah-baru">Catat penerimaan barang</h2>
-                        <p id="keterangan-form-serah" class="teks-abu">
-                            Isi data setelah barang diterima secara fisik oleh CS.
-                        </p>
+                        <p id="keterangan-form-serah" class="teks-abu">Isi data setelah barang diterima secara fisik oleh CS.</p>
                         <form id="form-serah-baru" action="#" method="post">
-                            <input
-                                type="hidden"
-                                id="id-catatan-edit-baru"
-                                name="id_catatan"
-                                value=""
-                            />
+                            <input type="hidden" id="id-catatan-edit-baru" name="id_catatan" value="" />
                             <div class="field">
                                 <label for="jenis-serah-tampil">Jenis transaksi</label>
-                                <input
-                                    id="jenis-serah-tampil"
-                                    name="jenis_tampil"
-                                    type="text"
-                                    value=""
-                                    readonly="readonly"
-                                />
+                                <input id="jenis-serah-tampil" name="jenis_tampil" type="text" value="" readonly="readonly" />
                             </div>
                             <div class="field">
-                                <label id="label-pihak-serah" for="nama-pihak-serah"
-                                    >Nama penyerah</label
-                                >
-                                <input
-                                    id="nama-pihak-serah"
-                                    name="nama_pihak"
-                                    type="text"
-                                    maxlength="100"
-                                />
+                                <label id="label-pihak-serah" for="nama-pihak-serah">Nama penyerah</label>
+                                <input id="nama-pihak-serah" name="nama_pihak" type="text" maxlength="100" />
                             </div>
                             <div class="field">
-                                <label for="keterangan-serah-baru"
-                                    >Keterangan tambahan (opsional)</label
-                                >
-                                <textarea
-                                    id="keterangan-serah-baru"
-                                    name="keterangan"
-                                    rows="4"
-                                    cols="30"
-                                ></textarea>
+                                <label for="keterangan-serah-baru">Keterangan tambahan (opsional)</label>
+                                <textarea id="keterangan-serah-baru" name="keterangan" rows="4" cols="30"></textarea>
                                 <p class="bantuan">
-                                    Tuliskan kondisi barang atau informasi singkat yang diperlukan.
-                                    Jangan memasukkan nomor identitas atau data pribadi sensitif.
+                                    Tuliskan kondisi barang atau informasi singkat yang diperlukan. Jangan memasukkan nomor identitas atau data
+                                    pribadi sensitif.
                                 </p>
                             </div>
                             <div id="konfirmasi-kembali" class="field" style="display: none">
                                 <label class="centang" for="cek-verifikasi-serah">
-                                    <input
-                                        type="checkbox"
-                                        id="cek-verifikasi-serah"
-                                        name="cek_verifikasi"
-                                    />
-                                    Saya telah memverifikasi kepemilikan dan menyerahkan barang
-                                    kepada penerima.
+                                    <input type="checkbox" id="cek-verifikasi-serah" name="cek_verifikasi" />
+                                    Saya telah memverifikasi kepemilikan dan menyerahkan barang kepada penerima.
                                 </label>
                             </div>
                             <div class="aksi">
-                                <button
-                                    type="submit"
-                                    id="tombol-simpan-serah"
-                                    class="tombol tombol-kuning"
-                                >
-                                    Simpan catatan
-                                </button>
-                                <button
-                                    type="button"
-                                    id="batal-edit-serah"
-                                    class="tombol tombol-outline"
-                                    style="display: none"
-                                >
-                                    Batal edit
-                                </button>
+                                <button type="submit" id="tombol-simpan-serah" class="tombol tombol-kuning">Simpan catatan</button>
+                                <button type="button" id="batal-edit-serah" class="tombol tombol-outline" style="display: none">Batal edit</button>
                             </div>
                         </form>
                     </div>
 
                     <div class="kotak-daftar-serah">
                         <h2>Riwayat barang ini</h2>
-                        <p class="teks-abu">
-                            Catatan penerimaan dan pengembalian untuk barang yang dipilih.
-                        </p>
+                        <p class="teks-abu">Catatan penerimaan dan pengembalian untuk barang yang dipilih.</p>
                         <div id="riwayat-barang-serah" class="serah-list"></div>
                         <div id="kosong-riwayat-barang" class="serah-kosong" style="display: none">
                             Belum ada catatan serah terima untuk barang ini.
@@ -198,10 +123,7 @@
                     <div class="footer-merk">
                         <h3>ATLOF</h3>
                     </div>
-                    <p>
-                        Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang
-                        barang hilang dan ditemukan.
-                    </p>
+                    <p>Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang barang hilang dan ditemukan.</p>
                     <span class="teks-emas">Temukan kembali, bantu kembali.</span>
                 </div>
                 <div class="footer-menu">
@@ -215,10 +137,7 @@
                     <div>
                         <strong>Untuk Lingkungan Kampus</strong>
                         <p>Universitas Atma Jaya Yogyakarta</p>
-                        <small
-                            >Kontak pelapor melalui Microsoft Teams. Pengembalian barang dilakukan
-                            dengan verifikasi kepemilikan.</small
-                        >
+                        <small>Kontak pelapor melalui Microsoft Teams. Pengembalian barang dilakukan dengan verifikasi kepemilikan.</small>
                     </div>
                 </div>
             </div>

@@ -6,34 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Katalog - ATLOF</title>
         <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
-        <link
-            rel="preload"
-            href="fonts/IBMPlexSans-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="fonts/Poppins-400-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="fonts/IBMPlexMono-400-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="fonts/IBMPlexMono-600-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
+        <link rel="preload" href="fonts/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link rel="preload" href="fonts/Poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link rel="preload" href="fonts/IBMPlexMono-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link rel="preload" href="fonts/IBMPlexMono-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
         <link rel="stylesheet" type="text/css" href="css/style.css" />
     </head>
 
@@ -60,20 +36,12 @@
             <div class="container bagian katalog-page">
                 <div class="pengantar">
                     <h1>Cari barang hilang dan ditemukan</h1>
-                    <p class="subjudul">
-                        Telusuri laporan dari berbagai kampus UAJY dan gunakan filter untuk
-                        menemukan barang yang kamu cari.
-                    </p>
+                    <p class="subjudul">Telusuri laporan dari berbagai kampus UAJY dan gunakan filter untuk menemukan barang yang kamu cari.</p>
                 </div>
                 <form id="form-cari" class="pencarian" action="katalog.xhtml" method="get">
                     <label for="cari">Cari nama atau ciri barang</label>
                     <div class="baris-pencarian">
-                        <input id="cari" type="text" name="cari" /><button
-                            class="tombol tombol-kuning"
-                            type="submit"
-                        >
-                            Cari barang
-                        </button>
+                        <input id="cari" type="text" name="cari" /><button class="tombol tombol-kuning" type="submit">Cari barang</button>
                     </div>
                 </form>
                 <div class="layout-katalog">
@@ -121,20 +89,8 @@
                                 <option value="sudah_dikembalikan">Sudah dikembalikan</option>
                             </select>
                         </div>
-                        <button
-                            id="tombol-filter"
-                            type="button"
-                            class="tombol tombol-kuning lebar-penuh"
-                        >
-                            Terapkan filter
-                        </button>
-                        <button
-                            id="tombol-reset"
-                            type="button"
-                            class="tombol tombol-outline lebar-penuh"
-                        >
-                            Bersihkan filter
-                        </button>
+                        <button id="tombol-filter" type="button" class="tombol tombol-kuning lebar-penuh">Terapkan filter</button>
+                        <button id="tombol-reset" type="button" class="tombol tombol-outline lebar-penuh">Bersihkan filter</button>
                     </div>
                     <div class="daftar-barang">
                         <div class="judul-bagian">
@@ -144,9 +100,7 @@
                             </div>
                         </div>
                         <div id="semua-barang" class="grid-barang grid-katalog"></div>
-                        <p id="tidak-ada" class="kosong" style="display: none">
-                            Belum ada barang yang sesuai. Coba ubah kata kunci atau filter.
-                        </p>
+                        <p id="tidak-ada" class="kosong" style="display: none">Belum ada barang yang sesuai. Coba ubah kata kunci atau filter.</p>
                     </div>
                 </div>
             </div>
@@ -157,10 +111,7 @@
                     <div class="footer-merk">
                         <h3>ATLOF</h3>
                     </div>
-                    <p>
-                        Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang
-                        barang hilang dan ditemukan.
-                    </p>
+                    <p>Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang barang hilang dan ditemukan.</p>
                     <span class="teks-emas">Temukan kembali, bantu kembali.</span>
                 </div>
                 <div class="footer-menu">
@@ -174,10 +125,7 @@
                     <div>
                         <strong>Untuk Lingkungan Kampus</strong>
                         <p>Universitas Atma Jaya Yogyakarta</p>
-                        <small
-                            >Kontak pelapor melalui Microsoft Teams. Pengembalian barang dilakukan
-                            dengan verifikasi kepemilikan.</small
-                        >
+                        <small>Kontak pelapor melalui Microsoft Teams. Pengembalian barang dilakukan dengan verifikasi kepemilikan.</small>
                     </div>
                 </div>
             </div>

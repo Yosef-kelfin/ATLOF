@@ -78,12 +78,7 @@ function muatLaporanServer() {
         cache: 'no-store',
     })
         .then(function (hasil) {
-            if (
-                hasil.ok &&
-                hasil.data &&
-                hasil.data.status === 'success' &&
-                Array.isArray(hasil.data.data)
-            ) {
+            if (hasil.ok && hasil.data && hasil.data.status === 'success' && Array.isArray(hasil.data.data)) {
                 cacheLaporan = hasil.data.data;
                 simpanSesi('atlofCacheLaporan', cacheLaporan);
             }
@@ -100,12 +95,7 @@ function muatSerahServer() {
         cache: 'no-store',
     })
         .then(function (hasil) {
-            if (
-                hasil.ok &&
-                hasil.data &&
-                hasil.data.status === 'success' &&
-                Array.isArray(hasil.data.data)
-            ) {
+            if (hasil.ok && hasil.data && hasil.data.status === 'success' && Array.isArray(hasil.data.data)) {
                 cacheSerah = hasil.data.data;
                 simpanSesi('atlofCacheSerah', cacheSerah);
             }
@@ -131,9 +121,7 @@ var pesanTimer = null;
 function pesan(isi) {
     var kotak = ambil('pesan-global');
     if (!kotak) {
-        kotak = document.createElementNS
-            ? document.createElementNS('http://www.w3.org/1999/xhtml', 'div')
-            : document.createElement('div');
+        kotak = document.createElementNS ? document.createElementNS('http://www.w3.org/1999/xhtml', 'div') : document.createElement('div');
         kotak.id = 'pesan-global';
         kotak.title = 'Klik untuk menutup pesan';
         kotak.setAttribute('role', 'status');
@@ -401,10 +389,7 @@ function pasangHeaderAkun() {
     if (adalahAdmin()) {
         var daftarMenu = document.querySelector('.menu-links');
         if (daftarMenu) {
-            daftarMenu.innerHTML +=
-                '<a href="admin_cs.xhtml"' +
-                (sekarang == 'admin_cs.xhtml' ? ' class="aktif"' : '') +
-                '>Dashboard CS</a>';
+            daftarMenu.innerHTML += '<a href="admin_cs.xhtml"' + (sekarang == 'admin_cs.xhtml' ? ' class="aktif"' : '') + '>Dashboard CS</a>';
         }
     }
 }
@@ -417,9 +402,7 @@ function pasangTautanAkses() {
             var halaman = link.getAttribute('href') || '';
             if (
                 !sudahMasuk() &&
-                /^(katalog|detail|buat_laporan|edit_laporan|laporan_saya|profil|admin_cs|serah_terima|riwayat_serah_terima)\.xhtml/.test(
-                    halaman,
-                )
+                /^(katalog|detail|buat_laporan|edit_laporan|laporan_saya|profil|admin_cs|serah_terima|riwayat_serah_terima)\.xhtml/.test(halaman)
             ) {
                 link.onclick = function (event) {
                     event.preventDefault();
@@ -432,11 +415,7 @@ function pasangTautanAkses() {
 
 // Ubah teks pengguna menjadi teks aman sebelum dimasukkan ke innerHTML.
 function bersihkan(nilai) {
-    return String(nilai)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+    return String(nilai).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function namaKategori(kategori) {
@@ -455,8 +434,7 @@ function namaStatus(status) {
 
 // Satu kelas warna untuk semua status, dipakai kartu, detail, katalog, dan dashboard.
 function kelasStatus(status) {
-    if (status == 'sudah_dikembalikan' || status == 'dikembalikan' || status == 'selesai')
-        return 'selesai';
+    if (status == 'sudah_dikembalikan' || status == 'dikembalikan' || status == 'selesai') return 'selesai';
     if (status == 'sudah_ditemukan' || status == 'diterima') return 'diterima';
     return 'menunggu';
 }
@@ -676,11 +654,7 @@ if (ambil('form-login')) {
                 return;
             }
             if (akun.password != password) {
-                pesan(
-                    akun.role == 'admin_cs'
-                        ? 'Password akun CS tidak sesuai.'
-                        : 'Password tidak sesuai.',
-                );
+                pesan(akun.role == 'admin_cs' ? 'Password akun CS tidak sesuai.' : 'Password tidak sesuai.');
                 return;
             }
             if (akun.role == 'admin_cs') {
@@ -744,8 +718,7 @@ if (ambil('form-login')) {
                         });
                         sessionStorage.setItem('atlofMasuk', 'ya');
                         sessionStorage.setItem('atlofSesiServer', 'ya');
-                        window.location.href =
-                            data.redirect || (tujuan == 'admin_cs.xhtml' ? 'index.xhtml' : tujuan);
+                        window.location.href = data.redirect || (tujuan == 'admin_cs.xhtml' ? 'index.xhtml' : tujuan);
                     }
                 })
                 .catch(function () {
@@ -797,8 +770,7 @@ function filterBarang() {
     var daftar = semuaLaporan();
     for (var i = 0; i < daftar.length; i++) {
         var b = daftar[i];
-        if ((b.nama + ' ' + b.lokasi + ' ' + b.deskripsi).toLowerCase().indexOf(kata) == -1)
-            continue;
+        if ((b.nama + ' ' + b.lokasi + ' ' + b.deskripsi).toLowerCase().indexOf(kata) == -1) continue;
         if (jenis && b.jenis != jenis) continue;
         if (kategori && b.kategori != kategori) continue;
         if (lokasi && b.lokasi != lokasi) continue;
@@ -850,12 +822,7 @@ function tampilkanDetail() {
         teks('detail-status', namaStatus(detail.status));
         teks('detail-pelapor', 'Dilaporkan oleh ' + detail.pelapor);
         teks('detail-kategori', namaKategori(detail.kategori));
-        teks(
-            'detail-lokasi',
-            detail.detail_lokasi
-                ? namaKampus(detail.lokasi) + ' - ' + detail.detail_lokasi
-                : namaKampus(detail.lokasi),
-        );
+        teks('detail-lokasi', detail.detail_lokasi ? namaKampus(detail.lokasi) + ' - ' + detail.detail_lokasi : namaKampus(detail.lokasi));
         teks('detail-tanggal', detail.tanggal);
         teks('detail-simpan', namaKampus(detail.penyimpanan));
         teks('detail-deskripsi', detail.deskripsi);
@@ -898,26 +865,16 @@ function tampilkanDetail() {
                     );
                 }
             } else {
-                teks(
-                    'detail-info-kontak',
-                    'Barang ditangani oleh ' +
-                        namaKampus(detail.penyimpanan) +
-                        '. Nomor WhatsApp layanan belum tersedia.',
-                );
+                teks('detail-info-kontak', 'Barang ditangani oleh ' + namaKampus(detail.penyimpanan) + '. Nomor WhatsApp layanan belum tersedia.');
                 if (aturWa && adalahAdmin() && dataAkun().kampus_cs == lokasiCS) {
                     aturWa.style.display = 'inline-flex';
                 }
             }
         } else {
-            teks(
-                'detail-info-kontak',
-                'Hubungi pelapor untuk menanyakan informasi dan verifikasi barang.',
-            );
+            teks('detail-info-kontak', 'Hubungi pelapor untuk menanyakan informasi dan verifikasi barang.');
             if (timTeams) {
                 timTeams.textContent = 'Hubungi via Microsoft Teams';
-                timTeams.href = teams
-                    ? 'https://teams.microsoft.com/l/chat/0/0?users=' + encodeURIComponent(teams)
-                    : 'https://teams.microsoft.com/';
+                timTeams.href = teams ? 'https://teams.microsoft.com/l/chat/0/0?users=' + encodeURIComponent(teams) : 'https://teams.microsoft.com/';
                 timTeams.style.display = 'inline-flex';
             }
         }
@@ -925,9 +882,7 @@ function tampilkanDetail() {
             var nomorWhatsapp = telepon.replace(/[^0-9]/g, '');
             if (nomorWhatsapp.charAt(0) == '0') nomorWhatsapp = '62' + nomorWhatsapp.slice(1);
             var tautanWa = ambil('detail-whatsapp-link');
-            tautanWa.textContent = kontakPenemu
-                ? 'Hubungi penemu via WhatsApp'
-                : 'Hubungi via WhatsApp';
+            tautanWa.textContent = kontakPenemu ? 'Hubungi penemu via WhatsApp' : 'Hubungi via WhatsApp';
             tautanWa.href = 'https://wa.me/' + nomorWhatsapp;
             ambil('detail-whatsapp').style.display = 'flex';
         } else {
@@ -953,13 +908,7 @@ function pilihanStatus(b, awalan) {
     var isi = '<select id="' + awalan + b.id + '" title="Pilih status laporan">';
     for (var i = 0; i < pilihan.length; i++) {
         isi +=
-            '<option value="' +
-            pilihan[i][0] +
-            '"' +
-            (b.status == pilihan[i][0] ? ' selected="selected"' : '') +
-            '>' +
-            pilihan[i][1] +
-            '</option>';
+            '<option value="' + pilihan[i][0] + '"' + (b.status == pilihan[i][0] ? ' selected="selected"' : '') + '>' + pilihan[i][1] + '</option>';
     }
     return isi + '</select>';
 }
@@ -977,8 +926,7 @@ function perbaruiLaporanSaya() {
         var dititipCS = b.jenis == 'ditemukan' && b.penyimpanan.indexOf('CS Kampus ') == 0;
         isi += '<div class="kartu-kelola" id="kelola-' + b.id + '">' + buatKartu(b);
         if (dititipCS) {
-            isi +=
-                '<p class="catatan-status">Status pengembalian dikelola oleh CS tempat barang dititipkan.</p>';
+            isi += '<p class="catatan-status">Status pengembalian dikelola oleh CS tempat barang dititipkan.</p>';
         } else {
             isi +=
                 '<div class="pengaturan-status"><label for="status-' +
@@ -1089,11 +1037,7 @@ function tanggalBenar(input) {
     var bulan = Number(bagian[1]);
     var tahun = Number(bagian[2]);
     var tanggal = new Date(tahun, bulan - 1, hari);
-    return (
-        tanggal.getFullYear() == tahun &&
-        tanggal.getMonth() == bulan - 1 &&
-        tanggal.getDate() == hari
-    );
+    return tanggal.getFullYear() == tahun && tanggal.getMonth() == bulan - 1 && tanggal.getDate() == hari;
 }
 
 // Kalender sederhana dibuat dengan JavaScript agar cocok untuk XHTML 1.0 Strict.
@@ -1102,20 +1046,7 @@ function pasangKalender() {
 
     var bulanSaatIni = new Date().getMonth();
     var tahunSaatIni = new Date().getFullYear();
-    var namaBulan = [
-        'Januari',
-        'Februari',
-        'Maret',
-        'April',
-        'Mei',
-        'Juni',
-        'Juli',
-        'Agustus',
-        'September',
-        'Oktober',
-        'November',
-        'Desember',
-    ];
+    var namaBulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     var kalender = ambil('kotak-kalender');
     var input = ambil('tanggal');
 
@@ -1139,12 +1070,7 @@ function pasangKalender() {
             isi += '<span class="tanggal-kosong"></span>';
         }
         for (var hari = 1; hari <= jumlahHari; hari++) {
-            isi +=
-                '<button type="button" class="pilih-hari" value="' +
-                hari +
-                '">' +
-                hari +
-                '</button>';
+            isi += '<button type="button" class="pilih-hari" value="' + hari + '">' + hari + '</button>';
         }
         ambil('hari-kalender').innerHTML = isi;
 
@@ -1152,8 +1078,7 @@ function pasangKalender() {
         for (var j = 0; j < tombolHari.length; j++) {
             tombolHari[j].onclick = function () {
                 var hariDipilih = Number(this.value);
-                input.value =
-                    duaAngka(hariDipilih) + '-' + duaAngka(bulanSaatIni + 1) + '-' + tahunSaatIni;
+                input.value = duaAngka(hariDipilih) + '-' + duaAngka(bulanSaatIni + 1) + '-' + tahunSaatIni;
                 kalender.style.display = 'none';
             };
         }
@@ -1218,8 +1143,7 @@ function aturFormLaporan(idForm) {
     }
 
     function aturLokasiLainnya() {
-        ambil('wadah-detail-lokasi').style.display =
-            ambil('lokasi').value == 'Lainnya' ? 'block' : 'none';
+        ambil('wadah-detail-lokasi').style.display = ambil('lokasi').value == 'Lainnya' ? 'block' : 'none';
     }
 
     tombolJenis[0].onchange = aturPilihan;
@@ -1249,10 +1173,7 @@ function aturFormLaporan(idForm) {
     if (adalahAdmin()) {
         var akunCs = dataAkun();
         if (idForm == 'form-laporan') ambil('telepon').value = akunCs.telepon || '';
-        teks(
-            'bantuan-telepon',
-            'Masukkan nomor WhatsApp layanan CS. Nomor akan ditampilkan di halaman detail laporan.',
-        );
+        teks('bantuan-telepon', 'Masukkan nomor WhatsApp layanan CS. Nomor akan ditampilkan di halaman detail laporan.');
     }
 
     form.onsubmit = function (event) {
@@ -1265,14 +1186,7 @@ function aturFormLaporan(idForm) {
         var deskripsi = ambil('deskripsi').value.trim();
         var penyimpanan = jenis == 'ditemukan' ? ambil('penyimpanan').value : '-';
         var foto = ambil('foto').files[0];
-        if (
-            !nama ||
-            !kategori ||
-            !tanggalBenar(tanggal) ||
-            !lokasi ||
-            !deskripsi ||
-            (jenis == 'ditemukan' && !penyimpanan)
-        ) {
+        if (!nama || !kategori || !tanggalBenar(tanggal) || !lokasi || !deskripsi || (jenis == 'ditemukan' && !penyimpanan)) {
             pesan('Lengkapi formulir dan pilih tanggal kejadian dari kalender.');
             return;
         }
@@ -1326,11 +1240,7 @@ function aturFormLaporan(idForm) {
             kategori: kategori,
             tanggal: tanggal,
             lokasi: lokasi,
-            status: dataEdit
-                ? dataEdit.status
-                : jenis == 'hilang'
-                  ? 'masih_dicari'
-                  : 'belum_dikembalikan',
+            status: dataEdit ? dataEdit.status : jenis == 'hilang' ? 'masih_dicari' : 'belum_dikembalikan',
             penyimpanan: penyimpanan,
             detail_lokasi: ambil('detail-lokasi').value.trim(),
             status_cs:
@@ -1552,8 +1462,7 @@ function daftarBarangCS() {
     if (!adalahAdmin()) return hasil;
     var lokasi = 'CS ' + dataAkun().kampus_cs;
     for (var i = 0; i < daftar.length; i++) {
-        if (daftar[i].jenis == 'ditemukan' && daftar[i].penyimpanan == lokasi)
-            hasil.push(daftar[i]);
+        if (daftar[i].jenis == 'ditemukan' && daftar[i].penyimpanan == lokasi) hasil.push(daftar[i]);
     }
     return hasil;
 }
@@ -1693,11 +1602,7 @@ function cariCatatan(id) {
 
 function adaCatatan(daftar, idLaporan, jenis, kecualiId) {
     for (var i = 0; i < daftar.length; i++) {
-        if (
-            daftar[i].id_laporan == idLaporan &&
-            daftar[i].jenis == jenis &&
-            daftar[i].id != kecualiId
-        ) {
+        if (daftar[i].id_laporan == idLaporan && daftar[i].jenis == jenis && daftar[i].id != kecualiId) {
             return true;
         }
     }
@@ -1832,43 +1737,26 @@ function tampilkanHalamanSerah() {
     var daftar = riwayatUntukBarang(idSerahSekarang);
     var berikutnya = jenisBerikutnyaSerah(daftar);
     var statusTampil =
-        berikutnya === 'penerimaan'
-            ? 'Menunggu pencatatan penerimaan'
-            : berikutnya === 'pengembalian'
-              ? 'Diterima CS'
-              : 'Sudah dikembalikan';
-    var kelasStatus =
-        berikutnya === 'penerimaan'
-            ? 'menunggu'
-            : berikutnya === 'pengembalian'
-              ? 'diterima'
-              : 'selesai';
+        berikutnya === 'penerimaan' ? 'Menunggu pencatatan penerimaan' : berikutnya === 'pengembalian' ? 'Diterima CS' : 'Sudah dikembalikan';
+    var kelasStatus = berikutnya === 'penerimaan' ? 'menunggu' : berikutnya === 'pengembalian' ? 'diterima' : 'selesai';
     teks('serah-status', statusTampil);
     ambil('serah-status').className = 'serah-status ' + kelasStatus;
     ambil('serah-status-badge').className = 'serah-status-badge ' + kelasStatus;
     ambil('serah-status-badge').textContent =
-        berikutnya === 'penerimaan'
-            ? 'Menunggu penerimaan'
-            : berikutnya === 'pengembalian'
-              ? 'Sudah diterima CS'
-              : 'Sudah dikembalikan';
+        berikutnya === 'penerimaan' ? 'Menunggu penerimaan' : berikutnya === 'pengembalian' ? 'Sudah diterima CS' : 'Sudah dikembalikan';
     ambil('kotak-form-serah').style.display = berikutnya === 'selesai' ? 'none' : 'block';
 
     // Saat penerimaan dan pengembalian sudah lengkap, form disembunyikan.
     // Panel riwayat lalu memakai lebar penuh agar dua kartu tetap lega.
     var layoutSerah = document.querySelector('.layout-serah-baru');
     if (layoutSerah) {
-        layoutSerah.className =
-            berikutnya === 'selesai' ? 'layout-serah-baru tanpa-form' : 'layout-serah-baru';
+        layoutSerah.className = berikutnya === 'selesai' ? 'layout-serah-baru tanpa-form' : 'layout-serah-baru';
     }
 
     if (berikutnya !== 'selesai') {
         ambil('form-serah-baru').reset();
         ambil('id-catatan-edit-baru').value = '';
-        teks(
-            'judul-form-serah-baru',
-            berikutnya === 'penerimaan' ? 'Catat penerimaan barang' : 'Catat pengembalian barang',
-        );
+        teks('judul-form-serah-baru', berikutnya === 'penerimaan' ? 'Catat penerimaan barang' : 'Catat pengembalian barang');
         teks(
             'keterangan-form-serah',
             berikutnya === 'penerimaan'
@@ -1877,12 +1765,8 @@ function tampilkanHalamanSerah() {
         );
         ambil('jenis-serah-tampil').value = namaJenisSerah(berikutnya);
         teks('label-pihak-serah', berikutnya === 'penerimaan' ? 'Nama penyerah' : 'Nama penerima');
-        teks(
-            'tombol-simpan-serah',
-            'Simpan ' + (berikutnya === 'penerimaan' ? 'penerimaan' : 'pengembalian'),
-        );
-        ambil('konfirmasi-kembali').style.display =
-            berikutnya === 'pengembalian' ? 'block' : 'none';
+        teks('tombol-simpan-serah', 'Simpan ' + (berikutnya === 'penerimaan' ? 'penerimaan' : 'pengembalian'));
+        ambil('konfirmasi-kembali').style.display = berikutnya === 'pengembalian' ? 'block' : 'none';
         ambil('batal-edit-serah').style.display = 'none';
         idCatatanEditSerah = 0;
     }
@@ -1933,15 +1817,9 @@ function mulaiEditSerah(idCatatan) {
     ambil('jenis-serah-tampil').value = namaJenisSerah(catatan.jenis);
     ambil('nama-pihak-serah').value = catatan.nama_pihak;
     ambil('keterangan-serah-baru').value = catatan.catatan || '';
-    teks(
-        'judul-form-serah-baru',
-        'Edit catatan ' + (catatan.jenis === 'penerimaan' ? 'penerimaan' : 'pengembalian'),
-    );
+    teks('judul-form-serah-baru', 'Edit catatan ' + (catatan.jenis === 'penerimaan' ? 'penerimaan' : 'pengembalian'));
     teks('label-pihak-serah', catatan.jenis === 'penerimaan' ? 'Nama penyerah' : 'Nama penerima');
-    teks(
-        'keterangan-form-serah',
-        'Perbaiki nama pihak atau keterangan. Jenis transaksi dan barang tidak bisa diubah.',
-    );
+    teks('keterangan-form-serah', 'Perbaiki nama pihak atau keterangan. Jenis transaksi dan barang tidak bisa diubah.');
     teks('tombol-simpan-serah', 'Simpan perubahan');
     ambil('konfirmasi-kembali').style.display = 'none';
     ambil('batal-edit-serah').style.display = 'inline-block';
@@ -2039,13 +1917,10 @@ function siapkanHalamanSerah() {
                     return;
                 }
                 if (jenis === 'pengembalian' && !ambil('cek-verifikasi-serah').checked) {
-                    pesan(
-                        'Centang konfirmasi verifikasi kepemilikan sebelum mencatat pengembalian.',
-                    );
+                    pesan('Centang konfirmasi verifikasi kepemilikan sebelum mencatat pengembalian.');
                     return;
                 }
-                if (!confirm('Simpan catatan ' + namaJenisSerah(jenis).toLowerCase() + ' ini?'))
-                    return;
+                if (!confirm('Simpan catatan ' + namaJenisSerah(jenis).toLowerCase() + ' ini?')) return;
                 dataKirim.append('laporan_id', idSerahSekarang);
                 if (ambil('cek-verifikasi-serah').checked) {
                     dataKirim.append('cek_verifikasi', '1');
@@ -2140,10 +2015,7 @@ function tampilkanRiwayatCS() {
         return Number(b.id) - Number(a.id);
     });
     teks('jumlah-riwayat-cs', hasil.length + ' dari ' + seluruh.length + ' catatan');
-    teks(
-        'keterangan-riwayat-cs',
-        'Riwayat penerimaan dan pengembalian di ' + namaKampus(dataAkun().kampus_cs) + '.',
-    );
+    teks('keterangan-riwayat-cs', 'Riwayat penerimaan dan pengembalian di ' + namaKampus(dataAkun().kampus_cs) + '.');
 
     var jumlahHalaman = Math.max(1, Math.ceil(hasil.length / jumlahRiwayatPerHalaman));
     if (halamanRiwayatCS > jumlahHalaman) halamanRiwayatCS = jumlahHalaman;
@@ -2176,10 +2048,7 @@ function tampilkanRiwayatCS() {
             '</span>' +
             '</div>' +
             '<div class="serah-meta">' +
-            metaSerah(
-                catatan.jenis === 'penerimaan' ? 'Penyerah' : 'Penerima',
-                catatan.nama_pihak,
-            ) +
+            metaSerah(catatan.jenis === 'penerimaan' ? 'Penyerah' : 'Penerima', catatan.nama_pihak) +
             metaSerah('Petugas', catatan.petugas) +
             (catatan.catatan ? metaSerah('Keterangan', catatan.catatan, true) : '') +
             '</div>' +
@@ -2189,8 +2058,7 @@ function tampilkanRiwayatCS() {
     }
     ambil('daftar-riwayat-cs').innerHTML = html;
     ambil('riwayat-cs-kosong').style.display = hasil.length ? 'none' : 'block';
-    ambil('halaman-riwayat-cs').style.display =
-        hasil.length > jumlahRiwayatPerHalaman ? 'flex' : 'none';
+    ambil('halaman-riwayat-cs').style.display = hasil.length > jumlahRiwayatPerHalaman ? 'flex' : 'none';
     teks('info-halaman-riwayat', 'Halaman ' + halamanRiwayatCS + ' dari ' + jumlahHalaman);
     ambil('riwayat-sebelumnya').disabled = halamanRiwayatCS === 1;
     ambil('riwayat-berikutnya').disabled = halamanRiwayatCS === jumlahHalaman;

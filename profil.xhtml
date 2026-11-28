@@ -6,34 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Profil - ATLOF</title>
         <link rel="icon" type="image/svg+xml" href="images/logo-atlof-ikon.svg" />
-        <link
-            rel="preload"
-            href="fonts/IBMPlexSans-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="fonts/Poppins-400-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="fonts/IBMPlexMono-400-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
-        <link
-            rel="preload"
-            href="fonts/IBMPlexMono-600-latin.woff2"
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-        />
+        <link rel="preload" href="fonts/IBMPlexSans-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link rel="preload" href="fonts/Poppins-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link rel="preload" href="fonts/IBMPlexMono-400-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+        <link rel="preload" href="fonts/IBMPlexMono-600-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
         <link rel="stylesheet" type="text/css" href="css/style.css" />
     </head>
 
@@ -68,97 +44,44 @@
                             <div>
                                 <h2 id="nama-profil">Pengguna ATLOF</h2>
                                 <p id="email-profil">Email akun</p>
-                                <span
-                                    id="label-peran-profil"
-                                    class="label-peran"
-                                    style="display: none"
-                                    >Admin CS</span
-                                >
+                                <span id="label-peran-profil" class="label-peran" style="display: none">Admin CS</span>
                             </div>
                         </div>
                         <div id="data-profil" class="profil-identitas">
-                            <div class="detail-identitas">
-                                <span>Nama lengkap</span><strong id="info-nama">-</strong>
-                            </div>
-                            <div class="detail-identitas">
-                                <span>Email akun</span><strong id="info-email">-</strong>
-                            </div>
-                            <div class="detail-identitas">
-                                <span>Microsoft Teams</span
-                                ><strong id="info-teams" class="nilai-kosong">-</strong>
-                            </div>
-                            <div
-                                id="identitas-admin"
-                                class="detail-identitas"
-                                style="display: none"
-                            >
+                            <div class="detail-identitas"><span>Nama lengkap</span><strong id="info-nama">-</strong></div>
+                            <div class="detail-identitas"><span>Email akun</span><strong id="info-email">-</strong></div>
+                            <div class="detail-identitas"><span>Microsoft Teams</span><strong id="info-teams" class="nilai-kosong">-</strong></div>
+                            <div id="identitas-admin" class="detail-identitas" style="display: none">
                                 <span>Lokasi pelayanan</span><strong id="info-kampus-cs">-</strong>
                             </div>
                             <div id="identitas-wa" class="detail-identitas" style="display: none">
-                                <span>WhatsApp layanan</span
-                                ><strong id="info-telepon" class="nilai-kosong">Belum diisi</strong>
+                                <span>WhatsApp layanan</span><strong id="info-telepon" class="nilai-kosong">Belum diisi</strong>
                             </div>
                         </div>
                         <div class="aksi profil-tombol" id="profil-tombol">
-                            <button
-                                type="button"
-                                id="tombol-edit-profil"
-                                class="tombol tombol-kuning"
-                            >
-                                Ubah profil</button
-                            ><button
-                                type="button"
-                                id="tombol-ganti-password"
-                                class="tombol tombol-outline"
-                            >
-                                Ubah password</button
-                            ><button type="button" id="tombol-logout" class="tombol tombol-bahaya">
-                                Keluar
-                            </button>
+                            <button type="button" id="tombol-edit-profil" class="tombol tombol-kuning">Ubah profil</button
+                            ><button type="button" id="tombol-ganti-password" class="tombol tombol-outline">Ubah password</button
+                            ><button type="button" id="tombol-logout" class="tombol tombol-bahaya">Keluar</button>
                         </div>
-                        <form
-                            id="form-profil"
-                            class="panel-form"
-                            action="#"
-                            method="post"
-                            style="display: none"
-                        >
+                        <form id="form-profil" class="panel-form" action="#" method="post" style="display: none">
                             <h3>Edit informasi profil</h3>
-                            <div class="field">
-                                <label for="nama">Nama lengkap</label
-                                ><input type="text" id="nama" />
-                            </div>
-                            <div class="field">
-                                <label for="email">Email akun</label
-                                ><input type="text" id="email" readonly="readonly" />
-                            </div>
-                            <div class="field">
-                                <label for="teams">Kontak Microsoft Teams</label
-                                ><input type="text" id="teams" />
-                            </div>
+                            <div class="field"><label for="nama">Nama lengkap</label><input type="text" id="nama" /></div>
+                            <div class="field"><label for="email">Email akun</label><input type="text" id="email" readonly="readonly" /></div>
+                            <div class="field"><label for="teams">Kontak Microsoft Teams</label><input type="text" id="teams" /></div>
                             <div class="field" id="form-nomor-cs" style="display: none">
                                 <label for="nomor-cs">WhatsApp layanan CS</label>
                                 <input type="text" id="nomor-cs" name="nomor-cs" />
                                 <p class="bantuan">
-                                    Nomor ini ditampilkan sebagai kontak CS untuk barang yang
-                                    dititipkan pada kampusmu. Gunakan nomor layanan yang diizinkan.
+                                    Nomor ini ditampilkan sebagai kontak CS untuk barang yang dititipkan pada kampusmu. Gunakan nomor layanan yang
+                                    diizinkan.
                                 </p>
                             </div>
                             <div class="aksi">
-                                <button class="tombol tombol-kuning" type="submit">
-                                    Simpan profil</button
-                                ><button class="tombol tombol-outline batal-profil" type="button">
-                                    Batal
-                                </button>
+                                <button class="tombol tombol-kuning" type="submit">Simpan profil</button
+                                ><button class="tombol tombol-outline batal-profil" type="button">Batal</button>
                             </div>
                         </form>
-                        <form
-                            id="form-password"
-                            class="panel-form"
-                            action="#"
-                            method="post"
-                            style="display: none"
-                        >
+                        <form id="form-password" class="panel-form" action="#" method="post" style="display: none">
                             <h3>Ubah password</h3>
                             <div class="field">
                                 <label for="password-lama">Password sekarang</label>
@@ -248,11 +171,8 @@
                                 </div>
                             </div>
                             <div class="aksi">
-                                <button class="tombol tombol-kuning" type="submit">
-                                    Perbarui password</button
-                                ><button class="tombol tombol-outline batal-profil" type="button">
-                                    Batal
-                                </button>
+                                <button class="tombol tombol-kuning" type="submit">Perbarui password</button
+                                ><button class="tombol tombol-outline batal-profil" type="button">Batal</button>
                             </div>
                         </form>
                     </div>
@@ -265,10 +185,7 @@
                     <div class="footer-merk">
                         <h3>ATLOF</h3>
                     </div>
-                    <p>
-                        Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang
-                        barang hilang dan ditemukan.
-                    </p>
+                    <p>Atma Lost &amp; Found membantu warga kampus saling berbagi informasi tentang barang hilang dan ditemukan.</p>
                     <span class="teks-emas">Temukan kembali, bantu kembali.</span>
                 </div>
                 <div class="footer-menu">
@@ -282,10 +199,7 @@
                     <div>
                         <strong>Untuk Lingkungan Kampus</strong>
                         <p>Universitas Atma Jaya Yogyakarta</p>
-                        <small
-                            >Kontak pelapor melalui Microsoft Teams. Pengembalian barang dilakukan
-                            dengan verifikasi kepemilikan.</small
-                        >
+                        <small>Kontak pelapor melalui Microsoft Teams. Pengembalian barang dilakukan dengan verifikasi kepemilikan.</small>
                     </div>
                 </div>
             </div>
